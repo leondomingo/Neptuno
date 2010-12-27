@@ -1,0 +1,219 @@
+.CampoSeleccionado
+{
+	float: left;
+	width: 200px;
+}
+
+.Seleccionado
+{
+	display:none;
+}
+
+.CampoSelector 
+{
+	min-height:30px;
+	clear:both;
+}
+
+.CajaSelector
+{
+	float: left;
+	clear: both;
+	width: 100%;
+}
+
+.LineaSelector .AreaTexto
+{
+	width:400px;
+	height:100px;
+	border: 1px solid #615959;
+}
+
+.LineaSelector .Texto
+{
+	border: 1px solid #615959;
+}
+
+.LineaSelector .Texto:focus, .LineaSelector .Texto:active, .LineaSelector .AreaTexto:focus, .LineaSelector .AreaTexto:active
+{
+	border: 1px solid #EE7744;
+}
+
+
+
+.CampoSelector .Selector
+{
+	margin-left:22%;	
+	min-height:40px;
+	margin-bottom:30px;
+}
+
+
+.FilaCabeceraResultado
+{
+	float: left;
+	width:100%;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	font-weight: bold;
+}
+
+.CabeceraResultado
+{
+	float: left;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	font-weight: bold;
+	width:130px;
+	height:100%;
+}
+
+.FilaResultado
+{
+	float: left;
+	width:100%;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	
+}
+
+.FilaResultado:hover
+{
+	/*background-color:#AAAAAA; */
+}
+
+.ColumnaResultado
+{
+	float: left;
+	width: 20%;
+	height:100%;
+	overflow:hidden;
+  min-height:20px;
+	width:130px;
+	overflow:hidden;
+	
+	border-top:1px solid #d1d1d1;
+	margin:0;
+	padding:0;
+	padding-top:5px;
+	padding-bottom:5px;
+	font-size:11px;
+}
+
+.abrirNuevaPestanya
+{
+	text-align:center;
+	width:60px;
+}
+
+.AccionActiva
+{
+	margin-top:10px;
+	margin-bottom:10px;
+	float:left;
+	border: 1px solid #615959;
+	padding:15px;
+	width:95% !important;
+	display:none;
+}
+
+.CampoSelector
+{
+	margin-bottom:3px;
+}
+
+.LineaSelector .Selector
+{
+	padding-left:107px;
+}
+
+.LabelSelector
+{
+	Float:left; 
+	width:20%;
+	overflow:hidden;
+	text-align:right;
+	margin-top:3px;
+	margin-right:3px;
+	min-height:40px;
+}
+
+.LineaSelector .selectorEnder
+{
+  min-width:200px;
+}
+
+.LineaSelector
+{
+	Float:left;
+	margin-bottom:20px;
+	margin-left:20px;
+	max-width:75%;
+	min-width:5%;
+}
+
+.BotonBuscarPersonal, .BotonBuscarPersonal, .BotonCrearPersonal, .BotonCrearPersonal  
+{
+	color:#000000;
+}
+
+.CajaSelector a, .CajaSelector a:visited 
+{
+	color:#000000;
+}
+
+.ResultadoBusqueda
+{
+	margin-top:10px;
+	margin-bottom:10px;
+	padding-left:4px;
+}
+
+
+.ColumnaSeleccionar
+{
+	text-decoration:underline;
+}
+
+
+.textoResultados
+{
+	margin-top:5px;
+	width:95%;
+	float:left;
+	border-bottom:1px solid #D1D1D1;
+	background-color:#F0F7F9;
+	font-size:10px;
+	clear:both;
+}
+
+.enlacesNavegacion
+{
+	float:left;
+	width:100%;
+	font-size:10px;
+}
+
+.addCampo
+{
+	float:left;
+	height:10px;
+	width:100%;
+	clear:both;
+	font-size:10px;
+}
+
+.CajaImprimirResultados
+{
+	display:none;
+}
+
+.sinresultados
+{
+	font-size:11px;	
+}
+
+.CajaBusqueda input
+{
+  border:1px solid #333;
+}

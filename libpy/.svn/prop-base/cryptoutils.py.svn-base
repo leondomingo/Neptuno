@@ -1,0 +1,13 @@
+K 14
+svn:executable
+V 1
+*
+K 13
+svn:mergeinfo
+V 301
+/Neptuno/Branches/Dev/libpy/cryptoutils.py:17355-19885
+/Neptuno/Branches/DevSw/libpy/cryptoutils.py:18788-18837
+/Neptuno/Branches/Devpg_fb/libpy/implementation/CryptoUtils.py:17578-17781
+/Neptuno/Dev/libpy/implementation/CryptoUtils.py:17576
+/Neptuno/Devpg_fb/libpy/implementation/CryptoUtils.py:17577
+END

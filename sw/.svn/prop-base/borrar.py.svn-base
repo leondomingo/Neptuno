@@ -1,0 +1,12 @@
+K 14
+svn:executable
+V 1
+*
+K 13
+svn:mergeinfo
+V 178
+/Neptuno/Branches/DevSw/sw/borrar.py:18788-18837
+/Neptuno/Branches/Devpg_fb/libpy/borrar.py:17578-17781
+/Neptuno/Dev/libpy/borrar.py:17576
+/Neptuno/Devpg_fb/libpy/borrar.py:17577
+END

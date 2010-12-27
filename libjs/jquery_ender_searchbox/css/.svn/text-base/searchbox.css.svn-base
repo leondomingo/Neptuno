@@ -1,0 +1,14 @@
+.TituloSelector
+{
+	font-weight:bold;
+}
+
+.busqueda:focus, .busqueda:active
+{
+	border:1px solid #EE7744;
+}
+
+.busqueda
+{
+	border:0.5px solid black;
+}

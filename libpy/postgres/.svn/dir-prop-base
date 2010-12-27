@@ -1,0 +1,13 @@
+K 10
+svn:ignore
+V 6
+*.pyc
+
+K 13
+svn:mergeinfo
+V 222
+/Neptuno/Branches/DevSw/libpy/postgres:18788-18837
+/Neptuno/Branches/Devpg_fb/libpy/implementation/postgres:17578-17781
+/Neptuno/Dev/libpy/implementation/postgres:17576
+/Neptuno/Devpg_fb/libpy/implementation/postgres:17577
+END

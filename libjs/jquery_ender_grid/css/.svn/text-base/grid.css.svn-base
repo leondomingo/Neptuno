@@ -1,0 +1,10 @@
+.navegacionResultados
+{
+    display:none;
+    font-weight:bold;
+}
+.anterior, .siguiente
+{
+	float:left;
+	width:80px;
+}

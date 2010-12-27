@@ -1,0 +1,43 @@
+.Detalles
+{
+    display:none;
+}
+
+.Seleccionado
+{
+    border:none;
+    max-width:none;
+    padding-left:0px;
+}
+
+.LabelSeleccionado
+{
+    width:49% !important;
+}
+
+.DetallesRegistro
+{
+    float:right;
+    width:100%;
+}
+
+.Acciones
+{
+    width:100%;
+    margin-top:10px;
+}
+
+.LineaSeleccionado
+{
+    padding: 0px !important;
+}
+
+.LabelSeleccinado
+{
+    margin-left:0px;
+}
+
+.EnlaceClases
+{
+    height:16px;
+}

@@ -1,0 +1,411 @@
+<script type="text/javascript">
+
+	/**************************************************************************
+	@function BuscarRegistro
+	@param {Event} event
+	@param {Boolean} exportar
+	@param {Object} selector
+	**************************************************************************/
+	function BuscarRegistro(event, exportar, selector)
+	{
+		if(!selector)
+		{
+			var selector=( exportar ? selector : $(this).parent().parent() );
+		}
+		var n_resultados = 50;
+		neptuno.logconsola.Log("BuscarRegistro::"+selector.attr('id'));
+		selector.find(".AccionActiva").fadeOut();		
+		
+		var usuarioNeptuno=neptuno.obtenerusuarioNeptuno();
+		var cajabusqueda=selector.find('.CajaBusqueda:first');
+		//var TerminoBusqueda=( exportar ? selector.attr('busqueda') : cajabusqueda.find(".busqueda").val() );
+		var TerminoBusqueda= cajabusqueda.find(".busqueda").val() ;
+		var nombretabla = selector.attr('tabla');
+		
+		var cajaresultados= selector.find('.ResultadoBusqueda:first');
+		
+		if(TerminoBusqueda=='')
+		{
+			cajabusqueda.find(".busqueda").val("*");
+			TerminoBusqueda="*";
+		}
+		
+		// Esta variable va a guardar el contenido de la última búsqueda
+		selector.attr('busqueda', TerminoBusqueda);
+		selector.find(".AccionActiva").fadeOut();
+
+		// Solo añadimos el resultado que indica el número de resultados,
+		// la primera vez.
+		var cuentaResultados=false;
+		
+		/*if( neptuno.getAttrData(selector.attr("id"), "pos")==0) 
+		{
+			neptuno.cntMsgs.Show("Buscando el término "+TerminoBusqueda+" en el selector "+selector.find('.TituloSelector').html() );
+			n_resultados='numero_resultados=true';
+			cuentaResultados=true;
+		}
+		else
+		{
+			n_resultados='';
+		}*/
+
+		var webservice="/neptuno/sw/buscar.py";
+		
+		if( neptuno.getAttrData(selector.attr("id"), "webservice")!=null )
+		{
+			webservice=neptuno.getAttrData(selector.attr("id"), "webservice");
+			n_resultados= '&'+n_resultados;
+		}
+		else
+		{
+		//	n_resultados = '?'+n_resultados; 
+		}
+		
+		// Parámetros por defecto
+		var campofiltrado = selector.attr('campofiltrado');
+		var valorfiltrado = selector.attr('valorfiltrado');
+		
+		
+		var data={};
+		if( neptuno.getAttrData(selector.attr("id"), "pos")==0)
+		{
+			data.n_resultados = true;
+		}
+		data.busqueda=TerminoBusqueda;
+		data.tabla=nombretabla;
+		
+		if (campofiltrado != null && campofiltrado != '' && campofiltrado != 'null') 
+		{
+			
+			data.valorfiltrado = valorfiltrado;
+			data.campofiltrado = campofiltrado;
+			data.campos = '[["' + campofiltrado + '","' + valorfiltrado + '"]]';
+		}
+		
+		/* Autenticación */
+		data.id_usuario=usuarioNeptuno.id;
+		data.id_sesion=usuarioNeptuno.challenge;
+
+		/* Navegación sobre los resultados */
+		data.limite_resultados=neptuno.getAttrData(selector.attr("id"), "maxResults");
+		data.pos=neptuno.getAttrData(selector.attr("id"), "pos");
+		data.generar_csv="False";
+
+		if(data.pos>0)
+		{
+			data.numero_resultados="false";
+		}
+
+		neptuno.logconsola.Log("BuscarRegistro "+data.limite_resultados+", "+data.pos);
+
+		if(exportar)
+		{
+			data.generar_csv="True";
+		}
+		
+		var extraparams=neptuno.getAttrDataObject(selector.attr("id"), "extraparams");
+
+		// recorremos los 'extraparams' y los agregamos a data
+		if( extraparams!=null )
+		{
+			for(var i=0;i<extraparams.length;i++)
+			{
+				var objeto=extraparams[i];
+				eval('data.'+objeto.clave+'=\''+objeto.valor+'\'');
+			} // for
+		}
+		
+		if(!exportar)
+		{
+			// No queremos mostrar siempre la barra de progreso, solo cuando la pos es 0
+			if(data.pos==0)
+			{
+				InicializaBarraProgreso();
+			}
+
+			
+			$.ajax({
+				url: webservice,
+				cache:false,
+				data: data, 
+				async : false,
+				campofiltrado:campofiltrado,
+				valorfiltrado:valorfiltrado,				
+				busqueda:TerminoBusqueda,
+				success:
+					function(respuesta)
+					{
+						
+						/*
+							Todo: Comprobar los posibles conflictos que pueda devolver el valor a true para
+							actualizar las acciones de los resultados de la búsqueda.
+						*/
+					       if(data.pos==0)
+					       {
+							CierraBarraProgreso();
+						}
+						
+						if(!exportar)
+						{
+							selector.Log('Llamando a procesarresultadobusqueda' );
+							//ProcesarResultadoBusqueda(selector, respuesta, cuentaResultados, true);
+							ProcesarResultadoBusqueda(selector, respuesta, true, true);
+						}
+						else
+						{
+						}
+					},
+				error:
+					function(respuesta)
+					{
+						CierraBarraProgreso();
+						selector.MuestraMensajeError(respuesta, "La búsqueda ha devuelto un error");
+					}
+				});
+		}
+		else
+		{
+			//webservice += '?campofiltrado'+campofiltrado+'&valorfiltrado='+valorfiltrado+'&busqueda='+TerminoBusqueda;
+			//alert(data.busqueda); 
+      neptuno.logconsola.MostrarObjeto(data);
+      neptuno.logconsola.Log(webservice+'?'+jQuery.param(data));
+      window.open(webservice+'?'+jQuery.param(data),'informe');
+      //$.download(webservice+'?'+jQuery.param(data),null, 'get');
+		}
+		
+	} // BuscarRegistro
+
+
+	/**************************************************************************
+		SeleccionarRegistro
+	**************************************************************************/
+	function SeleccionarRegistro()
+	{
+		var selector=$(this).parent().parent().parent().parent();
+		
+		selector.AsignarRegistro($(this).parent().attr('idSeleccionadoBusqueda'));
+		selector.find('.ResultadoBusqueda:first').fadeOut();		
+	} // SeleccionarRegistro
+
+	/**************************************************************************
+		CrearRegistro
+	**************************************************************************/
+	function CrearRegistro() 
+	{
+		$(this).parent().parent().find('.AccionActiva').attr('idRegistro', '-1');
+		$(this).parent().parent().parent().find('.ResultadoBusqueda:first').fadeOut();
+		$(this).parent().parent().EditarRegistro();		
+	} // CrearRegistro
+
+	
+	/**************************************************************************
+	* @function cambiaPosicion
+	* @param {Integer} siguiente
+	**************************************************************************/
+	function cambiaPosicion(idSelector, siguiente)
+	{
+		var selector=$("#"+idSelector);
+
+
+		neptuno.logconsola.Clear();
+		neptuno.logconsola.Log("cambiaPosicion::"+siguiente+" selector #"+selector.attr('id'));
+
+		var cajaresultados=selector.find(".ResultadoBusqueda");
+		var cajabusqueda=selector.find(".CajaBusqueda");
+
+		cajaresultados.find('.resultados').html('');;
+
+		var numero_resultados=neptuno.getAttrData(selector.attr("id"), "numero_resultados");
+		var maxResults=parseInt(neptuno.getAttrData(selector.attr("id"), "maxResults"));
+		var pos=parseInt(neptuno.getAttrData(selector.attr("id"), "pos"));
+
+		neptuno.logconsola.Log("cambiaPosicion::valores anteriores "+numero_resultados+" "+maxResults+" "+pos);
+		
+		var bloqueSiguiente=cajaresultados.find('.siguiente');
+		var bloqueAnterior=cajaresultados.find('.anterior');
+		
+		bloqueSiguiente.fadeIn();
+		bloqueAnterior.fadeIn();
+		
+		var posicionSiguiente=0;
+		var resultadosMostrados=selector.calculaResultadosMostrados();
+
+		if(siguiente)
+		{
+			posicionSiguiente=pos+maxResults;
+
+			if(posicionSiguiente+maxResults>=numero_resultados)
+			{
+				bloqueSiguiente.fadeOut();
+			}
+		}
+		else
+		{
+			posicionSiguiente=pos-maxResults;
+			
+			if(posicionSiguiente<=0)
+			{
+				posicionSiguiente=0;
+				bloqueAnterior.fadeOut();
+			}
+		}
+		
+		neptuno.logconsola.Log("cambiaPosicion:: posicionSiguiente="+posicionSiguiente+" numero_resultados="+numero_resultados);
+		neptuno.setAttrData(selector.attr("id"), "pos", posicionSiguiente);
+
+		cajaresultados.actualizaTextoResultados();
+		cajabusqueda.find('.BotonBuscar').trigger('click');
+
+	} // cambiaPosicion
+	
+	/**************************************************************************
+	* @function Anterior
+	* @param {Integer} idSelector
+	**************************************************************************/
+	function Anterior(idSelector)
+	{
+		cambiaPosicion( idSelector );
+	} // Anterior
+	
+	/**************************************************************************
+	* @funcion Siguiente
+	* @param {Integer} idSelector
+	**************************************************************************/
+	function Siguiente(idSelector)
+	{
+		cambiaPosicion(idSelector, true);
+	} // Siguiente
+
+	/**************************************************************************
+	* @function BuscarRegistroModoLista
+	**************************************************************************/
+	function BuscarRegistroModoLista()
+	{
+		var selector 			= $(this).parent().parent();
+		var campoFiltrado=neptuno.getAttrData(selector.attr("id"), "campofiltrado");
+		var valorFiltrado=neptuno.getAttrData(selector.attr("id"), "valorfiltrado");
+		
+		selector.DevolverLista(campoFiltrado, valorFiltrado);			
+	} // BuscarRegistroModoLista
+
+	/**
+	* @function ProcesarResultadoBusqueda
+	**/
+	function ProcesarResultadoBusqueda(selector, respuesta, cuentaResultados, actualizaAcciones)
+	{
+		var cajaresultados=selector.find(".ResultadoBusqueda");
+		var cajaaccionactiva=selector.find(".AccionActiva");
+		var cajanavega=selector.find(".navegacionResultados");
+		
+		eval('var registros = '+respuesta);
+		
+		var NPersonal = registros.columnas.length;
+		//var numeroResultadosReales=(cuentaResultados ? NPersonal-1 : NPersonal);
+		
+		var numeroResultadosReales = registros.datos.length;
+		
+		//selector.attr('resultadosUltimaBusqueda', numeroResultadosReales);
+		
+		// El último registro contiene información acerca del número de resultados total
+		if(cuentaResultados)
+		{
+			neptuno.setAttrData(selector.attr("id"), "numero_resultados", registros.numero_resultados);
+		}
+		
+		var maxresults=neptuno.getAttrData(selector.attr("id"), "maxresults");
+		var pos=neptuno.getAttrData(selector.attr("id"), "pos");
+
+		if(pos==0)
+		{
+			$(this).parent().parent().MuestraMensaje("La búsqueda ha devuelto "+numeroResultadosReales+" resultados");
+		}
+
+		cajaresultados.loadData(registros, pos, maxresults, cuentaResultados, selector.attr('campofiltrado'), selector.readyResults);
+		
+		if(parseInt(numeroResultadosReales)<=0 && selector.attr('campofiltrado')!='')
+		{
+			var idDialogo='#Dialogo'+selector.attr('id');
+			var tabla=selector.attr('tabla');
+			var titulo=selector.attr('titulo');
+			selector.attr('resultadosultimabusqueda', "0");
+			selector.find(".ResultadoBusqueda").find(".resultados").append("<div class=\"sinresultados\">No se han encontrado resultados</div>");
+			selector.find(".ResultadoBusqueda").show();
+		}
+		else
+		{
+			selector.find(".AccionActiva").html("");
+			selector.find(".AccionActiva").show();
+		}
+
+		cajanavega.actualizaTextoResultados();
+		
+	} // ProcesarResultadoBusqueda
+	
+	/*
+		º
+	 */
+	function exportarResultados()
+	{
+		var selector=$(this).parent().parent().parent().parent();
+		var terminoBusqueda=selector.attr("busqueda");
+		neptuno.logconsola.Log("exportarResultados()::terminoBusqueda="+terminoBusqueda);
+		
+		BuscarRegistro(null, true, selector);
+	} // exportarResultados
+	
+	
+	/*
+		imprimirResultados
+	*/
+	function imprimirResultados()
+	{
+		neptuno.logconsola.Log("selector::imprimirResultados");
+		
+		var selector=$(this).parent().parent().parent();
+		var busqueda=selector.attr('busqueda');
+		var tabla=selector.attr('tabla');
+		var miHTML=selector.find(".ResultadoBusqueda").html();
+		
+		// En primer lugar calculamos el número de columnas para ajustar el ancho.
+		var ncolumnas=selector.find(".ResultadoBusqueda").find(".FilaResultado:first").find(".ColumnaResultado").length;
+		if(ncolumnas>1)
+		{
+			var ancho=parseInt(100/(ncolumnas+1));
+		}
+		
+		// Cargamos la plantilla de impresión
+		$.get('/neptuno/libjs/jquery_ender_selector/modulos/Selector_print.htm',{},
+		function(plantillaImpresion)
+		{
+			var ventimp = window.open();
+			ventimp.document.write( plantillaImpresion );			
+			ventimp.document.write( miHTML );
+			ventimp.document.close();
+
+			if(busqueda!='*')
+			{
+				$(ventimp.document).find("#CabeceraImpresion").html("Resultados de la b&uacute;squeda de '"+busqueda+"' sobre "+tabla);
+			}
+			else
+			{
+				$(ventimp.document).find("#CabeceraImpresion").html("Todos los resultados de la tabla "+tabla);
+			}
+
+			$(ventimp.document).find(".ColumnaResultado").css("width", ancho+"%");
+			$(ventimp.document).find(".CabeceraResultado").css("width", ancho+"%");
+			$(ventimp.document).find(".CabeceraResultado").css("text-decoration", "underline");			
+		});			
+			
+	} // imprimirResultados
+
+</script>
+
+<div class="CajaBusqueda"/>
+<div class="CajaTituloGrande" />
+<div class="CajaSelector Seleccionado" />
+
+
+<div class="CajaSelector ResultadoBusqueda" />
+
+<div class="CajaSelector CajaDatos AccionActiva" />
+<div class="Dialogo" />

@@ -1,0 +1,7 @@
+<link href="/neptuno/libjs/jquery_ender_selector/modulos/Selector.css" rel="stylesheet" type="text/css">
+<link href="./css/estilos.css" rel="stylesheet" type="text/css">
+<link href="/neptuno/libjs/jquery_ender_selector/modulos/Selector_print.css" rel="stylesheet" type="text/css">
+<link href="./templates/imprimirHorario_print.css" rel="stylesheet" media="print" type="text/css">
+
+<div id="CabeceraImpresion"></div>
+<div class="Boton BotonImpresion" onclick="javascript:window.print();">Imprimir</div>

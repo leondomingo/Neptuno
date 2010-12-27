@@ -1,0 +1,124 @@
+.selectorEnder
+{
+  min-width:200px;
+  width:100%;
+  float:left;  
+}
+
+.selectorEnder .buscador
+{
+  display:none;
+}
+
+.selectorEnder  .elementoSeleccionado
+{
+  border:1px solid #e1e1e1;
+  cursor:pointer;
+  width:90%;
+  min-width:150px;
+  max-width:500px;
+  
+  float:left;
+  height:20px;
+  background-color:#f1f1f1;
+  
+}
+
+.selectorEnder .zonaBuscador
+{
+  background-color:#f1f1f1;
+  width:100%;
+  margin-top:5px;
+  float:left;
+}
+.selectorEnder .buscador
+{
+  
+  border-top:0px solid #333;
+  
+  float:left;
+  width:96% !important;
+  padding:0 2% !important;
+}
+
+.selectorEnder .cajaBuscador
+{
+  
+  padding-top:5px !important;
+  padding-bottom:5px !important;
+}
+.selectorEnder .botonBuscador
+{
+  margin-left:20px !important;
+}
+
+.selectorEnder .inputBuscador
+{
+  width:300px !important;
+  min-width:150px;
+  max-width:500px;
+}
+
+
+.selectorEnder .exportar
+{
+  display:none;
+}
+
+.selectorEnder .numero_resultados
+{
+  font-size:8px;
+}
+
+.selectorEnder .botonVaciar
+{
+  cursor:pointer;
+  margin-top:2px;
+  color:#334433;
+  opacity:0.3;
+  width:5%;
+  max-width:45px;
+  float:left;
+  font-size:0.9em;
+  margin-left:5px;
+}
+
+.selectorEnder .botonVaciar:hover
+{
+  color:#770000;
+  text-decoration:underline;
+}
+
+.selectorEnder .botonMinimizar
+{
+  float:right;
+  cursor:pointer;
+  width:16px; 
+}
+
+
+
+
+.selectorEnder .cabecera .celda:last-child
+{
+  border-radius:5px 5px 0px 0px;
+  -moz-border-radius:5px 5px 0px 0px;
+}
+
+.selectorEnder .fila .celda:last-child
+{
+  border-right:0px;
+}
+
+.selectorEnder .zonaBuscador 
+{
+  border-radius:6px;
+  -moz-border-radius:6px;
+  
+  
+}
+
+.selectorEnder .numero_resultados
+{
+  padding-bottom:4em;
+}

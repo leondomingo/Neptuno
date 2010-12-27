@@ -1,0 +1,122 @@
+.resultados
+{
+	width:100%;
+	float:left;
+	
+}
+
+.fila
+{
+	float:left;
+	min-width:51%;
+	cursor:pointer;
+	width:100%; 
+}
+
+.fila:nth-child(even) div
+{
+	background-color:#dde;
+	
+}
+
+.fila.odd
+{
+	
+}
+
+.celda
+{
+	float:left;
+	width:120px;
+	border-right:1px solid #e1e1e1;
+	border-bottom:1px solid #e1e1e1;
+	height:26px;
+	padding:8px 0 0 0;;
+	text-align:center;
+	overflow:hidden;
+	max-width:300px;
+}
+
+.cabecera .celda
+{
+	background-color:#115;
+	color:#e1e1e1;
+	font-weight:bold;
+}
+
+.filaHover:hover .celda
+{
+	background-color:#aaa;
+}
+
+
+
+
+
+.celda input
+{
+	width:100%;
+	height:100%;
+	border:0px;
+}
+
+
+.filaHover .celdaHover:hover
+{
+	background-color:#c1c1c1 !important;
+}
+
+.cabecera:hover .celda
+{
+	background-color:#115 !important;
+}
+
+
+.cabecera .celda:hover
+{
+	background-color:#334 !important;
+}
+
+.boton_fila
+{
+	float:left;
+	width:80px;
+	padding-left:25px;
+	height:31px;
+	padding:3px;
+	text-align:right;
+	overflow:hidden;	
+	width: 80px;
+	margin-left:20px;
+	float:left;
+	cursor:pointer;
+	border-color:#BBBBBB;
+	border-style:solid;
+	padding:0;
+	font-family:arial,sans-serif;
+	
+	font-size-adjust:none;
+	font-style:normal;
+	font-variant:normal;
+	font-weight:normal;
+	line-height:normal;
+	list-style-image:none;
+	list-style-position:outside;
+	list-style-type:none;
+	text-decoration:none;
+	-moz-background-clip:border;
+	-moz-background-inline-policy:continuous;
+	-moz-background-origin:padding;
+	background:#E3E3E3 none repeat scroll 0 0;
+	background-image:url(fondodegradado.png);
+	border-width:1px;
+	cursor:pointer;
+	height:20px;
+	padding-top:5px;
+	text-align:center;
+	
+	border-radius:3px;
+	-moz-border-radius:3px;
+	
+
+}
