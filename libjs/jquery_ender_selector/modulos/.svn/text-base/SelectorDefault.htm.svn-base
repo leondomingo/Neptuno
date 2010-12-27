@@ -1,5 +1,0 @@
-<div id="caja1">
-	<span name="Selector">
-		<div class="Selector" id="selectorDefault" titulo="" debug='true' cargaAcciones="false" />
-	</span>		
-</div>

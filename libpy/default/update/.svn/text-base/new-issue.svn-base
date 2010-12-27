@@ -1,4 +1,0 @@
-#!/bin/bash
-mkdir issue_$1
-cp ejemplo/ejemplo.py issue_$1/issue_$1.py
-cp ejemplo/ejemplo.sql issue_$1/issue_$1.sql
