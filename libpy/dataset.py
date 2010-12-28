@@ -189,7 +189,7 @@ class DataSet(object):
         ...
         itemN-1
         
-        devolverï¿½
+        devolverá
         
         [
          itemN-1,
@@ -211,7 +211,7 @@ class DataSet(object):
         ...
         itemN-1
         
-        devolverï¿½
+        devolverá
         
         [
          (N-1, itemN-1)
@@ -246,7 +246,7 @@ class DataSet(object):
           Indica el ancho de las columnas
           
           fit_width <bool> (por defecto=True)
-          Hace las columnas tan anchas como el valor mï¿½s ancho, que no sobrepase
+          Hace las columnas tan anchas como el valor más ancho, que no sobrepase
           el ancho fijado por 'width'.
           
         """
@@ -309,10 +309,7 @@ class DataSet(object):
                     linea += str(dato[c])[:w].rjust(w)
 
                 elif isinstance(dato[c], datetime.datetime):
-                    try:
-                        linea += dato[c].strftime('%s %s' % (self.date_fmt, self.time_fmt))[:w].rjust(w)
-                    except ValueError:
-                        linea += str(valor).decode('utf-8').replace('\n', '')[:w].ljust(w)
+                    linea += dato[c].strftime('%s %s' % (self.date_fmt, self.time_fmt))[:w].rjust(w)
 
                 elif isinstance(dato[c], datetime.date):
                     linea += dato[c].strftime(self.date_fmt)[:w].rjust(w)
@@ -329,7 +326,7 @@ class DataSet(object):
             
         resultado += '|'+'-'*l + '|\n'
         
-        # lï¿½nea de totales
+        # línea de totales
         if self.totales:
             linea = '|'
             for i, c in enumerate(self.columnas):

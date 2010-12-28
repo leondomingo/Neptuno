@@ -1,35 +1,23 @@
 # -*- coding: utf-8 -*-
 
-import re
-import sys
 from lxml import etree
 from base64 import encodestring
 from libpy.firebird.const_datos_olympo import TDF_PDF
 from nucleo.config import VARIABLES
 import tempfile
 import os
-import subprocess as sp
+import subprocess
 import threading
-import signal
-try:
-    import win32api
-except ImportError:
-    pass 
-
+import win32api
 from libpy.const_datos_neptuno import VAR_LANZADOR, VAR_TIMEOUT_CONSULTAS
 
 class KillLanzador(object):
     def __init__(self, process, time_out):
         self.process = process
-        self.t = threading.Timer(time_out, self.kill)
+        self.t = threading.Timer(time_out, self._kill)
         
-    def kill(self):
-        if sys.platform == 'win32':
-            win32api.TerminateProcess(int(self.process._handle), -1)
-            
-        else:
-            # linux
-            os.kill(self.process.pid, signal.SIGKILL)
+    def _kill(self):
+        win32api.TerminateProcess(int(self.process._handle), -1)
         
     def start(self):        
         self.t.start()
@@ -118,16 +106,7 @@ def lanzar_consulta(cod_usuario, servidor, base, cod_consulta, nombreinforme, \
             if nombre_aplicacion == '':
                 raise Exception('No está definida la variable "%s"' % VAR_LANZADOR)
             
-            else:
-                m_wine = re.search(r'^wine\s+(.+)', nombre_aplicacion)
-                if m_wine:
-                    cmd = ['wine', m_wine.group(1), nombre_xml, (log or '')]
-                
-                else:
-                    cmd = [nombre_aplicacion, nombre_xml, (log or '')]
-
-            # abrir proceso
-            p = sp.Popen(cmd)
+            p = subprocess.Popen([nombre_aplicacion, nombre_xml, (log or '')])
             
             # "time out" al lanzar una consulta
             if time_out is None:

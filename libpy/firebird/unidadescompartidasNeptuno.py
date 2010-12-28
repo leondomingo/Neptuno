@@ -14,32 +14,46 @@ from libpy.excepciones.usuarios import NoExisteUsuario, NoExisteRol
 from nucleo.const_datos import ROLES
 from libpy.firebird.util import nombre_tabla, cod_objeto,\
     fecha_de_creacion, fecha_de_actualizacion, atributo_objeto, ValorLogico
-from libpy.firebird.const_olympo import cl_Sesiones, cl_UsuariosWeb,\
-    atri_tipodeatributo, atri_tipodevalor, sesi_fechadecreacion, \
-    sesi_fechadeactualizacion, sesi_usuario, sesi_direccionip, sesi_usuarioweb, \
-    sesi_challenge, sesi_fechadecaducidad, uswe_fechadecreacion, \
-    uswe_fechadeactualizacion, uswe_usuario, uswe_usuarioperfil, \
-    uswe_nombredeusuario, uswe_contrasena, uswe_nombre, uswe_rol, uswe_ultimologin, \
-    clas_fechadecreacion, clas_fechadeactualizacion, clas_usuario, clas_nombre, \
-    atri_fechadecreacion, atri_fechadeactualizacion, atri_usuario, atri_nombre, \
-    atri_clase, atri_atributoenlazado, atri_clasedeatributoenlazado, atri_estructural,\
-    atri_requerido, atri_unico, usua_fechadecreacion, usua_fechadeactualizacion,\
-    usua_usuario, usua_nombre, usua_login, usua_administrador,\
-    usua_gestiondocumental, docu_fechadecreacion, docu_fechadeactualizacion,\
-    docu_usuario, docu_titulo, docu_formato, docu_repositorio, docu_autor,\
-    docu_tipo, docu_version, docu_estado, docu_privado, tdd_fechadeactualizacion,\
-    tdd_usuario, tdd_fechadecreacion, tdd_nombre, tdd_descripcion,\
-    fdd_fechadecreacion, fdd_fechadeactualizacion, fdd_usuario, fdd_nombre,\
-    fdd_extension, fdd_descripcion, reob_fechadecreacion,\
-    reob_fechadeactualizacion, reob_usuario, reob_clase, reob_codigodeobjeto,\
-    reob_documento, cons_fechadecreacion, cons_fechaversion, cons_usuario,\
-    cons_nombre, cons_clase, cons_fichero, cons_identificador,\
-    cons_utilizarfastreport, pdc_fechadecreacion, pdc_fechadeactualizacion,\
-    pdc_usuario, pdc_consulta, idol_fechadecreacion, idol_fechadeactualizacion,\
-    idol_usuario, idol_nombre, idol_codigo, idol_activo, cl_Atributos,\
-    cl_Usuarios, cl_Clases, cl_Documentos, cl_FormatosDeDocumento,\
-    cl_TiposDeDocumento, cl_RelacionObjetosDocumentos, cl_Consultas,\
-    cl_ParametrosDeConsulta, cl_IdiomasOlympo
+from libpy.firebird.const_olympo import cl_Sesiones,\
+    sesiones_fechadecreacion, sesiones_fechadeactualizacion, sesiones_usuario,\
+    sesiones_direccionip, sesiones_usuarioweb, cl_UsuariosWeb,\
+    usuariosweb_fechadecreacion, usuariosweb_fechadeactualizacion,\
+    usuariosweb_usuarioperfil, usuariosweb_contrasena,\
+    usuariosweb_nombredeusuario, usuariosweb_ultimologin, usuariosweb_usuario,\
+    sesiones_challenge, usuariosweb_rol, cl_Clases, clases_fechadecreacion,\
+    clases_fechadeactualizacion, clases_usuario, cl_Usuarios,\
+    usuarios_fechadecreacion, usuarios_fechadeactualizacion, usuarios_usuario,\
+    usuarios_nombre, usuarios_gestiondocumental, usuarios_administrador,\
+    cl_Documentos, documentos_fechadecreacion,\
+    documentos_fechadeactualizacion, documentos_usuario, cl_Atributos,\
+    atributos_fechadecreacion, atributos_fechadeactualizacion, atributos_usuario,\
+    atributos_nombre, atributos_clase, atributos_atributoenlazado,\
+    atributos_clasedeatributoenlazado, atributos_tipodeatributo,\
+    atributos_tipodevalor, atributos_estructural,\
+    atributos_requerido, atributos_unico, documentos_titulo,\
+    documentos_repositorio, documentos_formato, documentos_autor,\
+    documentos_tipo, documentos_version, documentos_estado, documentos_privado,\
+    cl_FormatosDeDocumento, formatosdedocumento_fechadecreacion,\
+    formatosdedocumento_fechadeactualizacion, formatosdedocumento_usuario,\
+    formatosdedocumento_nombre, formatosdedocumento_extension,\
+    formatosdedocumento_descripcion, cl_RelacionObjetosDocumentos,\
+    relacionobjetosdocumentos_fechadecreacion,\
+    relacionobjetosdocumentos_fechadeactualizacion,\
+    relacionobjetosdocumentos_usuario, relacionobjetosdocumentos_clase,\
+    relacionobjetosdocumentos_codigodeobjeto,\
+    relacionobjetosdocumentos_documento, clases_nombre, cl_Consultas,\
+    consultas_fechaversion, consultas_usuario, consultas_nombre, consultas_clase,\
+    consultas_identificador, consultas_fichero, consultas_utilizarfastreport,\
+    consultas_fechadecreacion, cl_ParametrosDeConsulta,\
+    parametrosdeconsulta_fechadecreacion,\
+    parametrosdeconsulta_fechadeactualizacion, parametrosdeconsulta_usuario,\
+    parametrosdeconsulta_consulta, usuarios_login, cl_IdiomasOlympo,\
+    idiomasolympo_fechadecreacion, idiomasolympo_fechadeactualizacion,\
+    idiomasolympo_usuario, idiomasolympo_nombre, idiomasolympo_activo,\
+    idiomasolympo_codigo, sesiones_fechadecaducidad, usuariosweb_nombre,\
+    cl_TiposDeDocumento, tiposdedocumento_fechadecreacion,\
+    tiposdedocumento_fechadeactualizacion, tiposdedocumento_usuario,\
+    tiposdedocumento_nombre, tiposdedocumento_descripcion
 from libpy.const_datos_neptuno import PRIVL_LECTURA_ESCRITURA
 from nucleo.const_datos import SESSION_LIFE
 
@@ -62,13 +76,13 @@ class sesionesNeptuno(Base):
     cod_clase = cl_Sesiones
     
     id = cod_objeto(cl_Sesiones)
-    fechadecreacion = fecha_de_creacion(sesi_fechadecreacion)
-    fechadeactualizacion = fecha_de_actualizacion(sesi_fechadeactualizacion)
-    id_usuarios_usuario = Column(sesi_usuario, Integer)
-    direccionip = Column(sesi_direccionip, String)
-    id_usuariosweb_usuarioweb = Column(sesi_usuarioweb, Integer)
-    challenge = Column(sesi_challenge, String)
-    fecha_caducidad = Column(sesi_fechadecaducidad, TIMESTAMP)
+    fechadecreacion = fecha_de_creacion(sesiones_fechadecreacion)
+    fechadeactualizacion = fecha_de_actualizacion(sesiones_fechadeactualizacion)
+    id_usuarios_usuario = Column(sesiones_usuario, Integer)
+    direccionip = Column(sesiones_direccionip, String)
+    id_usuariosweb_usuarioweb = Column(sesiones_usuarioweb, Integer)
+    challenge = Column(sesiones_challenge, String)
+    fecha_caducidad = Column(sesiones_fechadecaducidad, TIMESTAMP)
     
 class usuariosNeptuno(Base):
     
@@ -76,15 +90,15 @@ class usuariosNeptuno(Base):
     cod_clase = cl_UsuariosWeb
     
     id = cod_objeto(cl_UsuariosWeb)
-    fechadecreacion = fecha_de_creacion(uswe_fechadecreacion)
-    fechadeactualizacion = fecha_de_actualizacion(uswe_fechadeactualizacion)
-    id_usuarios_usuario = Column(uswe_usuario, Integer)
-    id_usuarios_usuarioperfil = Column(uswe_usuarioperfil, Integer)
-    nombre_usuario = Column(uswe_nombredeusuario, String)
-    contrasenya = Column(uswe_contrasena, String)
-    nombre = Column(uswe_nombre, String)
-    rol = Column(uswe_rol, String)
-    ultimologin = Column(uswe_ultimologin, TIMESTAMP) #, default=datetime.now())
+    fechadecreacion = fecha_de_creacion(usuariosweb_fechadecreacion)
+    fechadeactualizacion = fecha_de_actualizacion(usuariosweb_fechadeactualizacion)
+    id_usuarios_usuario = Column(usuariosweb_usuario, Integer)
+    id_usuarios_usuarioperfil = Column(usuariosweb_usuarioperfil, Integer)
+    nombre_usuario = Column(usuariosweb_nombredeusuario, String)
+    contrasenya = Column(usuariosweb_contrasena, String)
+    nombre = Column(usuariosweb_nombre, String)
+    rol = Column(usuariosweb_rol, String)
+    ultimologin = Column(usuariosweb_ultimologin, TIMESTAMP) #, default=datetime.now())
     
     privl_tabla = None
     privl_columna = None
@@ -282,12 +296,12 @@ class ClasesOlympo(Base):
     
     id = cod_objeto(cl_Clases)
     
-    fechaDeCreacion = fecha_de_creacion(clas_fechadecreacion)
-    fechaDeActualizacion = fecha_de_actualizacion(clas_fechadeactualizacion)
-    id_usuarios_usuario = atributo_objeto(clas_usuario, cl_Usuarios)
+    fechaDeCreacion = fecha_de_creacion(clases_fechadecreacion)
+    fechaDeActualizacion = fecha_de_actualizacion(clases_fechadeactualizacion)
+    id_usuarios_usuario = atributo_objeto(clases_usuario, cl_Usuarios)
     
-    nombre = Column(clas_nombre, String)
-    #descripcion = Column(clas_descripcion, String)
+    nombre = Column(clases_nombre, String)
+    #descripcion = Column(clases_descripcion, String)
 
 class AtributosOlympo(Base):
     
@@ -298,26 +312,26 @@ class AtributosOlympo(Base):
     
     id = cod_objeto(cl_Atributos)
     
-    fechaDeCreacion = fecha_de_creacion(atri_fechadecreacion)
-    fechaDeActualizacion = fecha_de_actualizacion(atri_fechadeactualizacion)
-    id_usuarios_usuario = atributo_objeto(atri_usuario, cl_Usuarios)
+    fechaDeCreacion = fecha_de_creacion(atributos_fechadecreacion)
+    fechaDeActualizacion = fecha_de_actualizacion(atributos_fechadeactualizacion)
+    id_usuarios_usuario = atributo_objeto(atributos_usuario, cl_Usuarios)
     
-    nombre = Column(atri_nombre, String)
-    id_clases_clase = atributo_objeto(atri_clase, cl_Clases)
+    nombre = Column(atributos_nombre, String)
+    id_clases_clase = atributo_objeto(atributos_clase, cl_Clases)
         
-    atributoEnlazado = atributo_objeto(atri_atributoenlazado, cl_Atributos)
-    id_clas_clasedeatributoenlazado = atributo_objeto(atri_clasedeatributoenlazado, cl_Atributos)
+    atributoEnlazado = atributo_objeto(atributos_atributoenlazado, cl_Atributos)
+    claseDeAtributoEnlazado = atributo_objeto(atributos_clasedeatributoenlazado, cl_Atributos)
     
-    id_tda_tipodeatributo = Column(atri_tipodeatributo, Integer) # tipos de atributos
-    id_tdv_tipodevalor = Column(atri_tipodevalor, Integer) # tipos de valores
+    tipoDeAtributo = Column(atributos_tipodeatributo, Integer) # tipos de atributos
+    tipoDeValor = Column(atributos_tipodevalor, Integer) # tipos de valores
     
-    id_valo_estructural = Column(atri_estructural, Integer)
+    id_valo_estructural = Column(atributos_estructural, Integer)
     estructural = ValorLogico('id_valo_estructural')
     
-    id_valo_requerido = Column(atri_requerido, Integer)
+    id_valo_requerido = Column(atributos_requerido, Integer)
     requerido = ValorLogico('id_valo_requerido')
     
-    id_valo_unico = Column(atri_unico, Integer)
+    id_valo_unico = Column(atributos_unico, Integer)
     unico = ValorLogico('id_valo_unico')
     
 ClasesOlympo.atributos = \
@@ -331,17 +345,17 @@ class UsuariosOlympo(Base):
     cod_clase = cl_Usuarios
     
     id = cod_objeto(cl_Usuarios)
-    fechaDeCreacion = fecha_de_creacion(usua_fechadecreacion)
-    fechaDeActualizacion = fecha_de_actualizacion(usua_fechadeactualizacion)
-    id_usuarios_usuario = atributo_objeto(usua_usuario, cl_Usuarios)
+    fechaDeCreacion = fecha_de_creacion(usuarios_fechadecreacion)
+    fechaDeActualizacion = fecha_de_actualizacion(usuarios_fechadeactualizacion)
+    id_usuarios_usuario = atributo_objeto(usuarios_usuario, cl_Usuarios)
     
-    nombre = Column(usua_nombre, String)
-    login = Column(usua_login, String)
+    nombre = Column(usuarios_nombre, String)
+    login = Column(usuarios_login, String)
     
-    id_valo_administrador = Column(usua_administrador, Integer)
+    id_valo_administrador = Column(usuarios_administrador, Integer)
     administrador = ValorLogico('id_valo_administrador')
     
-    id_valo_gestionDocumental = Column(usua_gestiondocumental, Integer)
+    id_valo_gestionDocumental = Column(usuarios_gestiondocumental, Integer)
     gestionDocumental = ValorLogico('id_valo_gestionDocumental')    
 
 class DocumentosOlympo(Base):
@@ -350,19 +364,19 @@ class DocumentosOlympo(Base):
     cod_clase = cl_Documentos
     
     id = cod_objeto(cl_Documentos)
-    fechaDeCreacion = fecha_de_creacion(docu_fechadecreacion)
-    fechaDeActualizacin = fecha_de_actualizacion(docu_fechadeactualizacion)
-    id_usuarios_usuario = atributo_objeto(docu_usuario, cl_Usuarios)
+    fechaDeCreacion = fecha_de_creacion(documentos_fechadecreacion)
+    fechaDeActualizacin = fecha_de_actualizacion(documentos_fechadeactualizacion)
+    id_usuarios_usuario = atributo_objeto(documentos_usuario, cl_Usuarios)
     
-    titulo = Column(docu_titulo, String)
-    repositorio = Column(docu_repositorio, String)
-    formato = atributo_objeto(docu_formato, cl_FormatosDeDocumento)
-    autor = Column(docu_autor, String) 
-    tipo = atributo_objeto(docu_tipo, cl_TiposDeDocumento)
-    version = Column(docu_version, String)
-    estado = Column(docu_estado, Integer) # estados de documentos
+    titulo = Column(documentos_titulo, String)
+    repositorio = Column(documentos_repositorio, String)
+    formato = atributo_objeto(documentos_formato, cl_FormatosDeDocumento)
+    autor = Column(documentos_autor, String) 
+    tipo = atributo_objeto(documentos_tipo, cl_TiposDeDocumento)
+    version = Column(documentos_version, String)
+    estado = Column(documentos_estado, Integer) # estados de documentos
     
-    id_valo_privado = Column(docu_privado, Integer) # valores lógicos
+    id_valo_privado = Column(documentos_privado, Integer) # valores lógicos
     privado = ValorLogico('id_valo_privado')
     
 class TiposDeDocumento(Base):
@@ -371,12 +385,12 @@ class TiposDeDocumento(Base):
     cod_clase = cl_TiposDeDocumento
     
     id = cod_objeto(cl_TiposDeDocumento)
-    fechadecreacion = fecha_de_creacion(tdd_fechadecreacion)
-    fechadeactualizacion = fecha_de_actualizacion(tdd_fechadeactualizacion)
-    id_usuarios_usuario = atributo_objeto(tdd_usuario, cl_Usuarios)
+    fechadecreacion = fecha_de_creacion(tiposdedocumento_fechadecreacion)
+    fechadeactualizacion = fecha_de_actualizacion(tiposdedocumento_fechadeactualizacion)
+    id_usuarios_usuario = atributo_objeto(tiposdedocumento_usuario, cl_Usuarios)
     
-    nombre = Column(tdd_nombre, String)
-    descripcion = Column(tdd_descripcion, String)    
+    nombre = Column(tiposdedocumento_nombre, String)
+    descripcion = Column(tiposdedocumento_descripcion, String)    
     
 class FormatosDeDocumentoOlympo(Base):
     
@@ -384,13 +398,13 @@ class FormatosDeDocumentoOlympo(Base):
     cod_clase = cl_FormatosDeDocumento
     
     id = cod_objeto(cl_FormatosDeDocumento)
-    fechaDeCreacion = fecha_de_creacion(fdd_fechadecreacion)
-    fechaDeActualizacion = fecha_de_actualizacion(fdd_fechadeactualizacion)
-    id_usuario_usuario = atributo_objeto(fdd_usuario, cl_Usuarios)
+    fechaDeCreacion = fecha_de_creacion(formatosdedocumento_fechadecreacion)
+    fechaDeActualizacion = fecha_de_actualizacion(formatosdedocumento_fechadeactualizacion)
+    id_usuario_usuario = atributo_objeto(formatosdedocumento_usuario, cl_Usuarios)
     
-    nombre = Column(fdd_nombre, String)
-    extension = Column(fdd_extension, String)
-    descripcion = Column(fdd_descripcion, String)
+    nombre = Column(formatosdedocumento_nombre, String)
+    extension = Column(formatosdedocumento_extension, String)
+    descripcion = Column(formatosdedocumento_descripcion, String)
     
 class RelacionObjetosDocumentosOlympo(Base):
     
@@ -398,13 +412,13 @@ class RelacionObjetosDocumentosOlympo(Base):
     cod_clase = cl_RelacionObjetosDocumentos
     
     id = cod_objeto(cl_RelacionObjetosDocumentos)
-    fechaDeCreacion = fecha_de_creacion(reob_fechadecreacion)
-    fechaDeActualizacion = fecha_de_actualizacion(reob_fechadeactualizacion)
-    id_usuarios_usuario = atributo_objeto(reob_usuario, cl_Usuarios)
+    fechaDeCreacion = fecha_de_creacion(relacionobjetosdocumentos_fechadecreacion)
+    fechaDeActualizacion = fecha_de_actualizacion(relacionobjetosdocumentos_fechadeactualizacion)
+    id_usuarios_usuario = atributo_objeto(relacionobjetosdocumentos_usuario, cl_Usuarios)
     
-    id_clases_clase = atributo_objeto(reob_clase, cl_Clases)
-    codigoDeObjeto = Column(reob_codigodeobjeto, Integer)
-    id_documentos_documento = atributo_objeto(reob_documento, cl_Documentos) 
+    id_clases_clase = atributo_objeto(relacionobjetosdocumentos_clase, cl_Clases)
+    codigoDeObjeto = Column(relacionobjetosdocumentos_codigodeobjeto, Integer)
+    id_documentos_documento = atributo_objeto(relacionobjetosdocumentos_documento, cl_Documentos) 
     
 class ConsultasOlympo(Base):
     
@@ -412,15 +426,15 @@ class ConsultasOlympo(Base):
     cod_clase = cl_Consultas
     
     id = cod_objeto(cl_Consultas)
-    fechaDeCreacion = fecha_de_creacion(cons_fechadecreacion)
-    fechaDeActualizacion = fecha_de_actualizacion(cons_fechaversion)
-    id_usuarios_usuario = atributo_objeto(cons_usuario, cl_Usuarios)
+    fechaDeCreacion = fecha_de_creacion(consultas_fechadecreacion)
+    fechaDeActualizacion = fecha_de_actualizacion(consultas_fechaversion)
+    id_usuarios_usuario = atributo_objeto(consultas_usuario, cl_Usuarios)
     
-    nombre = Column(cons_nombre, String)
-    clase = atributo_objeto(cons_clase, cl_Clases)
-    fichero = Column(cons_fichero, String)
-    identificador = Column(cons_identificador, String)
-    id_valo_utilizarFastReport = Column(cons_utilizarfastreport, Integer)
+    nombre = Column(consultas_nombre, String)
+    clase = atributo_objeto(consultas_clase, cl_Clases)
+    fichero = Column(consultas_fichero, String)
+    identificador = Column(consultas_identificador, String)
+    id_valo_utilizarFastReport = Column(consultas_utilizarfastreport, Integer)
     utilizarFastReport = ValorLogico('id_valo_utilizarFastReport')
     
 class ParametrosDeConsultaOlympo(Base):
@@ -429,11 +443,11 @@ class ParametrosDeConsultaOlympo(Base):
     cod_clase = cl_ParametrosDeConsulta
     
     id = cod_objeto(cl_ParametrosDeConsulta)
-    fechaDeCreacion = fecha_de_creacion(pdc_fechadecreacion)
-    fechaDeActualizacion = fecha_de_actualizacion(pdc_fechadeactualizacion)
-    id_usuarios_usuario = atributo_objeto(pdc_usuario, cl_Usuarios)
+    fechaDeCreacion = fecha_de_creacion(parametrosdeconsulta_fechadecreacion)
+    fechaDeActualizacion = fecha_de_actualizacion(parametrosdeconsulta_fechadeactualizacion)
+    id_usuarios_usuario = atributo_objeto(parametrosdeconsulta_usuario, cl_Usuarios)
     
-    id_consultas_consulta = atributo_objeto(pdc_consulta, cl_Consultas)
+    id_consultas_consulta = atributo_objeto(parametrosdeconsulta_consulta, cl_Consultas)
     
 ConsultasOlympo.parametros = \
     relation(ParametrosDeConsultaOlympo,
@@ -446,14 +460,14 @@ class IdiomasOlympo(Base):
     cod_clase = cl_IdiomasOlympo
     
     id = cod_objeto(cl_IdiomasOlympo)
-    fechadecreacion = fecha_de_creacion(idol_fechadecreacion)
-    fechadeactualizacion = fecha_de_actualizacion(idol_fechadeactualizacion)
-    id_usuarios_usuario = atributo_objeto(idol_usuario, cl_Usuarios)
+    fechadecreacion = fecha_de_creacion(idiomasolympo_fechadecreacion)
+    fechadeactualizacion = fecha_de_actualizacion(idiomasolympo_fechadeactualizacion)
+    id_usuarios_usuario = atributo_objeto(idiomasolympo_usuario, cl_Usuarios)
     
-    nombre = Column(idol_nombre, String)
-    codigo = Column(idol_codigo, Integer)
+    nombre = Column(idiomasolympo_nombre, String)
+    codigo = Column(idiomasolympo_codigo, Integer)
     
-    id_valo_activo = Column(idol_activo, Integer)
+    id_valo_activo = Column(idiomasolympo_activo, Integer)
     activo = ValorLogico('id_valo_activo')
     
     

@@ -67,3 +67,50 @@
 {
 	height:15px;
 }
+
+.celda.boton
+{
+  width: 80px;
+  margin-left:5px;
+  float:left;
+  cursor:pointer;
+  border-color:#BBBBBB;
+  border-style:solid;
+  padding:0;
+  font-family:arial,sans-serif;
+  
+  font-size-adjust:none;
+  font-style:normal;
+  font-variant:normal;
+  font-weight:normal;
+  line-height:normal;
+  list-style-image:none;
+  list-style-position:outside;
+  list-style-type:none;
+  text-decoration:none;
+  -moz-background-clip:border;
+  -moz-background-inline-policy:continuous;
+  -moz-background-origin:padding;
+  background:#E3E3E3 none repeat scroll 0 0;
+  background-image:url(fondodegradado.png);
+  border-width:1px;
+  cursor:pointer;
+  height:20px;
+  padding-top:5px;
+  text-align:center;
+  
+  border-radius:5px;
+  -moz-border-radius:5px;
+  
+  box-shadow:3px 3px 5px #666;
+  -moz-box-shadow:3px 3px 5px #666;
+}
+
+.celda.boton:hover
+{
+  border-color:#939393;
+  box-shadow:1px 1px 5px #666;
+  -moz-box-shadow:1px 1px 5px #666;
+
+}
+

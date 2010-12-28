@@ -6,6 +6,9 @@ var rutaBaseBuscador = '/neptuno/';
 	{
 		var lugar = $(this);
 		
+		console.log('********++');
+		console.log(params.fEdicionCampos);
+		
 		var parametros = JSON.stringify(params).replace(/"/g,"'");
 		$("head").append("<link>");
     	css = $("head").children(":last");
@@ -20,13 +23,13 @@ var rutaBaseBuscador = '/neptuno/';
 		{
 			lugar.find('.buscador').attr('url',sw);
 			lugar.find('.buscador').attr('params',parametros);
-			
+			lugar.find('.buscador').data('params',params);
 			lugar.find('.buscador').data('fFila',fFila);
 			lugar.find('.buscador').data('fFinal',fFinal);
 			lugar.find('input').keyup(function(e) {if(e.keyCode == 13) {$(this).parent().lanzaBuscador();}});
 			
-			lugar.find('.botonBuscador').bind('clickea',$(this).lanzaBuscador);
-			lugar.activarBoton('botonBuscador');
+			lugar.find('.botonBuscador.buscar').bind('clickea',$(this).lanzaBuscador);
+			lugar.activarBoton('botonBuscador.buscar');
 
 
 			
@@ -48,37 +51,49 @@ var rutaBaseBuscador = '/neptuno/';
 
 	$.fn.lanzaBuscador = function()
 	{
+	 
 		var lugar = $(this);
-		lugar.parents('.buscador').desactivarBoton('botonBuscador');
+		lugar.parents('.buscador').desactivarBoton('botonBuscador.buscar');
 		
 		var url = $(this).parents('.buscador').attr('url');
 		var fFila = $(this).parents('.buscador').data('fFila');
 		var fFinalPrev = $(this).parents('.buscador').data('fFinal');
 		
 		var params = $(this).parents('.buscador').attr('params').replace(/'/g,"\"");
-	 
+    	 
 		eval("var data =" + params);
+		
+		params = $(this).parents('.buscador').data('params');
+		console.log('+++++++');
+		console.log(params.fEdicionCampos);
+		
 		
 		if(typeof fFinalPrev == 'function')
 		{
-			fFinal = function()
+			var fFinal = function(lug)
 			{
 				fFinalPrev();
-				lugar.parents('.buscador').activarBoton('botonBuscador');	
+				if(lug) lugar = lug;
+				lugar.parents('.buscador').activarBoton('botonBuscador.buscar');	
 			}
 		}
 		else
 		{
-			fFinal = fFinalPrev+";$(this).parents('.buscador').activarBoton('botonBuscador');";
+			var fFinal = function(lug)
+			{
+
+			   if(lug) lugar = lug;
+			   lugar.parents('.buscador').activarBoton('botonBuscador.buscar'); 
+			}
 		}
 		
 
 		
 		data.busqueda = $(this).parents('.buscador').find('.textoBusqueda').val();
 		
-		$(this).parents('.buscador').find('.resultadosBuscador').html('').listaPaginada(url,data,fFila,fFinal);
-		
-
+		$(this).parents('.buscador').find('.resultadosBuscador').listaPaginada(url,data,fFila,fFinal,true,true);
+		$(this).parents('.buscador').find('.resultadosBuscador').data('fEdicionCampos',params.fEdicionCampos);
+    console.log("entrando en lanzaBuscador");
 	}
 	
 	$.fn.nuevoBotonBuscador = function(nombreBoton, textoBoton, funcionBoton)

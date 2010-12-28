@@ -261,7 +261,7 @@ function LlamadaIncorrecta(xhr,msg,excep)
 (function($)
 {
 
-  $.fn.soloNumeros = function()
+  $.fn.soloNumeros = function(enlazar)
   {
     var valor=  $(this).val();
     valor = valor.replace(/[^0-9.,-]/g, "");
@@ -271,7 +271,51 @@ function LlamadaIncorrecta(xhr,msg,excep)
     valor = valor.replace(',','.');
     $(this).val(valor);
     
+    if(enlazar)
+    {
+      $(this).bind('change',$(this).soloNumeros);  
+    }
+    
+    return $(this).val();
   }
+  
+
+  $.fn.soloFecha = function(enlazar)
+  {
+    var valor=  $(this).val();
+    valor = valor.replace(/[^0-9-/]/g, "");
+    if((valor[valor.length-1] == '.')||(valor[valor.length-1] == ',')) valor += '0';
+    if((valor[0]=='.')||(valor[0]==',')) valor = '0'+valor;
+    if(valor=='') valor = "01/01/1900";
+    
+    valor = valor.replace(/,/g,'-');
+    
+    valor = valor.replace(/\//g,'-');
+    
+    var valor_dividido = valor.split('-');
+    
+    var anyo = valor_dividido[2].replace(/[^0-9]/g, "").substring(0,4);
+    if(anyo.length < 4) anyo += '0000';
+    valor = valor_dividido[0].replace(/[^0-9]/g, "")+'/'+valor_dividido[1].replace(/[^0-9]/g, "")+'/'+anyo;
+    
+    
+    
+    $(this).val(valor);
+    
+    if(enlazar)
+    {
+    
+      $(this).bind('change',$(this).soloFecha);
+      
+    }
+    
+    
+    return $(this).val();
+    
+  }  
+  
+  
+  
 })(jQuery);
 
 

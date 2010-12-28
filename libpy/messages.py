@@ -19,11 +19,6 @@ class MessagesNeptuno(object):
         self.idioma = idioma
         
     @message
-    def getErrorGeneral(self):
-        return {const.LANG_ESP: u'Ha ocurrido un error',
-                const.LANG_ENG: u'An error has ocurred'}
-        
-    @message
     def getSesionIncorrecta(self):
         return {const.LANG_ESP: u'Sesión incorrecta',
                 const.LANG_ENG: u'Incorrect session'}

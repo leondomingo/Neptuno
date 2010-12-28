@@ -1,0 +1,60 @@
+.buscador, .buscador .titulo, .buscador .cajaBuscador, .buscador .resultadosBuscador
+{
+	width:100%;
+	float:left;
+}
+
+.cajaBuscador
+{
+	margin-bottom:1em;
+}
+
+.inputBuscador
+{
+	width:200px;	
+	float:left;
+}
+
+.inputBuscador input
+{
+	width:100%;
+	float:left;
+}
+
+.botonBuscador
+{
+	width: 80px;
+	margin-left:20px;
+	float:left;
+	cursor:pointer;
+	border-color:#BBBBBB;
+	border-style:solid;
+	padding:0;
+	font-family:arial,sans-serif;
+	
+	font-size-adjust:none;
+	font-style:normal;
+	font-variant:normal;
+	font-weight:normal;
+	line-height:normal;
+	list-style-image:none;
+	list-style-position:outside;
+	list-style-type:none;
+	text-decoration:none;
+	-moz-background-clip:border;
+	-moz-background-inline-policy:continuous;
+	-moz-background-origin:padding;
+	background:#E3E3E3 none repeat scroll 0 0;
+	background-image:url(fondodegradado.png);
+	border-width:1px;
+	cursor:pointer;
+	height:20px;
+	padding-top:5px;
+	text-align:center;
+}
+
+.botonBuscador:hover
+{
+	border-color:#939393;
+}
+
