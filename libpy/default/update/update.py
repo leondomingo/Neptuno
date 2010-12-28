@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import sys
 import os
+import sys
+from config import CONFIG
+sys.path = sys.path + CONFIG['paths']
 import re
 import subprocess as sp
-from update_config import CONFIG
 
 def actualizar(modo='post'):
 
@@ -20,7 +21,8 @@ def actualizar(modo='post'):
                 m_issue = re.search(r'^(\w+)\s+(pre|post)', linea)
                 if m_issue and m_issue.group(2) == modo.lower() and \
                 m_issue.group(1) not in realizados:
-                    realizados.append('%s    %s' % m_issue.group(1))
+                    realizados.append('%s    %s' % \
+                                      (m_issue.group(1), m_issue.group(2)))
 
         finally:
             f_done.close()
@@ -49,16 +51,16 @@ def actualizar(modo='post'):
                                             (m_issue.group(1), m_issue.group(2)))
                         if ext == '.py':
                             # ejecutar Python
-                            sp.call([sys.executable, m_issue.group(3)])
+                            sp.check_call([sys.executable, m_issue.group(3)])
 
                         elif ext == '.sql':
                             # ejecutar SQL
                             sys.stdout.write('Ejecutando SQL...\n')
-                            sp.call([os.path.join(CONFIG['pg_path'], 'psql'),
-                                     '-h', CONFIG['host'], 
-                                     '-U', CONFIG['user'],
-                                     '-d', CONFIG['db'],
-                                     '-f', m_issue.group(3)]
+                            sp.check_call([os.path.join(CONFIG['pg_path'], 'psql'),
+                                           '-h', CONFIG['host'], 
+                                           '-U', CONFIG['user'],
+                                           '-d', CONFIG['db'],
+                                           '-f', m_issue.group(3)]
                                     )
 
                         # registrar en fichero de actualizaciones realizadas (updates-done)
