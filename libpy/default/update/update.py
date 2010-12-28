@@ -36,7 +36,8 @@ def actualizar(modo='post'):
             if m_coment:
                 continue
 
-            m_issue = re.search(r'^(\w+)\s+(pre|post)\s+([\w./]+)', linea, re.I | re.U)
+            m_issue = re.search(r'^([\w\-\._]+)\s+(pre|post)\s+([\w./]+)', 
+                                linea, re.I | re.U)
             if m_issue:
                 if m_issue.group(1) in realizados or \
                 m_issue.group(2).lower() != modo.lower():
