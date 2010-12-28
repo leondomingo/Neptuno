@@ -2,15 +2,17 @@
 
 import os
 import sys
-from config import CONFIG
-sys.path = sys.path + CONFIG['paths']
 import re
 import subprocess as sp
+from config import CONFIG
+sys.path = sys.path + CONFIG['paths']
 
 def actualizar(modo='post'):
-
+    
     if modo.lower() != 'pre' and modo.lower() != 'post':
         raise Exception('Modo "%s" incorrecto' % modo)
+
+    sys.stdout.write('Actualizando en modo "%s"\n' % modo)
 
     # leer actualizaciones realizadas
     realizados = []
@@ -36,6 +38,8 @@ def actualizar(modo='post'):
             if m_coment:
                 continue
 
+            # 7916.modelo    post    ./issue_7916/issue_7916.sql
+            # 7916-otros     post    ./issue_7916/issue_7916.py
             m_issue = re.search(r'^([\w\-\._]+)\s+(pre|post)\s+([\w./]+)', 
                                 linea, re.I | re.U)
             if m_issue:
