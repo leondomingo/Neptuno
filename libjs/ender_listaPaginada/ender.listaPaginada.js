@@ -71,8 +71,7 @@ css.attr({
         $(this).data('editable',p.editable);
         $(this).data('campos',p.params.camposEdicion);
         //$(this).data('fEdicionCampos',p.params.fEdicionCampos);
-        console.log('******');
-        console.log(p.params.fEdicionCampos);
+
         $(this).attr('listaPaginada',true);
     	  $(this).attr('listaInicializada',true);
     		var lugar = $(this);
@@ -103,7 +102,7 @@ css.attr({
   	  var borrable = $(this).data("borrable");
   	  var editable = $(this).data("editable");
   	  var lugar = $(this);
-console.log('a');
+
       if(borrable)
       {
         if(typeof(fFinal)=="function")
@@ -133,7 +132,7 @@ console.log('a');
           }
         
       }      
-  	  console.log(sw);
+  	  
   	  $.ajax(
         {
           url:sw,
@@ -257,22 +256,25 @@ console.log('a');
       
       for(var i=0;i<campos.length;i++)
       {
-        var html = '<div class="campo" ';
-        if(campos[i].texto==null || campos[i].texto=='') html += ' style="display:none;" ';
+        var html = '<div class="campo  ';
+        if(campos[i].texto==null || campos[i].texto=='') html += ' oculto ';
+        if(campos[i].requerido == true) html += ' requerido ';
+        html += '"';
         html += '>';
         html += '<div class="titulo">'+campos[i].texto+'</div>';
         html += '<div class="valor">';
 
-        html += '<input id="'+campos[i].nombre+'" name="'+campos[i].nombre+'" value="'+campos[i].valor+'"></input>';
+        html += '<input id="'+campos[i].nombre+'" name="'+campos[i].nombre+'" value="'+campos[i].valor+'" "';
+        if(campos[i].requerido == true) html+= " requerido=true ";
+        html += '></input>';
         html += "</div>";
         html +='</div>';
         ventana.append(html);      
       }
-
+      if($().wTooptip != undefined) ventana.find('.requerido .titulo').wTooltip({content:"Campo requerido", appendTip:ventana});
       ventana.find('#id_sesion, #id_usuario').hide();
       ventana.find('nuevoCampoListaPaginada').bind('submit',$(this).listaPaginada.enviarRegistro)
-      ventana.dialog();
-
+      ventana.dialog({ width: 600, title:"Evaluaciones" });
       ventana.dialog('option','buttons',
         {
           "Cancelar":function(){ventana.dialog('close');},
@@ -284,7 +286,8 @@ console.log('a');
         }
       );
       ventana.dialog('open');
-      if(lista.data('fEdicionCampos')) lista.data('fEdicionCampos')(); 
+      if(lista.data('fEdicionCampos')) lista.data('fEdicionCampos')();
+       
       return ventana;
     },
     editarRegistro:function()
@@ -323,43 +326,60 @@ console.log('a');
       var ventana = $(this).data('ventana');
          
       var campos = ventana.find('[id]').not('#id_usuario,#id_sesion,#tabla');
-      var data = {};
-      data.id_usuario = ventana.find('#id_usuario').val();
-      data.id_sesion = ventana.find('#id_sesion').val();
-      data.tabla = ventana.find('#tabla').val();
-
-      data.datos = "{";
-      
-      for(var i=0;i<campos.length;i++)
+      var requeridos = ventana.find('[requerido="true"]');
+      var errores = false;
+      $('[requerido="true"]').each(function()
+                                   {
+                                      if($(this).val() =='')
+                                      {
+                                          $(this).css('background-color','#FAA'); 
+                                          errores = true;
+                                      }
+                                   });
+      if(!errores)
       {
-        if($(campos[i]).val()!="null")
-        {
-          if(i>0) data.datos +=', '
-          data.datos += '"'+$(campos[i]).attr('id')+'" : "'+$(campos[i]).val()+'"';
-        }
-      };
-      data.datos += "}";      
-      
-
-      var sw_guardar = lista.data('sw_guardar');  
-
-
-
-      ventana.dialog('close');
-
-      $.ajax(
-        {
-          url:sw_guardar,
-          method:'POST',
-          dataType:'json',
-          data:data,
-          success:function()
-          {
-            lista.listaPaginada('cargar');
-          },
+        var data = {};
+        data.id_usuario = ventana.find('#id_usuario').val();
+        data.id_sesion = ventana.find('#id_sesion').val();
+        data.tabla = ventana.find('#tabla').val();
+  
+        data.datos = "{";
         
-        }
-      );
+        for(var i=0;i<campos.length;i++)
+        {
+          if($(campos[i]).val()!="null")
+          {
+            if(i>0) data.datos +=', '
+            data.datos += '"'+$(campos[i]).attr('id')+'" : "'+$(campos[i]).val()+'"';
+          }
+        };
+        data.datos += "}";      
+        
+  
+        var sw_guardar = lista.data('sw_guardar');  
+  
+  
+  
+        ventana.dialog('close');
+  
+        $.ajax(
+          {
+            url:sw_guardar,
+            method:'POST',
+            dataType:'json',
+            data:data,
+            success:function()
+            {
+              lista.listaPaginada('cargar');
+            },
+          
+          }
+        );
+      }
+      else
+      {
+        alert('Rellene todos los campos indicados, por favor');
+      }
     
     }
   
@@ -541,3 +561,6 @@ function jsonToGet(json)
 	var str_get = JSON.stringify(json).replace(/,/g,"&").replace(/ /g,"").replace(/:/g,"=").replace(/{/g,'').replace(/}/g,'').replace(/"/g,'').replace('(','').replace(')','');
 	return str_get;
 }
+
+
+

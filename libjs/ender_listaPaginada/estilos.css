@@ -114,3 +114,37 @@
 
 }
 
+.nuevoCampoListaPaginada input, .nuevoCampoListaPaginada select, .nuevoCampoListaPaginada selector, .nuevoCampoListaPaginada textarea
+{
+  min-width: 220px;
+  margin-right:10px;
+}
+
+.nuevoCampoListaPaginada .campo
+{
+  width:280px;
+  float:left;
+}
+
+
+.nuevoCampoListaPaginada .requerido .titulo
+{
+  font-weight:bold;
+  
+}
+
+.nuevoCampoListaPaginada .requerido .valor *:not(button)
+{
+  background-color:#FFD;
+}
+
+.nuevoCampoListaPaginada .valor *
+{
+  border-radius:5px;
+  -moz-border-radius:5px;  
+}
+
+.nuevoCampoListaPaginada .oculto
+{
+  display:none;
+}

@@ -280,31 +280,57 @@ function LlamadaIncorrecta(xhr,msg,excep)
   }
   
 
-  $.fn.soloFecha = function(enlazar)
+  $.fn.soloFecha = function(enlazar, no_nulo)
   {
     var valor=  $(this).val();
     valor = valor.replace(/[^0-9-/]/g, "");
     if((valor[valor.length-1] == '.')||(valor[valor.length-1] == ',')) valor += '0';
     if((valor[0]=='.')||(valor[0]==',')) valor = '0'+valor;
-    if(valor=='') valor = "01/01/1900";
+
     
-    valor = valor.replace(/,/g,'-');
+    if(valor != '')
+    {
+      valor = valor.replace(/,/g,'-');
     
-    valor = valor.replace(/\//g,'-');
+      valor = valor.replace(/\//g,'-');
     
-    var valor_dividido = valor.split('-');
+      var valor_dividido = valor.split('-');
+
+      if(valor_dividido != null && valor_dividido != undefined && valor_dividido.length > 2)
+      {
+
+        var anyo = valor_dividido[2].replace(/[^0-9]/g, "").substring(0,4);
+
+        if(anyo.length < 4) 
+        {
+          anyo += '0000';
+          anyo = anyo.substr(0,4);
+        }
+
+        valor = valor_dividido[0].replace(/[^0-9]/g, "")+'/'+valor_dividido[1].replace(/[^0-9]/g, "")+'/'+anyo;
+
+      }
+      else
+      {
+        valor = '';
+
+      }    
+    }
     
-    var anyo = valor_dividido[2].replace(/[^0-9]/g, "").substring(0,4);
-    if(anyo.length < 4) anyo += '0000';
-    valor = valor_dividido[0].replace(/[^0-9]/g, "")+'/'+valor_dividido[1].replace(/[^0-9]/g, "")+'/'+anyo;
-    
+    if(valor=='' && no_nulo)
+    {
+      var currentTime = new Date()
+      valor = currentTime.getDay()+'/'+currentTime.getMonth()+'/'+currentTime.getFullYear();
+    }
+
+
     
     
     $(this).val(valor);
     
     if(enlazar)
     {
-    
+      $(this).unbind('change');
       $(this).bind('change',$(this).soloFecha);
       
     }
@@ -317,6 +343,35 @@ function LlamadaIncorrecta(xhr,msg,excep)
   
   
 })(jQuery);
+
+
+var oldAlert = alert;
+
+function jAlert(mensaje)
+{
+  $('body').find('.alert').remove();
+  var params =
+  {
+    modal: true,
+    dialogClass: 'alertNeptuno',
+    title: "Aviso",
+    bgiframe: true,
+    buttons: 
+    {
+      Aceptar: function() 
+      {
+        $(this).dialog('close');
+      }
+    }
+  };
+  
+  $('body').append('<div class="alert">'+mensaje+'</div>').find('.alert').dialog(params);
+
+}
+
+ 
+
+var alert = jAlert;
 
 
 $('.numerico').live('bind',$(this).soloNumeros);
