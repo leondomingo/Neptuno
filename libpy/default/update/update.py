@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 
-import sys
 import os
+import sys
 import re
 import subprocess as sp
-from update_config import CONFIG
+from config import CONFIG
+sys.path = sys.path + CONFIG['paths']
 
 def actualizar(modo='post'):
-
+    
     if modo.lower() != 'pre' and modo.lower() != 'post':
         raise Exception('Modo "%s" incorrecto' % modo)
+
+    sys.stdout.write('Actualizando en modo "%s"\n' % modo)
 
     # leer actualizaciones realizadas
     realizados = []
@@ -20,7 +23,8 @@ def actualizar(modo='post'):
                 m_issue = re.search(r'^(\w+)\s+(pre|post)', linea)
                 if m_issue and m_issue.group(2) == modo.lower() and \
                 m_issue.group(1) not in realizados:
-                    realizados.append('%s    %s' % m_issue.group(1))
+                    realizados.append('%s    %s' % \
+                                      (m_issue.group(1), m_issue.group(2)))
 
         finally:
             f_done.close()
@@ -34,7 +38,10 @@ def actualizar(modo='post'):
             if m_coment:
                 continue
 
-            m_issue = re.search(r'^(\w+)\s+(pre|post)\s+([\w./]+)', linea, re.I | re.U)
+            # 7916.modelo    post    ./issue_7916/issue_7916.sql
+            # 7916-otros     post    ./issue_7916/issue_7916.py
+            m_issue = re.search(r'^([\w\-\._]+)\s+(pre|post)\s+([\w./]+)', 
+                                linea, re.I | re.U)
             if m_issue:
                 if m_issue.group(1) in realizados or \
                 m_issue.group(2).lower() != modo.lower():
@@ -49,16 +56,16 @@ def actualizar(modo='post'):
                                             (m_issue.group(1), m_issue.group(2)))
                         if ext == '.py':
                             # ejecutar Python
-                            sp.call([sys.executable, m_issue.group(3)])
+                            sp.check_call([sys.executable, m_issue.group(3)])
 
                         elif ext == '.sql':
                             # ejecutar SQL
                             sys.stdout.write('Ejecutando SQL...\n')
-                            sp.call([os.path.join(CONFIG['pg_path'], 'psql'),
-                                     '-h', CONFIG['host'], 
-                                     '-U', CONFIG['user'],
-                                     '-d', CONFIG['db'],
-                                     '-f', m_issue.group(3)]
+                            sp.check_call([os.path.join(CONFIG['pg_path'], 'psql'),
+                                           '-h', CONFIG['host'], 
+                                           '-U', CONFIG['user'],
+                                           '-d', CONFIG['db'],
+                                           '-f', m_issue.group(3)]
                                     )
 
                         # registrar en fichero de actualizaciones realizadas (updates-done)
