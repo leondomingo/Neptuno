@@ -148,3 +148,19 @@
 {
   display:none;
 }
+
+.botonBuscador
+{
+  max-width:200px;
+}
+
+.paginacion
+{
+  max-width:200px;
+}
+
+.paginacion > *
+{
+  max-width:40px; 
+}
+}

@@ -67,8 +67,8 @@ css.attr({
         $(this).data("sw_datosRegistro",sw_datosRegistro);
         $(this).data('fFila',fFila);
         $(this).data('fFinal',fFinal);
-        $(this).data('borrable',p.borrable);
-        $(this).data('editable',p.editable);
+        $(this).data('borrable',p.params.borrable);
+        $(this).data('editable',p.params.editable);
         $(this).data('campos',p.params.camposEdicion);
         //$(this).data('fEdicionCampos',p.params.fEdicionCampos);
 
@@ -103,7 +103,7 @@ css.attr({
   	  var editable = $(this).data("editable");
   	  var lugar = $(this);
 
-      if(borrable)
+      if(borrable==true)
       {
         if(typeof(fFinal)=="function")
         {
@@ -122,7 +122,7 @@ css.attr({
           }
         }
       }
-      if(editable)
+      if(editable==true)
       {
           var fFinalOriginalEditar = fFinal;
           fFinal = function()
@@ -407,9 +407,7 @@ css.attr({
           sw:arguments[0],
           params:arguments[1],
           fFila:arguments[2],
-          fFinal:arguments[3],
-          borrable:arguments[4],
-          editable:arguments[5]          
+          fFinal:arguments[3]          
         }
         arguments = [argumentos];
       } 
