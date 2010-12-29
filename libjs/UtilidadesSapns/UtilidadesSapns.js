@@ -306,8 +306,15 @@ function LlamadaIncorrecta(xhr,msg,excep)
           anyo += '0000';
           anyo = anyo.substr(0,4);
         }
-
-        valor = valor_dividido[0].replace(/[^0-9]/g, "")+'/'+valor_dividido[1].replace(/[^0-9]/g, "")+'/'+anyo;
+        var dia = valor_dividido[0].replace(/[^0-9]/g, "");
+        if(dia.length<2) dia = '0'+dia;
+        if(dia>31 || dia<1) dia = '01';
+        
+        var mes = valor_dividido[1].replace(/[^0-9]/g, "");
+        if(mes.length<2) mes = '0'+mes;
+        if(mes>12 || mes<1) mes = '01';
+        
+        valor = dia +'/'+mes+'/'+anyo;
 
       }
       else
@@ -320,7 +327,7 @@ function LlamadaIncorrecta(xhr,msg,excep)
     if(valor=='' && no_nulo)
     {
       var currentTime = new Date()
-      valor = currentTime.getDay()+'/'+currentTime.getMonth()+'/'+currentTime.getFullYear();
+      valor = currentTime.getDate()+'/'+(currentTime.getMonth()+1)+'/'+currentTime.getFullYear();
     }
 
 
