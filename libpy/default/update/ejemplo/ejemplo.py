@@ -3,7 +3,9 @@
 import os
 import sys
 sys.path.append(os.getcwd())
-from update_config import CONFIG
+from config import CONFIG
 sys.path = sys.path + CONFIG['paths']
 
-# TODO: Aquí las operaciones de actualización
+if __name__ == '__main__':
+    # TODO: Aquí las operaciones de actualización
+    pass
