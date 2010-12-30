@@ -70,6 +70,7 @@ css.attr({
         $(this).data('borrable',p.params.borrable);
         $(this).data('editable',p.params.editable);
         $(this).data('campos',p.params.camposEdicion);
+        $(this).data('filtroCamposNuevo',p.params.filtroCamposNuevo);
         //$(this).data('fEdicionCampos',p.params.fEdicionCampos);
 
         $(this).attr('listaPaginada',true);
@@ -249,19 +250,19 @@ css.attr({
 
       var lista = $(this);
 
-      campos.push({"nombre":"id","texto":"","valor":"null"});
+      campos.push({"nombre":"id","etiqueta":"","valor":"null"});
       $(this).data('campos',campos);
       
-      $(this).find('form.nuevoCampoListaPaginada').data('padre',$(this));
+      $(this).find('.nuevoCampoListaPaginada').data('padre',$(this));
       
       for(var i=0;i<campos.length;i++)
       {
         var html = '<div class="campo  ';
-        if(campos[i].texto==null || campos[i].texto=='') html += ' oculto ';
+        if(campos[i].etiqueta==null || campos[i].etiqueta=='') html += ' oculto ';
         if(campos[i].requerido == true) html += ' requerido ';
         html += '"';
         html += '>';
-        html += '<div class="titulo">'+campos[i].texto+'</div>';
+        html += '<div class="titulo">'+campos[i].etiqueta+'</div>';
         html += '<div class="valor">';
 
         html += '<input id="'+campos[i].nombre+'" name="'+campos[i].nombre+'" value="'+campos[i].valor+'" "';
@@ -272,7 +273,9 @@ css.attr({
         ventana.append(html);      
       }
       if($().wTooptip != undefined) ventana.find('.requerido .titulo').wTooltip({content:"Campo requerido", appendTip:ventana});
+      
       ventana.find('#id_sesion, #id_usuario').hide();
+      $(this).listaPaginada('tiposDeCampos');
       ventana.find('nuevoCampoListaPaginada').bind('submit',$(this).listaPaginada.enviarRegistro)
       ventana.dialog({ width: 600, title:"Evaluaciones" });
       ventana.dialog('option','buttons',
@@ -285,6 +288,7 @@ css.attr({
                               }
         }
       );
+      
       ventana.dialog('open');
       if(lista.data('fEdicionCampos')) lista.data('fEdicionCampos')();
        
@@ -350,8 +354,20 @@ css.attr({
           if($(campos[i]).val()!="null")
           {
             if(i>0) data.datos +=', '
-            data.datos += '"'+$(campos[i]).attr('id')+'" : "'+$(campos[i]).val()+'"';
+            if(  isNaN(
+                        $(campos[i]).val()
+                       ) || 
+                       $(campos[i]).val()=='')
+            {
+              data.datos += '"'+$(campos[i]).attr('id')+'" : "'+$(campos[i]).val()+'"';  
+            }
+            else
+            {
+              data.datos += '"'+$(campos[i]).attr('id')+'" : '+$(campos[i]).val()+'';
+            }
+            
           }
+          
         };
         data.datos += "}";      
         
@@ -381,6 +397,38 @@ css.attr({
         alert('Rellene todos los campos indicados, por favor');
       }
     
+    },
+    tiposDeCampos:function()
+    {
+      var ventana=$('.nuevoCampoListaPaginada');
+      
+      var campos = $(this).data('campos');
+      
+      for(var i=0;i<campos.length;i++)
+      {
+        console.log(campos[i].nombre +' - '+campos[i].tipo);
+        if(campos[i].tipo == 'date')
+        {
+          console.log('ttt');
+          neptuno.cargaDatePicker($('.nuevoCampoListaPaginada').find("#"+campos[i].nombre));
+          //$('.nuevoCampoListaPaginada').find("#"+campos[i].nombre).soloFecha(true,true);
+          
+        }
+      }
+      
+      if($(this).data('filtroCamposNuevo'))
+      {
+        var filtro = $(this).data('filtroCamposNuevo');
+        for(var j=0;j<filtro.length;j++)
+        {
+          alert(filtro[j][1]);
+          $('.nuevoCampoListaPaginada').find("#"+filtro[j][0]).val(filtro[j][1]);
+          $('.nuevoCampoListaPaginada').find("#"+filtro[j][0]).parents('.campo').hide();  
+        }
+        
+      }
+      
+      $('.nuevoCampoListaPaginada').find('#id').parents('.campo').hide(); 
     }
   
   }

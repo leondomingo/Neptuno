@@ -283,17 +283,20 @@ function LlamadaIncorrecta(xhr,msg,excep)
   $.fn.soloFecha = function(enlazar, no_nulo)
   {
     var valor=  $(this).val();
+
     valor = valor.replace(/[^0-9-/]/g, "");
+
     if((valor[valor.length-1] == '.')||(valor[valor.length-1] == ',')) valor += '0';
+
     if((valor[0]=='.')||(valor[0]==',')) valor = '0'+valor;
 
-    
+
     if(valor != '')
     {
       valor = valor.replace(/,/g,'-');
     
       valor = valor.replace(/\//g,'-');
-    
+
       var valor_dividido = valor.split('-');
 
       if(valor_dividido != null && valor_dividido != undefined && valor_dividido.length > 2)
@@ -309,7 +312,7 @@ function LlamadaIncorrecta(xhr,msg,excep)
         var dia = valor_dividido[0].replace(/[^0-9]/g, "");
         if(dia.length<2) dia = '0'+dia;
         if(dia>31 || dia<1) dia = '01';
-        
+
         var mes = valor_dividido[1].replace(/[^0-9]/g, "");
         if(mes.length<2) mes = '0'+mes;
         if(mes>12 || mes<1) mes = '01';

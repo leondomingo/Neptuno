@@ -112,5 +112,17 @@ var rutaBaseBuscador = '/neptuno/';
 			$(this).activarBoton(nombreBoton);
 		}		
 	}	
+	
+	$.fn.botonNuevo =function()
+	{
+	  var buscador = $(this)
+	  $(this).nuevoBotonBuscador('Nuevo',
+                                           'Nuevo',
+                                            function()
+                                            {
+                                              buscador.find('.resultadosBuscador').listaPaginada('nuevoRegistro');  
+                                            });
+    
+	} 
 
 })(jQuery);

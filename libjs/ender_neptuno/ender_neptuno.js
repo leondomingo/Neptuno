@@ -1924,3 +1924,36 @@ function continuar(texto, fSalida)
             					 ); // Dialogo		
 
 }
+
+
+function getCampos(tabla)
+{
+  var usuarioNeptuno = neptuno.obtenerusuarioNeptuno();
+  var campos = [];
+  $.ajax(
+  {
+      url:'/neptuno/sw/datosRegistro.py',
+      dataType:'json',
+      async:false,
+      data:
+      {
+        id_usuario:usuarioNeptuno.id,
+        id_sesion:usuarioNeptuno.challenge,
+        tabla:tabla,
+        id:-1
+      },
+      success:function(res)
+      {
+        campos = res; 
+        for(var i=0;i<campos.length;i++){if(!campos[i].valor) campos[i].valor=''};
+        campos.push({ nombre: "id_usuario", etiqueta: "", valor: usuarioNeptuno.id, requerido:true});
+        campos.push({ nombre: "id_sesion", etiqueta:"", valor: usuarioNeptuno.challenge, requerido:true});
+        campos.push({ nombre: "tabla", etiqueta:"", valor: tabla, requerido:true});
+        return campos;          
+      }
+      
+  }
+  );
+  
+  return campos;
+}
