@@ -353,18 +353,25 @@ css.attr({
         {
           if($(campos[i]).val()!="null")
           {
-            if(i>0) data.datos +=', '
-            if(  isNaN(
-                        $(campos[i]).val()
-                       ) || 
-                       $(campos[i]).val()=='')
+            if(i>0) data.datos +=', ';
+            var valor = $(campos[i]).val();
+            if($(campos[i]).hasClass('fecha') && valor=='')
             {
-              data.datos += '"'+$(campos[i]).attr('id')+'" : "'+$(campos[i]).val()+'"';  
-            }
+              data.datos += '"'+$(campos[i]).attr('id')+'" : null';  
+            } 
             else
             {
-              data.datos += '"'+$(campos[i]).attr('id')+'" : '+$(campos[i]).val()+'';
+              if(  isNaN($(campos[i]).val()) || 
+                       $(campos[i]).val()=='')
+              {
+                data.datos += '"'+$(campos[i]).attr('id')+'" : "'+$(campos[i]).val()+'"';  
+              }
+              else
+              {
+                data.datos += '"'+$(campos[i]).attr('id')+'" : '+$(campos[i]).val()+'';
+              }
             }
+
             
           }
           
