@@ -250,7 +250,8 @@ css.attr({
 
       var lista = $(this);
 
-      campos.push({"nombre":"id","etiqueta":"","valor":"null"});
+      
+      
       $(this).data('campos',campos);
       
       $(this).find('.nuevoCampoListaPaginada').data('padre',$(this));
@@ -272,6 +273,8 @@ css.attr({
         html +='</div>';
         ventana.append(html);      
       }
+      
+      
       if($().wTooptip != undefined) ventana.find('.requerido .titulo').wTooltip({content:"Campo requerido", appendTip:ventana});
       
       ventana.find('#id_sesion, #id_usuario').hide();
@@ -355,7 +358,7 @@ css.attr({
           {
             if(i>0) data.datos +=', ';
             var valor = $(campos[i]).val();
-            if($(campos[i]).hasClass('fecha') && valor=='')
+            if( ($(campos[i]).hasClass('fecha') && valor=='') || (campos[i] == 'id' && valor == '') )
             {
               data.datos += '"'+$(campos[i]).attr('id')+'" : null';  
             } 
