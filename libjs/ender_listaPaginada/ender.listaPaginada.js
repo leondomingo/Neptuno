@@ -418,7 +418,7 @@ css.attr({
         {
           console.log('ttt');
           neptuno.cargaDatePicker($('.nuevoCampoListaPaginada').find("#"+campos[i].nombre));
-          //$('.nuevoCampoListaPaginada').find("#"+campos[i].nombre).soloFecha(true,true);
+          $('.nuevoCampoListaPaginada').find("#"+campos[i].nombre).soloFecha(true,true);
           
         }
       }
