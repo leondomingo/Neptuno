@@ -31,7 +31,7 @@ try:
 except ImportError:
     DEFINICION_CLASES = None
 
-from const_datos import ROL_TABLAS, ROL_COLUMNAS
+from nucleo.const_datos import ROL_TABLAS, ROL_COLUMNAS
 usuariosNeptuno.privl_tabla = RolTablas(ROL_TABLAS)
 usuariosNeptuno.privl_columna = RolColumnas(ROL_COLUMNAS)
 
