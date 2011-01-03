@@ -142,6 +142,7 @@ var rutaBaseSelectorSW = '/neptuno/sw';
           var selector = $(this);
           $(this).find('.zonaBuscador').buscador(sw,params,null, function(){botonesSelector(selector);if(fBuscador!=null) fBuscador();selector.find('.resultados').ajustarAnchoCeldas()});
           $(this).trigger('cargado');
+          $(this).attr('inicializado',true);
         });
         
       }

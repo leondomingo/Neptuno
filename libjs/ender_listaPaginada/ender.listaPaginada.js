@@ -472,12 +472,25 @@ css.attr({
       
       if($(this).data('filtroCamposNuevo'))
       {
+       
         var filtro = $(this).data('filtroCamposNuevo');
         for(var j=0;j<filtro.length;j++)
         {
+          var nombreCampo = filtro[j][0];
+          var valorCampo = filtro[j][1];
+          if($('.nuevoCampoListaPaginada').find("#"+nombreCampo).hasClass('selectorEnder') &&  !!!$('.nuevoCampoListaPaginada').find("#"+nombreCampo).attr('inicializado'))
+          {
+            $('.nuevoCampoListaPaginada').find("#"+nombreCampo).bind('cargado',function()
+                                                                                {
+                                                                                  $('.nuevoCampoListaPaginada').find("#"+nombreCampo).val(valorCampo);
+                                                                                });
+          }
+          else
+          {
+            $('.nuevoCampoListaPaginada').find("#"+nombreCampo).val(valorCampo);  
+          }
           
-          $('.nuevoCampoListaPaginada').find("#"+filtro[j][0]).val(filtro[j][1]);
-          $('.nuevoCampoListaPaginada').find("#"+filtro[j][0]).parents('.campo').hide();  
+          $('.nuevoCampoListaPaginada').find("#"+nombreCampo).parents('.campo').hide();  
         }
         
       }
