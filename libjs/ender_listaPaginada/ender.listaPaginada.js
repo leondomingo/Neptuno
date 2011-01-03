@@ -54,7 +54,7 @@ css.attr({
         }
         else
         {
-          var sw_datosRegistro = '/neptuno/sw/datosRegistro.py/raw';
+          var sw_datosRegistro = '/neptuno/sw/datosRegistro.py';
         }     
 
         var params = p.params;
@@ -144,8 +144,12 @@ css.attr({
           dataType: "json",
           success:function(res)
           {
-            lugar.find('.listaPaginada').html('<div class="exportar" onclick="$(this).exportarCSVListaPaginada()">exportar</div><div class="paginacion"></div>');
             
+
+            lugar.find('.listaPaginada').html('<div class="exportar" onclick="$(this).exportarCSVListaPaginada()">exportar</div><div class="paginacion"></div>');
+
+        
+  
             lugar.find('.listaPaginada').eq(0).listaJSON(res,fFila,fFinal);
             lugar.find('.listaPaginada').append('<div class="numero_resultados">Número de resultados: '+res.numero_resultados+'</div>');
             
@@ -168,8 +172,7 @@ css.attr({
               
               
               lugar.find('.listaPaginada').find('.paginacion').append('<div class="texto_paginas">de '+total_paginas+'</div>');         
-              
-    
+                  
               //lugar.find('.listaPaginada').find('.paginacion').html(n_paginas);
             }
             
@@ -208,6 +211,7 @@ css.attr({
        var sw_borrar = lugar.data('sw_borrar');
        var datos = {}
        datos.tabla = params.tabla;
+       datos.tablaEdicion = params.tablaEdicion;
        datos.id_usuario = params.id_usuario;
        datos.id_sesion = params.id_sesion;
        datos.id = idObjeto;
@@ -274,7 +278,7 @@ css.attr({
         ventana.append(html);      
       }
       
-      
+      ventana.find('#id').val("null");
       if($().wTooptip != undefined) ventana.find('.requerido .titulo').wTooltip({content:"Campo requerido", appendTip:ventana});
       
       ventana.find('#id_sesion, #id_usuario').hide();
@@ -293,6 +297,7 @@ css.attr({
       );
       
       ventana.dialog('open');
+      ventana.fadeIn();
       if(lista.data('fEdicionCampos')) lista.data('fEdicionCampos')();
        
       return ventana;
@@ -302,6 +307,9 @@ css.attr({
       var padre = $(this).parents('[listaPaginada]');
       var params = padre.data('params');
       var idObjeto = $(this).parents('.fila').attr('idObjeto');
+      var tabla = params.tablaEdicion;
+      if(!tabla) tabla = params.tabla;
+      
       $.ajax(
         {
           url:padre.data('sw_datosRegistro'),
@@ -310,15 +318,32 @@ css.attr({
           {
             id_usuario:params.id_usuario,
             id_sesion:params.id_sesion,
-            tabla:params.tabla,
+            tabla:tabla,
             id:idObjeto
           },
           success:function(res)
           {
             var ventana = padre.listaPaginada('nuevoRegistro');
-            for(campo in res)
+            
+            
+            for(var x=0;x<res.length;x++)
             {
-              ventana.find('#'+campo).val(res[campo]);
+              var campo = res[x];
+              
+              if(!!campo.utilizar_selector == false) 
+              {
+                
+                
+                ventana.find('#'+campo.nombre).val(campo.valor);
+                
+              }
+              else
+              {
+                ventana.find('#'+campo.nombre).selectEnder('selecciona',campo.valor,campo.titulo);
+                ventana.find('#'+campo.nombre).val(campo.valor);
+                ventana.find('#'+campo.nombre).find('.elementoSeleccionado').html(campo.titulo);
+              }
+              
             }
           }
         }
@@ -356,9 +381,9 @@ css.attr({
         {
           if($(campos[i]).val()!="null")
           {
-            if(i>0) data.datos +=', ';
+            if(data.datos != "{") data.datos +=', ';
             var valor = $(campos[i]).val();
-            if( ($(campos[i]).hasClass('fecha') && valor=='') || (campos[i] == 'id' && valor == '') )
+            if( ($(campos[i]).hasClass('fecha') && valor==''))
             {
               data.datos += '"'+$(campos[i]).attr('id')+'" : null';  
             } 
@@ -398,7 +423,10 @@ css.attr({
             {
               lista.listaPaginada('cargar');
             },
-          
+            error:function()
+            {
+              alert('Se ha producido un error al guardar los datos');
+            }
           }
         );
       }
@@ -411,18 +439,34 @@ css.attr({
     tiposDeCampos:function()
     {
       var ventana=$('.nuevoCampoListaPaginada');
-      
+      var usuarioNeptuno = neptuno.obtenerusuarioNeptuno();
       var campos = $(this).data('campos');
       
       for(var i=0;i<campos.length;i++)
       {
-        console.log(campos[i].nombre +' - '+campos[i].tipo);
+        
         if(campos[i].tipo == 'date')
         {
-          console.log('ttt');
+        
           neptuno.cargaDatePicker($('.nuevoCampoListaPaginada').find("#"+campos[i].nombre));
           $('.nuevoCampoListaPaginada').find("#"+campos[i].nombre).soloFecha(true,true);
           
+        }
+        else if
+        (!!campos[i].utilizar_selector == true)
+        {
+          var padre = $('.nuevoCampoListaPaginada').find("#"+campos[i].nombre).parent();
+          padre.find("#"+campos[i].nombre).remove();
+          padre.append('<div id="'+campos[i].nombre+'" class="anchoDoble"></div>');
+          padre.find("#"+campos[i].nombre).parents('.campo').addClass('anchoDoble');
+          
+          var paramsSelector =
+          {
+            tabla:campos[i].tabla_relacionada,
+            campoIdentificador:campos[i].campos_referencia,
+            usuario:usuarioNeptuno
+          }  
+          $('.nuevoCampoListaPaginada').find("#"+campos[i].nombre).selectEnder(paramsSelector);
         }
       }
       
@@ -431,7 +475,7 @@ css.attr({
         var filtro = $(this).data('filtroCamposNuevo');
         for(var j=0;j<filtro.length;j++)
         {
-          alert(filtro[j][1]);
+          
           $('.nuevoCampoListaPaginada').find("#"+filtro[j][0]).val(filtro[j][1]);
           $('.nuevoCampoListaPaginada').find("#"+filtro[j][0]).parents('.campo').hide();  
         }
@@ -528,7 +572,7 @@ css.attr({
 		else
 			var lugar = $(this).find('.listaPaginada').parent();
 			
-		lugar.find('.cabecera').bind('click',$(this).ordena);
+		
 	}
 	
 	$.fn.ordena = function(e)

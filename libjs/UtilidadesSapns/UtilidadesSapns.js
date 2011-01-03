@@ -327,7 +327,11 @@ function LlamadaIncorrecta(xhr,msg,excep)
     if(valor=='' && no_nulo)
     {
       var currentTime = new Date()
-      valor = currentTime.getDate()+'/'+(currentTime.getMonth()+1)+'/'+currentTime.getFullYear();
+      var dia =currentTime.getDate();
+      if(dia <10) dia = '0'+dia;
+      var mes = currentTime.getMonth()+1;
+      if(mes <10) mes = '0'+mes;
+      valor = dia +'/'+mes+'/'+currentTime.getFullYear();
     }
 
 
@@ -348,7 +352,52 @@ function LlamadaIncorrecta(xhr,msg,excep)
     
   }    
   
+  $.fn.oldVal = $.fn.val;
   
+  $.fn.val = function(a)
+  {
+    
+    //console.log('#'+$(this).attr('id')+'.'+$(this).attr('class')+'.val('+a+') == '+$(this).oldVal());
+
+    if(a != null && a != undefined) 
+    {
+      if($(this).is("div"))
+      {
+        $(this).attr('value',a);
+        return true;  
+      }
+      else
+      {
+        $(this).oldVal(a);
+        return true;
+      }
+      
+      
+    }    
+    else 
+    {
+      
+      if($(this).is(".selectorEnder"))
+      {
+      
+        return $(this).attr('value');
+        
+      }
+      else if($(this).is("div"))
+      {
+      
+        return $(this).attr('value');
+      }
+      else
+      {
+        return $(this).oldVal();
+      }
+      
+    }
+
+
+  }
+
   
 })(jQuery);
 

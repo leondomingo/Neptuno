@@ -12,51 +12,6 @@ var rutaBaseSelectorSW = '/neptuno/sw';
 
 (function($)
 {
-  $.fn.oldVal = $.fn.val;
-  
-  $.fn.val = function(a)
-  {
-    
-    //console.log('#'+$(this).attr('id')+'.'+$(this).attr('class')+'.val('+a+') == '+$(this).oldVal());
-
-    if(a != null && a != undefined) 
-    {
-      if($(this).is("div"))
-      {
-        $(this).attr('value',a);
-        return true;  
-      }
-      else
-      {
-        $(this).oldVal(a);
-        return true;
-      }
-      
-      
-    }    
-    else 
-    {
-      
-      if($(this).is(".selectorEnder"))
-      {
-      
-        return $(this).attr('value');
-        
-      }
-      else if($(this).is("div"))
-      {
-      
-        return $(this).attr('value');
-      }
-      else
-      {
-        return $(this).oldVal();
-      }
-      
-    }
-
-
-  }
   
   $.fn.selectorTablaEnder = function(tabla,campo) // facilita la inicialización de un selector vacío sobre una tabla
   {
@@ -83,109 +38,146 @@ var rutaBaseSelectorSW = '/neptuno/sw';
       $(this).selectEnder(params);
   }
   
-  $.fn.selectEnder = function(params)
+  $.fn.selectEnder = function( method ) 
   {
-    
-    /* parametros */
-    /* seleccionado: Objeto que indica el registro seleccionado al inicializar, con formato {id: id_objeto, valor: texto a mostar}*/
-    var seleccionado = params.seleccionado;
-    
-    /* tabla: tabla de la que se recogen los datos en la BDD */
-    var tabla = params.tabla;
-    
-    /* filtro: campo y valor por el que se filtra la búsqueda*/
-    var filtro = params.filtro;
-    
-    /* campoIdentificador: Campo de la tabla del que se recoge el texto a mostrar una vez seleccionado un registro.
-    Puede contener varios campos separados por '+' */
-    var campoIdentificador = params.campoIdentificador;
-    if(campoIdentificador == null || campoIdentificador == '') campoIdentificador = 'id';
-    
-    /* usuario: objeto con los datos del usuario (id y challenge) */
-    var usuario = params.usuario;
-    
-    /* fBuscador: función que se ejecuta cuando se completa una llamada al buscador */
-    var fBuscador = params.fBuscador;
-    
-    /* fSeleccion: función que se ejecuta cuando se realiza una selección */
-    var fSeleccion = params.fSeleccion;
-    
-    /* sw: url del servicio web que accede a la base de datos*/
-    var sw = params.sw;
-    
-    /* extraParams: parametros adicionales que pudiera necesitar el sw */    
-    var extraParams = params.extraParams;
-    
-    /* fparametros*/
-    
-    
-    if(tabla != '' && tabla != null)
+    if ( metodos_selector[method] ) 
     {
-      if(sw == null || sw == '') sw = rutaBaseSelectorSW+'/buscar.py';
+      return metodos_selector[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
+    } 
+    return metodos_selector.init.apply( this, arguments );  
+  };
+
+  var metodos_selector =
+  {
+    init:function(params)
+    { 
+      /* parametros */
+      /* seleccionado: Objeto que indica el registro seleccionado al inicializar, con formato {id: id_objeto, valor: texto a mostar}*/
+      var seleccionado = params.seleccionado;
       
-      $(this).addClass('selectorEnder');
-      $(this).load(rutaCompletaSelector+'/plantilla.htm',null,function()
+      /* tabla: tabla de la que se recogen los datos en la BDD */
+      var tabla = params.tabla;
+      
+      /* filtro: campo y valor por el que se filtra la búsqueda*/
+      var filtro = params.filtro;
+      
+      /* campoIdentificador: Campo de la tabla del que se recoge el texto a mostrar una vez seleccionado un registro.
+      Puede contener varios campos separados por '+' */
+      var campoIdentificador = params.campoIdentificador;
+      if(campoIdentificador == null || campoIdentificador == '') campoIdentificador = 'id';
+      
+      /* usuario: objeto con los datos del usuario (id y challenge) */
+      var usuario = params.usuario;
+      
+      /* fBuscador: función que se ejecuta cuando se completa una llamada al buscador */
+      var fBuscador = params.fBuscador;
+      
+      /* fSeleccion: función que se ejecuta cuando se realiza una selección */
+      var fSeleccion = params.fSeleccion;
+      
+      /* sw: url del servicio web que accede a la base de datos*/
+      var sw = params.sw;
+      
+      /* extraParams: parametros adicionales que pudiera necesitar el sw */    
+      var extraParams = params.extraParams;
+      
+      /* fparametros*/
+      
+      
+      if(tabla != '' && tabla != null)
       {
-        $("head").append("<link>");
-        css = $("head").children(":last");
-        css.attr({
-            rel:  "stylesheet",
-            type: "text/css",
-            href: rutaCompletaSelector+'/estilos.css'
-        });      
+        if(sw == null || sw == '') sw = rutaBaseSelectorSW+'/buscar.py';
         
-     
-        var params = 
+        $(this).addClass('selectorEnder');
+        $(this).load(rutaCompletaSelector+'/plantilla.htm',null,function()
         {
-          busqueda: "",
-          id_usuario: usuario.id,
-          id_sesion: usuario.challenge,
-          campos: filtro,
-          limite_resultados: 10,
-          n_resultados: true,
-          pos: 0,
-          tabla: tabla
-        };
+          $("head").append("<link>");
+          css = $("head").children(":last");
+          css.attr({
+              rel:  "stylesheet",
+              type: "text/css",
+              href: rutaCompletaSelector+'/estilos.css'
+          });      
+          
+       
+          var params = 
+          {
+            busqueda: "",
+            id_usuario: usuario.id,
+            id_sesion: usuario.challenge,
+            campos: filtro,
+            limite_resultados: 10,
+            n_resultados: true,
+            pos: 0,
+            tabla: tabla
+          };
+          
+          
+          for(var nombrePropiedad in extraParams) 
+          {
+              eval("params."+nombrePropiedad+" = '"+extraParams[nombrePropiedad]+"'");
+          }
+          
+          
+          
+          if(seleccionado != null && seleccionado.id>0)
+          {
+            $(this).attr('value',seleccionado.id);
+            $(this).attr('idSeleccionado',seleccionado.id);
+            $(this).find('.elementoSeleccionado').html(seleccionado.valor);  
+          }
+          else
+          {
+            $(this).attr('value',null);
+            $(this).attr('idSeleccionado',null);
+          }
+          
+          $(this).find('.elementoSeleccionado').after('<div class="botonVaciar"><img src="'+rutaCompletaSelector+'/vaciar.png"></img></div>');
+          $(this).find('.botonVaciar').bind('click', $(this).vaciarSelectorEnder);
+          $(this).bind('mouseover',function(){$(this).find('.botonVaciar').css('opacity','1')});
+          $(this).bind('mouseout',function(){$(this).find('.botonVaciar').css('opacity','0.3')});
+          $(this).attr('campoIdentificador',campoIdentificador);
+          $(this).find('.elementoSeleccionado').click(despliegaBuscadorSelector);    
+          $(this).data('fSeleccion',fSeleccion);
+          var selector = $(this);
+          $(this).find('.zonaBuscador').buscador(sw,params,null, function(){botonesSelector(selector);if(fBuscador!=null) fBuscador();selector.find('.resultados').ajustarAnchoCeldas()});
+          $(this).trigger('cargado');
+        });
         
-        
-        for(var nombrePropiedad in extraParams) 
-        {
-            eval("params."+nombrePropiedad+" = '"+extraParams[nombrePropiedad]+"'");
-        }
-        
-        
-        
-        if(seleccionado != null && seleccionado.id>0)
-        {
-          $(this).attr('value',seleccionado.id);
-          $(this).attr('idSeleccionado',seleccionado.id);
-          $(this).find('.elementoSeleccionado').html(seleccionado.valor);  
-        }
-        else
-        {
-          $(this).attr('value',-1);
-          $(this).attr('idSeleccionado',-1);
-        }
-        
-        $(this).find('.elementoSeleccionado').after('<div class="botonVaciar"><img src="'+rutaCompletaSelector+'/vaciar.png"></img></div>');
-        $(this).find('.botonVaciar').bind('click', $(this).vaciarSelectorEnder);
-        $(this).bind('mouseover',function(){$(this).find('.botonVaciar').css('opacity','1')});
-        $(this).bind('mouseout',function(){$(this).find('.botonVaciar').css('opacity','0.3')});
-        $(this).attr('campoIdentificador',campoIdentificador);
-        $(this).find('.elementoSeleccionado').click(despliegaBuscadorSelector);    
-        $(this).data('fSeleccion',fSeleccion);
-        var selector = $(this);
-        $(this).find('.zonaBuscador').buscador(sw,params,null, function(){botonesSelector(selector);if(fBuscador!=null) fBuscador();selector.find('.resultados').ajustarAnchoCeldas()});
-      });
+      }
       
-    }
+    },
+    'selecciona':function(id,valor)
+    {
+
     
+      if($(this).find('.elementoSeleccionado').length > 0)
+      {   // si se hace esta llamada cuando el selector ya está creado, se hace la asignación
+        
+        $(this).find('.elementoSeleccionado').html(valor);
+        $(this).val(id);
+        $(this).attr('idSeleccionado',id);
+        $(this).change();    
+      }
+      else
+      { // sino espera a que el método init lance el trigger "cargado" y la hace entonces     
+        $(this).one('cargado',function()
+        {
+          $(this).find('.elementoSeleccionado').html(valor);
+          $(this).val(id);
+          $(this).attr('idSeleccionado',id);
+          $(this).change();    
+          
+        })
+      }
+
+    }
   }
-  
+    
   $.fn.vaciarSelectorEnder = function()
   {
-    $(this).parents('.selectorEnder').attr('value',-1);
-    $(this).parents('.selectorEnder').attr('idSeleccionado',-1);
+    $(this).parents('.selectorEnder').attr('value',null);
+    $(this).parents('.selectorEnder').attr('idSeleccionado',null);
     $(this).parents('.selectorEnder').find('.elementoSeleccionado').html('');
   }
   

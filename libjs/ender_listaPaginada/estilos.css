@@ -138,7 +138,7 @@
   background-color:#FFD;
 }
 
-.nuevoCampoListaPaginada .valor *
+.nuevoCampoListaPaginada .valor *:not(.celda,.fila)
 {
   border-radius:5px;
   -moz-border-radius:5px;  
@@ -163,4 +163,14 @@
 {
   max-width:40px; 
 }
+
+.nuevoCampoListaPaginada
+{
+  display:none;
+}
+
+
+.nuevoCampoListaPaginada .anchoDoble
+{
+  width:560px;
 }

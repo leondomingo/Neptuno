@@ -6,8 +6,6 @@ var rutaBaseBuscador = '/neptuno/';
 	{
 		var lugar = $(this);
 		
-		console.log('********++');
-		console.log(params.fEdicionCampos);
 		
 		var parametros = JSON.stringify(params).replace(/"/g,"'");
 		$("head").append("<link>");
@@ -30,8 +28,12 @@ var rutaBaseBuscador = '/neptuno/';
 			
 			lugar.find('.botonBuscador.buscar').bind('clickea',$(this).lanzaBuscador);
 			lugar.activarBoton('botonBuscador.buscar');
-
-
+      if(!!params.editable == true)
+      {
+        lugar.find('.buscador').botonNuevo();
+        lugar.find('.botonBuscador.buscar').click();
+      }
+      
 			
 			if(typeof fSalidaBuscador=='function')
 			{
@@ -64,8 +66,7 @@ var rutaBaseBuscador = '/neptuno/';
 		eval("var data =" + params);
 		
 		params = $(this).parents('.buscador').data('params');
-		console.log('+++++++');
-		console.log(params.fEdicionCampos);
+
 		
 		
 		if(typeof fFinalPrev == 'function')
@@ -93,7 +94,7 @@ var rutaBaseBuscador = '/neptuno/';
 		
 		$(this).parents('.buscador').find('.resultadosBuscador').listaPaginada(url,data,fFila,fFinal,true,true);
 		$(this).parents('.buscador').find('.resultadosBuscador').data('fEdicionCampos',params.fEdicionCampos);
-    console.log("entrando en lanzaBuscador");
+    
 	}
 	
 	$.fn.nuevoBotonBuscador = function(nombreBoton, textoBoton, funcionBoton)

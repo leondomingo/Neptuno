@@ -1957,3 +1957,34 @@ function getCampos(tabla)
   
   return campos;
 }
+
+
+function mostrarTablaDialog(tabla)
+{
+  var usuarioNeptuno = neptuno.obtenerusuarioNeptuno();
+ 
+  var campos = getCampos(tabla);
+
+  var params=
+  {
+    id_usuario: usuarioNeptuno.id,
+    id_sesion: usuarioNeptuno.challenge,
+    tabla:tabla,
+    camposEdicion:campos,
+    editable:true,
+    borrable:true
+  }; 
+  
+  $('.exploradorTablas').remove();
+  $('body').append('<div class="exploradorTablas"></div>');
+  $(".exploradorTablas").buscador("/neptuno/sw/buscar.py",
+                                  params,
+                                  null, 
+                                  null, 
+                                  function()
+                                   {
+                                     $(".exploradorTablas").find('.botonBuscador.buscar').click();
+                                   });
+  $(".exploradorTablas").dialog({ width: 800, height:600, title:tabla });
+    
+}
