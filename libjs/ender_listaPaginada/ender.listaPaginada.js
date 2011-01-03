@@ -284,7 +284,7 @@ css.attr({
       ventana.find('#id_sesion, #id_usuario').hide();
       $(this).listaPaginada('tiposDeCampos');
       ventana.find('nuevoCampoListaPaginada').bind('submit',$(this).listaPaginada.enviarRegistro)
-      ventana.dialog({ width: 600, title:"Evaluaciones" });
+      ventana.dialog({ width: 600, title:"Edición estandar" });
       ventana.dialog('option','buttons',
         {
           "Cancelar":function(){ventana.dialog('close');},
