@@ -319,11 +319,11 @@ class AtributosOlympo(Base):
     nombre = Column(atributos_nombre, String)
     id_clases_clase = atributo_objeto(atributos_clase, cl_Clases)
         
-    atributoEnlazado = atributo_objeto(atributos_atributoenlazado, cl_Atributos)
-    claseDeAtributoEnlazado = atributo_objeto(atributos_clasedeatributoenlazado, cl_Atributos)
+    id_atri_atributoenlazado = atributo_objeto(atributos_atributoenlazado, cl_Atributos)
+    id_clas_clasedeatributoenlazado = atributo_objeto(atributos_clasedeatributoenlazado, cl_Atributos)
     
-    tipoDeAtributo = Column(atributos_tipodeatributo, Integer) # tipos de atributos
-    tipoDeValor = Column(atributos_tipodevalor, Integer) # tipos de valores
+    id_tda_tipodeatributo = Column(atributos_tipodeatributo, Integer) # tipos de atributos
+    id_tdv_tipodevalor = Column(atributos_tipodevalor, Integer) # tipos de valores
     
     id_valo_estructural = Column(atributos_estructural, Integer)
     estructural = ValorLogico('id_valo_estructural')
