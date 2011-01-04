@@ -7,6 +7,7 @@ import re
 import subprocess as sp
 from config import CONFIG
 sys.path = sys.path + CONFIG['paths']
+from nucleo.config import CONFIGURACION
 
 def actualizar(modo='post'):
     
@@ -62,11 +63,11 @@ def actualizar(modo='post'):
                         elif ext == '.sql':
                             # ejecutar SQL
                             sys.stdout.write('Ejecutando SQL...\n')
-                            os.environ['PGPASSWORD'] = CONFIG['password']
+                            os.environ['PGPASSWORD'] = CONFIGURACION['password']
                             sp.check_call([os.path.join(CONFIG['pg_path'], 'psql'),
-                                           '-h', CONFIG['host'], 
-                                           '-U', CONFIG['user'],
-                                           '-d', CONFIG['db'],
+                                           '-h', CONFIGURACION['host'], 
+                                           '-U', CONFIGURACION['user'],
+                                           '-d', CONFIGURACION['db'],
                                            '-f', m_issue.group(3)]
                                     )
 
