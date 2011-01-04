@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import os
@@ -61,6 +62,7 @@ def actualizar(modo='post'):
                         elif ext == '.sql':
                             # ejecutar SQL
                             sys.stdout.write('Ejecutando SQL...\n')
+                            os.environ['PGPASSWORD'] = CONFIG['password']
                             sp.check_call([os.path.join(CONFIG['pg_path'], 'psql'),
                                            '-h', CONFIG['host'], 
                                            '-U', CONFIG['user'],
