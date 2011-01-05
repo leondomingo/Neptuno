@@ -19,6 +19,9 @@ def actualizar(modo='post'):
     sys.stdout.write('Actualizando en modo "%s"\n' % modo)
 
     # leer actualizaciones realizadas
+    # 6729 post
+    # 7832 pre
+    # ...
     realizados = []
     if os.path.exists(os.path.join(current_path, 'updates-done')):
         f_done = file(os.path.exists(os.path.join(current_path, 
@@ -26,10 +29,16 @@ def actualizar(modo='post'):
         try:
             for linea in f_done:
                 m_issue = re.search(r'^(\w+)\s+(pre|post)', linea)
-                if m_issue and m_issue.group(2) == modo.lower() and \
-                m_issue.group(1) not in realizados:
-                    realizados.append('%s %s' % (m_issue.group(1), 
-                                                 m_issue.group(2)))
+                if m_issue:
+                    # 6729 post
+                    current_issue = '%s %s' % (m_issue.group(1),
+                                               m_issue.group(2))
+                    
+                    if m_issue.group(2) == modo.lower() and \
+                    current_issue not in realizados:
+                        # 6729 post
+                        realizados.append('%s %s' % (m_issue.group(1), 
+                                                     m_issue.group(2)))
 
         finally:
             f_done.close()
@@ -39,6 +48,8 @@ def actualizar(modo='post'):
     f_done = file(os.path.join(current_path, 'updates-done'), 'a')
     try:
         for linea in f:
+            # # esto es un comentario
+            # #7000 pre
             m_coment = re.search(r'^#.+', linea)
             if m_coment:
                 continue
@@ -48,11 +59,15 @@ def actualizar(modo='post'):
             m_issue = re.search(r'^([\w\-\._]+)\s+(pre|post)\s+([\w./]+)', 
                                 linea, re.I | re.U)
             if m_issue:
-                current_issue = '%s %s' % (m_issue.group(1), modo)
+                # 6729    post    ./issue_6729/issue_6729.sql
+                # ===========================================
+                # 6729 post
+                current_issue = '%s %s' % (m_issue.group(1), 
+                                           m_issue.group(2))
+                
                 if current_issue in realizados or \
                 m_issue.group(2).lower() != modo.lower():
-                    sys.stderr.write('Saltando actualización %s \n' % \
-                                        current_issue.group(1))
+                    sys.stderr.write('Saltando actualización %s \n' % current_issue)
 
                 else:
                     # obtener extensión del fichero de actualización
@@ -75,7 +90,7 @@ def actualizar(modo='post'):
                                     )
 
                         # registrar en fichero de actualizaciones realizadas (updates-done)
-                        f_done.write('%s %s\n' % (m_issue.group(1), modo))
+                        f_done.write('%s\n' % current_issue)
 
                     except Exception, e:
                         sys.stderr.write(str(e))
