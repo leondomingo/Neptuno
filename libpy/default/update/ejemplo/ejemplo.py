@@ -2,7 +2,9 @@
 
 import os
 import sys
-sys.path.append(os.getcwd())
+current_path = os.path.dirname(os.path.abspath(__file__))
+# directorio superior a este
+sys.path.append(os.path.split(current_path)[0])
 from config import CONFIG
 sys.path = sys.path + CONFIG['paths']
 
