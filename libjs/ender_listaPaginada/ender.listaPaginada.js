@@ -360,11 +360,22 @@ css.attr({
       var campos = ventana.find('[id]').not('#id_usuario,#id_sesion,#tabla');
       var requeridos = ventana.find('[requerido="true"]');
       var errores = false;
+      
+      ventana.find('input, select, .selectorEnder .elementoSeleccionado').css('background-color','');
       $('[requerido="true"]').each(function()
                                    {
-                                      if($(this).val() =='')
+                                      
+                                      if($(this).val() =='' || $(this).val() == null || $(this).val()=="null")
                                       {
-                                          $(this).css('background-color','#FAA'); 
+                                          if($(this).find('.elementoSeleccionado').length > 0)
+                                          {
+                                            $(this).find('.elementoSeleccionado').css('background-color','#FAA');  
+                                          }
+                                          else
+                                          {
+                                            $(this).css('background-color','#FAA');  
+                                          }
+                                           
                                           errores = true;
                                       }
                                    });
@@ -456,8 +467,9 @@ css.attr({
         (!!campos[i].utilizar_selector == true)
         {
           var padre = $('.nuevoCampoListaPaginada').find("#"+campos[i].nombre).parent();
+          var requerido = padre.find("#"+campos[i].nombre).attr('requerido');
           padre.find("#"+campos[i].nombre).remove();
-          padre.append('<div id="'+campos[i].nombre+'" class="anchoDoble"></div>');
+          padre.append('<div id="'+campos[i].nombre+'" requerido="'+requerido+'" class="anchoDoble"></div>');
           padre.find("#"+campos[i].nombre).parents('.campo').addClass('anchoDoble');
           
           var paramsSelector =

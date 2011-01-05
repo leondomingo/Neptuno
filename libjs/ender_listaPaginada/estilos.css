@@ -133,10 +133,16 @@
   
 }
 
-.nuevoCampoListaPaginada .requerido .valor *:not(button)
+.nuevoCampoListaPaginada .requerido .valor *:not(button, .selectorEnder)
 {
   background-color:#FFD;
 }
+
+.nuevoCampoListaPaginada .requerido .valor .selectorEnder .elementoSeleccionado
+{
+  background-color:#FFD;
+}
+
 
 .nuevoCampoListaPaginada .valor *:not(.celda,.fila)
 {
