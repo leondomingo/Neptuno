@@ -76,7 +76,9 @@ def actualizar(modo='post'):
                         sys.stdout.write('Actualizando %s\n' % current_issue)
                         if ext == '.py':
                             # ejecutar Python
-                            sp.check_call([sys.executable, m_issue.group(3)])
+                            sp.check_call([sys.executable, 
+                                           os.path.join(current_path,
+                                                        m_issue.group(3))])
 
                         elif ext == '.sql':
                             # ejecutar SQL
@@ -86,8 +88,8 @@ def actualizar(modo='post'):
                                            '-h', CONFIGURACION['host'], 
                                            '-U', CONFIGURACION['user'],
                                            '-d', CONFIGURACION['db'],
-                                           '-f', m_issue.group(3)]
-                                    )
+                                           '-f', os.path.join(current_path,
+                                                              m_issue.group(3))])
 
                         # registrar en fichero de actualizaciones realizadas (updates-done)
                         f_done.write('%s\n' % current_issue)
