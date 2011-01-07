@@ -8,6 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relation
 from sqlalchemy.sql.expression import and_
 from sqlalchemy.sql.functions import current_timestamp
+from libpy.log import NeptunoLogger
 from libpy.excepciones.usuarios import NombreDeUsuarioYaExiste 
 from libpy.excepciones.eneptuno import SesionIncorrecta
 from libpy.excepciones.usuarios import NoExisteUsuario, NoExisteRol
@@ -212,9 +213,9 @@ class usuariosNeptuno(Base):
         al id_usuario en caso de éxito, o una excepción en caso de fallo.
         
         IN
-          conector
-          id_usuario
-          id_sesion
+          conector    <Conexion>
+          id_usuario  <int>
+          id_sesion   <str>
             
         OUT
           <usuariosNeptuno>
@@ -224,27 +225,35 @@ class usuariosNeptuno(Base):
           SesionIncorrecta
         """
         
-        usuario = conector.conexion.query(cls).get(id_usuario)        
-        if usuario is None:
-            raise NoExisteUsuario()
+        logger = NeptunoLogger.get_logger('usuariosNeptuno.comprobar_sesion')
+        try:
+            logger.debug('Comprobando sesión...%d %s' % (id_usuario, id_sesion))
+            
+            usuario = conector.conexion.query(cls).get(id_usuario)        
+            if usuario is None:
+                raise NoExisteUsuario(id_usuario)
+            
+            # Comprobar sesión
+            sesion = \
+                conector.conexion.query(sesionesNeptuno).\
+                        filter(and_(sesionesNeptuno.id_usuariosweb_usuarioweb == id_usuario,
+                                    sesionesNeptuno.challenge == id_sesion,
+                                    sesionesNeptuno.fecha_caducidad >= current_timestamp()
+                                    )).\
+                        first()
+                        
+            if sesion is None:
+                raise SesionIncorrecta()
+            
+            sesion.fecha_caducidad = datetime.now() + timedelta(minutes=SESSION_LIFE)
+            conector.conexion.add(sesion)
+            conector.conexion.commit()
+            
+            return usuario
         
-        # Comprobar sesión
-        sesion = \
-            conector.conexion.query(sesionesNeptuno).\
-                    filter(and_(sesionesNeptuno.id_usuariosweb_usuarioweb == id_usuario,
-                                sesionesNeptuno.challenge == id_sesion,
-                                sesionesNeptuno.fecha_caducidad >= current_timestamp()
-                                )).\
-                    first()
-                    
-        if sesion is None:
-            raise SesionIncorrecta()
-        
-        sesion.fecha_caducidad = datetime.now() + timedelta(minutes=SESSION_LIFE)
-        conector.conexion.add(sesion)
-        conector.conexion.commit()
-        
-        return usuario
+        except Exception, e:
+            logger.error(e)
+            raise
     
     @classmethod
     def getUsuario(cls, conector, login):
