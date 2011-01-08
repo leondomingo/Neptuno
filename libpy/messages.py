@@ -32,3 +32,8 @@ class MessagesNeptuno(object):
     def getLoginIncorrecto(self):
         return {const.LANG_ESP: u'Login incorrecto',
                 const.LANG_ENG: u'Incorrect login'}
+        
+    @message
+    def getErrorGeneral(self):
+        return {const.LANG_ESP: u'Ha ocurrido un error',
+                const.LANG_ENG: u'An error has occurred',}        
