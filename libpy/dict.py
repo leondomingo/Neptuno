@@ -5,7 +5,25 @@ class Dict(dict):
         for k, v in kw.iteritems():
             if isinstance(v, dict) or isinstance(v, Dict):
                 self[k] = Dict(**v)
-            
+                
+            elif isinstance(v, list):
+                v2 = []
+                for item in v:
+                    v2.append(Dict(**item))
+                    
+                self[k] = v2
+
+            elif isinstance(v, tuple):
+                v2 = None
+                for item in v:
+                    if not v2:
+                        v2 = (Dict(**item),)
+                        
+                    else:
+                        v2 = v2 + (Dict(**item),)
+                    
+                self[k] = v2
+
             else:
                 self[k] = v
             
@@ -19,21 +37,13 @@ class Dict(dict):
             
 if __name__ == '__main__':
     
-    d = Dict(uno=1, dos=2.2, tres=[])
-    print d.uno
-    print d.dos
+    origen = {"cargos": [{"id": 1, "desc": "uno"}, {"id": 2, "desc": "dos"}],
+              "tupla": ({"a": 1000}, {"a": 2000},)
+              }
     
-    d.tres.append('leon')
-    d.tres.append('domingo')
-    print ' '.join(d.tres)
+    destino = Dict(**origen)
+    print destino.cargos
+    print destino.cargos[0].id
     
-    # atributo que no estaba definido en el __init__
-    d.hola = 'hola'
-    print d.hola
-    
-    # en tres niveles
-    d2 = Dict(uno=1, dos=dict(a=dict(a1=1, a2=2), b=2))
-    
-    print 'd2:', d2, type(d2)
-    print d2.dos.a.a1
-    print d2.dos.a.a2
+    print destino.tupla
+    print destino.tupla[0].a

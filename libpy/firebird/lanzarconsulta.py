@@ -1,23 +1,36 @@
 # -*- coding: utf-8 -*-
 
+import re
+import sys
 from lxml import etree
 from base64 import encodestring
-from libpy.firebird.const_datos_olympo import TDF_PDF
-from nucleo.config import VARIABLES
 import tempfile
 import os
-import subprocess
+import subprocess as sp
 import threading
-import win32api
+import signal
+try:
+    import win32api
+except ImportError:
+    pass 
+from libpy.log import NeptunoLogger
+from libpy.firebird.const_datos_olympo import TDF_PDF
+from nucleo.config import VARIABLES
+
 from libpy.const_datos_neptuno import VAR_LANZADOR, VAR_TIMEOUT_CONSULTAS
 
 class KillLanzador(object):
     def __init__(self, process, time_out):
         self.process = process
-        self.t = threading.Timer(time_out, self._kill)
+        self.t = threading.Timer(time_out, self.kill)
         
-    def _kill(self):
-        win32api.TerminateProcess(int(self.process._handle), -1)
+    def kill(self):
+        if sys.platform == 'win32':
+            win32api.TerminateProcess(int(self.process._handle), -1)
+            
+        else:
+            # linux
+            os.kill(self.process.pid, signal.SIGKILL)
         
     def start(self):        
         self.t.start()
@@ -49,6 +62,8 @@ def lanzar_consulta(cod_usuario, servidor, base, cod_consulta, nombreinforme, \
       Exception
         No existe la variable "lanzador"
     """
+    
+    logger = NeptunoLogger.get_logger('lanzar_consulta')
 
     root = etree.Element('root')
     
@@ -103,10 +118,26 @@ def lanzar_consulta(cod_usuario, servidor, base, cod_consulta, nombreinforme, \
             # llamar a la aplicación que genera el PDF
             nombre_aplicacion = VARIABLES.get(VAR_LANZADOR)
             
-            if nombre_aplicacion == '':
-                raise Exception('No está definida la variable "%s"' % VAR_LANZADOR)
+            logger.debug('Lanzando informe (%s)' % nombre_aplicacion)
             
-            p = subprocess.Popen([nombre_aplicacion, nombre_xml, (log or '')])
+            if nombre_aplicacion == '':
+                e = Exception('No está definida la variable "%s"' % VAR_LANZADOR)
+                logger.error(e)
+                raise e
+            
+            else:
+                m_wine = re.search(r'^(.+wine)\s+(.+)', nombre_aplicacion)
+                if m_wine:
+                    cmd = [m_wine.group(1), m_wine.group(2), nombre_xml, 
+                           (log or '')]
+                
+                else:
+                    cmd = [nombre_aplicacion, nombre_xml, (log or '')]
+                    
+            logger.debug('Comando para lanzar consulta: "%s"' % cmd)
+
+            # abrir proceso
+            p = sp.Popen(cmd)
             
             # "time out" al lanzar una consulta
             if time_out is None:
@@ -120,7 +151,11 @@ def lanzar_consulta(cod_usuario, servidor, base, cod_consulta, nombreinforme, \
                 killer.start()
                 
                 # ejecutar lanzador
-                p.communicate(0)
+                logger.debug('Ejecutando lanzador de consulta (%d)' % os.getuid())
+                out_data, err_data = p.communicate(0)
+                
+                logger.debug(out_data)
+                logger.debug(err_data)
                 
                 # leer el resultado que se ha escrito en "nombre_pdf"
                 fichero_pdf = file(nombre_pdf, 'rb')
@@ -132,7 +167,7 @@ def lanzar_consulta(cod_usuario, servidor, base, cod_consulta, nombreinforme, \
             finally:
                 killer.t.cancel()
                 
-        finally:            
+        finally:
             if os.access(nombre_xml, os.F_OK or os.R_OK):
                 os.remove(nombre_xml)
                 

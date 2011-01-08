@@ -168,7 +168,7 @@ class usuariosNeptuno(Base):
         al id_usuario en caso de éxito, o una excepción en caso de fallo.
         
         IN
-          conector   <ConexionNeptuno>
+          conector   <Conexion>
           id_usuario <int>
           id_sesion  <str>
           
@@ -180,30 +180,33 @@ class usuariosNeptuno(Base):
           SesionIncorrecta
         """
         
-        logger.debug('comprobar_sesion: Comprobando sesión (%d %s)' % \
-                        (id_usuario, id_sesion))
+        logger.debug('usuariosNeptuno.comprobar_sesion...%d %s' % \
+                        (id_usuario, id_sesion))        
+        try:
+            usuario = conector.conexion.query(cls).get(id_usuario)
+            if usuario is None:
+                raise NoExisteUsuario(id_usuario)
+            
+            # Buscar sesión
+            sesion = conector.conexion.query(sesionesNeptuno).\
+                        filter(and_(sesionesNeptuno.id_usuarios_id == id_usuario,
+                                    sesionesNeptuno.challenge == id_sesion,
+                                    sesionesNeptuno.fecha_caducidad >= current_timestamp())).\
+                        first()
+                        
+            if sesion is None:
+                raise SesionIncorrecta()
+            
+            # alargar la caducidad
+            sesion.fecha_caducidad = datetime.now() + timedelta(minutes=SESSION_LIFE)
+            conector.conexion.add(sesion)
+            conector.conexion.commit()
+            
+            return usuario
         
-        usuario = conector.conexion.query(cls).get(id_usuario)
-        if usuario is None:
-            raise NoExisteUsuario()
-        
-        # Buscar sesión
-        sesion = conector.conexion.query(sesionesNeptuno).\
-                    filter(and_(sesionesNeptuno.id_usuarios_id == id_usuario,
-                                sesionesNeptuno.challenge == id_sesion,
-                                sesionesNeptuno.fecha_caducidad >= current_timestamp())).\
-                    first()
-                    
-        if sesion is None:
-            logger.error('Sesión incorrecta')
-            raise SesionIncorrecta()
-        
-        # alargar la caducidad
-        sesion.fecha_caducidad = datetime.now() + timedelta(minutes=SESSION_LIFE)
-        conector.conexion.add(sesion)
-        conector.conexion.commit()
-        
-        return usuario 
+        except Exception, e:
+            logger.error(e)
+            raise 
     
     @staticmethod
     def getUsuario(conector, login):
@@ -212,8 +215,8 @@ class usuariosNeptuno(Base):
         salta la excepción NoExisteUsuario.
         
         IN
-          conector <conexionNeptuno>
-          login <str>
+          conector <Conexion>
+          login    <str>
             
         OUT
            <usuariosNeptuno>
