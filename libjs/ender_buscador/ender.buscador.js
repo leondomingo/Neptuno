@@ -91,7 +91,7 @@ var rutaBaseBuscador = '/neptuno/';
 
 		
 		data.busqueda = $(this).parents('.buscador').find('.textoBusqueda').val();
-		console.log($(this).parents('.buscador').find('.textoBusqueda').val())
+		
 		
 		var params_lista = 
 		{
@@ -100,7 +100,7 @@ var rutaBaseBuscador = '/neptuno/';
 		  fFila:fFila,
 		  fFinal:fFinal
 		};
-		console.log(params_lista);
+		
 		$(this).parents('.buscador').find('.resultadosBuscador').listaPaginada('init',params_lista);
 		$(this).parents('.buscador').find('.resultadosBuscador').data('fEdicionCampos',params.fEdicionCampos);
     
