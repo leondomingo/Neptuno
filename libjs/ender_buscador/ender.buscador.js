@@ -91,8 +91,17 @@ var rutaBaseBuscador = '/neptuno/';
 
 		
 		data.busqueda = $(this).parents('.buscador').find('.textoBusqueda').val();
+		console.log($(this).parents('.buscador').find('.textoBusqueda').val())
 		
-		$(this).parents('.buscador').find('.resultadosBuscador').listaPaginada(url,data,fFila,fFinal,true,true);
+		var params_lista = 
+		{
+		  "sw":url,
+		  "params":data,
+		  fFila:fFila,
+		  fFinal:fFinal
+		};
+		console.log(params_lista);
+		$(this).parents('.buscador').find('.resultadosBuscador').listaPaginada('init',params_lista);
 		$(this).parents('.buscador').find('.resultadosBuscador').data('fEdicionCampos',params.fEdicionCampos);
     
 	}

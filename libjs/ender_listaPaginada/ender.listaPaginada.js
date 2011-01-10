@@ -60,7 +60,10 @@ css.attr({
         var params = p.params;
         var fFila = p.fFila;
         var fFinal = p.fFinal;
+        console.log('*******');
+        console.log(params);
         $(this).data("params",params);
+        console.log($(this).data("params"));
         $(this).data("sw",sw);
         $(this).data("sw_borrar",sw_borrar);
         $(this).data("sw_guardar",sw_guardar);
@@ -90,6 +93,7 @@ css.attr({
     	}
   		else
   		{
+  		  if(p.params != null) $(this).data("params",p.params);
   		  $(this).listaPaginada('cargar');
   		}
   	},
