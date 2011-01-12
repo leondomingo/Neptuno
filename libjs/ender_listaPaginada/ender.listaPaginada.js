@@ -647,7 +647,7 @@ css.attr({
 		data.pos = (1*data.pos)-(1*data.limite_resultados);
 		
 		if(data.pos<0) data.pos = 0;
-		
+		lugar.attr('listaInicializada',false);
 		lugar.listaPaginada(url,data,fFila,fFinal);		
 		
 	}
@@ -669,7 +669,7 @@ css.attr({
 		
 		data.pos = (1*data.limite_resultados)+(1*data.pos);			
 		if(data.pos>=data.numero_resultados) data.pos = 0;	
-		
+		lugar.attr('listaInicializada',false);
 		lugar.listaPaginada(url,data,fFila,fFinal);		
 		
 	}
