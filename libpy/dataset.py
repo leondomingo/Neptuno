@@ -189,7 +189,7 @@ class DataSet(object):
         ...
         itemN-1
         
-        devolverá
+        devolver
         
         [
          itemN-1,
@@ -201,8 +201,9 @@ class DataSet(object):
         return reversed(self.datos)
     
     def ereversed(self):
-        """Devuelve un iterador enumerado para recorrer la lista del final al 
-        principio
+        """
+        Devuelve un iterador enumerado para recorrer la lista del final al 
+        principio.
         
         Para un DataSet de N valores
         
@@ -211,7 +212,7 @@ class DataSet(object):
         ...
         itemN-1
         
-        devolverá
+        devolver
         
         [
          (N-1, itemN-1)
@@ -240,15 +241,16 @@ class DataSet(object):
         |      |      |      |      |
         |      |      |      |      |
         |---------------------------|
+        |      |      |      |      | <- totales
+        |---------------------------|
         
         IN
           width <int> (opcional)
           Indica el ancho de las columnas
           
           fit_width <bool> (por defecto=True)
-          Hace las columnas tan anchas como el valor más ancho, que no sobrepase
+          Hace las columnas tan anchas como el valor mï¿½s ancho, que no sobrepase
           el ancho fijado por 'width'.
-          
         """
         
         if fit_width:
@@ -258,7 +260,7 @@ class DataSet(object):
                 for d in self.datos: 
                     if len(str(d[c])) > widths[i]:
                         widths[i] = len(str(d[c]))
-
+                        
                 if len(self.columnas[i]) > widths[i]:
                     widths[i] = len(self.columnas[i])
 
@@ -326,7 +328,7 @@ class DataSet(object):
             
         resultado += '|'+'-'*l + '|\n'
         
-        # línea de totales
+        # lÃ­nea de totales
         if self.totales:
             linea = '|'
             for i, c in enumerate(self.columnas):

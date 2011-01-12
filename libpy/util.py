@@ -307,7 +307,7 @@ def format_float(valor, separador_miles=',', separador_decimal='.',
     if isinstance(valor, float) or isinstance(valor, Decimal):
         texto = fmt % valor
         
-    elif isinstance(valor, str):
+    elif isinstance(valor, str) or valor is None:
         texto = fmt % float(valor or 0)
     
     m = re.search(r'([\+-]?)0*(\d*)\.(\d+)', texto)
