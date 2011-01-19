@@ -462,7 +462,7 @@ css.attr({
         
           neptuno.cargaDatePicker($('.nuevoCampoListaPaginada').find("#"+campos[i].nombre));
           $('.nuevoCampoListaPaginada').find("#"+campos[i].nombre).soloFecha(true,true);
-          if(!!campos[i].requerido != true) $('.nuevoCampoListaPaginada').find("#"+campos[i].nombre).val('');
+          $('.nuevoCampoListaPaginada').find("#"+campos[i].nombre).val('');
           
         }
         else if

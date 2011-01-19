@@ -115,7 +115,7 @@
 			position: 		'top-right', // Is this still needed?
 			glue: 			'after',
 			theme: 			'default',
-			corners: 		'10px',
+			corners: 		'0px',
 			check: 			250,
 			life: 			3000,
 			speed: 			'normal',
@@ -185,8 +185,6 @@
 				$(this).data("jGrowl").created = new Date();
 			}).trigger('jGrowl.open');
 		
-			/** Optional Corners Plugin **/
-			if ( $.fn.corner != undefined ) $(notification).corner( o.corners );
 
 			/** Add a Global Closer if more than one notification exists **/
 			if ( $('div.jGrowl-notification:parent', this.element).size() > 1 && $('div.jGrowl-closer', this.element).size() == 0 && this.defaults.closer != false ) {
