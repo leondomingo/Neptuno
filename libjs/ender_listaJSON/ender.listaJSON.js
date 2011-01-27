@@ -1,5 +1,15 @@
 var edicionPorDefecto = '/neptuno/sw/datosRegistro.py';
-
+/***************************************
+ *  parametros:
+ *  · paramJSON: objeto de la forma:
+ *    {
+ *      columnas: array con Nombre de las columnas,
+ *      datos: array con cada uno de las filas, en forma de array
+ *    }
+ *  · fFila: función que se ejecuta al dibujar una fila
+ *  · fFinal: función ejecutada al terminar el dibujado
+ * 
+ */
 (function($)
 {
 	$.fn.listaJSON = function(paramJson, fFila, fFinal)
@@ -18,6 +28,7 @@ var edicionPorDefecto = '/neptuno/sw/datosRegistro.py';
 		
 		
 		$(this).hide();
+		$(this).attr('listaJSON',true);
 		$(this).append('<div class="resultados"></div>');
 		
 		$(this).nuevaFila(cabecera,cabecera, 'cabecera',null);
@@ -118,11 +129,11 @@ var edicionPorDefecto = '/neptuno/sw/datosRegistro.py';
 	{
 		if (id_fila > 0) 
 		{
-			$(this).find('.fila[idObjeto="' + id_fila + '"]').not('.cabecera').append('<div class="boton_fila ' + nombreBoton + '">' + textoBoton + '</div>');
+			$(this).find('.fila[idObjeto="' + id_fila + '"]').not('.cabecera').append('<div class="boton_fila boton celda ' + nombreBoton + '">' + textoBoton + '</div>');
 		}
 		else
 		{
-			$(this).find('.fila').not('.cabecera').append('<div class="boton_fila ' + nombreBoton + '">' + textoBoton + '</div>');
+			$(this).find('.fila').not('.cabecera').append('<div class="boton_fila  boton celda ' + nombreBoton + '">' + textoBoton + '</div>');
 		} 
 			
 		if(typeof(funcionBoton) == 'function')

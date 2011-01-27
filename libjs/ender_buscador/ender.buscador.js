@@ -1,5 +1,14 @@
 var rutaBaseBuscador = '/neptuno/';
  
+ /****************************************
+ 
+ parametros:
+  sw: url del servicio web que devuelve los datos buscados,
+  params: parametros que se le pasan al constructor de listaPaginada
+  fFila: función que se ejecuta después de dibujar cada fila
+  fFinal: función que se ejecuta al  final del dibujado de la lista
+ ****************************************/
+ 
 (function($)
 {
 	$.fn.buscador = function(sw,params,fFila,fFinal, fSalidaBuscador)
@@ -58,7 +67,7 @@ var rutaBaseBuscador = '/neptuno/';
 		lugar.parents('.buscador').desactivarBoton('botonBuscador.buscar');
 		
 		var url = $(this).parents('.buscador').attr('url');
-		var fFila = $(this).parents('.buscador').data('fFila');
+		var fFila = $(this).parents('.buscador').data('fFila'); 
 		var fFinalPrev = $(this).parents('.buscador').data('fFinal');
 		
 		var params = $(this).parents('.buscador').attr('params').replace(/'/g,"\"");
