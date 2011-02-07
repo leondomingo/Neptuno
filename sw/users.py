@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
-import simplejson
+import simplejson as sj
 from libpy.conexion import Conexion
 from nucleo.config import IMPLEMENTATION_TYPE, LANGUAGE
 from libpy.neptunofactory import load_module, get_claseusuarios
 from libpy.util import get_param, EFaltaParametro
 from libpy.excepciones.eneptuno import SesionIncorrecta
 from libpy.const_datos_neptuno import STATUS, MESSAGE, EXPIRATION
-from libpy.excepciones.loginneptuno import ELoginIncorrecto
+from libpy.excepciones.loginneptuno import ELoginIncorrecto,\
+    EContrasenaIncorrecta
 ln = load_module(IMPLEMENTATION_TYPE, 'loginneptuno', 'loginNeptuno')
 loginNeptuno = ln.loginNeptuno
 Usuarios = get_claseusuarios(IMPLEMENTATION_TYPE)
@@ -46,29 +47,29 @@ def compruebasesion(req):
         loginNep = loginNeptuno(Conexion())    
         loginNep.check_sesion(id_usuario, id_sesion)
         
-        return simplejson.dumps({STATUS: True})
+        return sj.dumps({STATUS: True})
         
-    except (EFaltaParametro,), e:
+    except EFaltaParametro, e:
         logger.error(e)
         raise apache.SERVER_RETURN, apache.HTTP_FORBIDDEN
     
-    except (SesionIncorrecta,), e:
+    except (SesionIncorrecta, NoExisteUsuario,), e:
         logger.error(e)
-        return simplejson.dumps({STATUS: False,
-                                 EXPIRATION: True})
+        return sj.dumps({STATUS: False,
+                         EXPIRATION: True})
     
-    except (SesionIncorrecta, NoExisteUsuario), e:
+    except Exception, e:
         logger.error(e)
-        return simplejson.dumps({STATUS: False, 
-                                 MESSAGE: msg.getNoExisteUsuario()})
+        return sj.dumps({STATUS: False,
+                         MESSAGE: msg.getErrorGeneral()})
     
 def login(req):
     """    
     Servicio web de login de usuario
     
     IN
-      login    <str>
-      password <str>
+      login     <str>
+      password  <str>
       
     OUT
       {
@@ -92,16 +93,21 @@ def login(req):
                     
         user[STATUS] = True
     
-        return simplejson.dumps(user)
-        
-    except (ELoginIncorrecto), e:
-        logger.error(e)
-        return simplejson.dumps({STATUS: False,
-                                 MESSAGE: msg.getLoginIncorrecto()})
-    
-    except (EFaltaParametro), e:
+        return sj.dumps(user)
+
+    except EFaltaParametro, e:
         logger.error(e)
         raise apache.SERVER_RETURN, apache.HTTP_FORBIDDEN 
+
+    except (ELoginIncorrecto, NoExisteUsuario, EContrasenaIncorrecta,), e:
+        logger.error(e)
+        return sj.dumps({STATUS: False,
+                         MESSAGE: msg.getLoginIncorrecto()})
+    
+    except Exception, e:
+        logger.error(e)
+        return sj.dumps({STATUS: False,
+                         MESSAGE: msg.getErrorGeneral()})
 
 def cerrarsesion(req):    
     """
@@ -128,16 +134,21 @@ def cerrarsesion(req):
         sesion_borrada = loginNeptuno(Conexion()).\
                             delelete_sesion(id_usuario, id_sesion)
                             
-        return simplejson.dumps({STATUS: sesion_borrada})
+        return sj.dumps({STATUS: sesion_borrada})
     
-    except (EFaltaParametro,), e:
+    except EFaltaParametro, e:
         logger.error(e)
         raise apache.SERVER_RETURN, apache.HTTP_FORBIDDEN
     
-    except (NoExisteUsuario), e:
+    except NoExisteUsuario, e:
         logger.error(e)
-        return simplejson.dumps({STATUS: False,
-                                 MESSAGE: msg.getNoExisteUsuario()})
+        return sj.dumps({STATUS: False,
+                         MESSAGE: msg.getNoExisteUsuario()})
+        
+    except Exception, e:
+        logger.error(e)
+        return sj.dumps({STATUS: False,
+                         MESSAGE: msg.getErrorGeneral()})
     
 #def actualizarpassword(req):
 #    """

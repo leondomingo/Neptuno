@@ -4,7 +4,7 @@ from sqlalchemy.sql.expression import and_, func
 from datetime import datetime, timedelta
 from libpy.cryptoutils import CryptoUtils
 from libpy.excepciones.loginneptuno import EGenerandoSesion, \
-    EContrasenaIncorrecta
+    EContrasenaIncorrecta, ELoginIncorrecto
 from libpy.excepciones.usuarios import NoExisteUsuario
 from libpy.conexion import Conexion
 from libpy.log import NeptunoLogger
@@ -104,7 +104,7 @@ class loginNeptuno(object):
            "nombre":    <str>,
            "rol":       <str>,
            "challenge": <str>
-          }          
+          }
         """
         
         logger = NeptunoLogger.get_logger('(FB) loginNeptuno.login')
@@ -131,26 +131,23 @@ class loginNeptuno(object):
             sesion_usuario.direccionip = ip
             sesion_usuario.fecha_caducidad = datetime.now() + timedelta(minutes=SESSION_LIFE)
         
-            try:
-                self.conector.conexion.add(sesion_usuario)
-                
-                # actualizar 'Último login'
-                user.ultimologin = datetime.now()
-                
-                self.conector.conexion.add(user)                        
-                self.conector.conexion.commit()
-                
-                datos_login = user.datos_login(conector=self.conector)
-                datos_login['challenge'] = id_sesion
-                
-                logger.debug('Login correcto de usuario "%s"' % user_login)
-                
-                return datos_login
-                        
-            except Exception, e:
-                # No se ha podido insertar el identificador de sesión
-                logger.error(e)
-                raise EGenerandoSesion()
+            self.conector.conexion.add(sesion_usuario)
+            
+            # actualizar 'Último login'
+            user.ultimologin = datetime.now()
+            
+            self.conector.conexion.add(user)                        
+            self.conector.conexion.flush()
+            
+            datos_login = user.datos_login(conector=self.conector)
+            datos_login['challenge'] = id_sesion
+            
+            logger.debug('Login correcto de usuario "%s"' % user_login)
+            
+            # guardar definitivamente
+            self.conector.conexion.commit()
+            
+            return datos_login
             
         except Exception, e:
             logger.error(e)

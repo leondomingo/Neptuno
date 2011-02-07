@@ -62,7 +62,7 @@ def actualizar(modo='post'):
 
             # 7916.modelo    post    ./issue_7916/issue_7916.sql
             # 7916-otros     post    ./issue_7916/issue_7916.py
-            m_issue = re.search(r'^([\w\-\._]+)\s+(pre|post)\s+([\w./]+)', 
+            m_issue = re.search(r'^([\w\-\._]+)\s+(pre|post)\s+([\w./-]+)', 
                                 linea, re.I | re.U)
             if m_issue:
                 # 6729    post    ./issue_6729/issue_6729.sql
