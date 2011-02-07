@@ -202,14 +202,14 @@ function botonesSelector(selector)
 function seleccionarRegistro()
 {
   var id = $(this).parent().attr('idObjeto');
-  var campos =$(this).parents('.selectorEnder').attr('campoIdentificador').split("+"); 
+  var campos =$(this).parents('.selectorEnder').attr('campoIdentificador').split(","); 
   var texto = '';
   for(var i = 0; i<campos.length;i++)
   {
-    if(texto!='') texto += ' ';
+    if(texto!='') texto += '.';
     texto += $(this).parents('.resultados').find('.fila[idObjeto="'+id+'"]').find('.celda[id_columna="'+campos[i]+'"]').html();  
   }
-    
+  
   $(this).parents('.selectorEnder').find('.elementoSeleccionado').html(texto);
   $(this).parents('.selectorEnder').attr('value',id);
   $(this).parents('.selectorEnder').attr('idSeleccionado',id);

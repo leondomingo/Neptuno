@@ -6,8 +6,6 @@ css.attr({
 		href: "/neptuno/libjs/ender_listaPaginada/estilos.css"
 });
 
-
-
 (function($)
 {
 	var imagen_carga = '/neptuno/libjs/ender_listaPaginada/load.gif';
@@ -145,12 +143,8 @@ css.attr({
           dataType: "json",
           success:function(res)
           {
-            
-
             lugar.find('.listaPaginada').html('<div class="exportar" onclick="$(this).exportarCSVListaPaginada()">exportar</div><div class="paginacion"></div>');
 
-        
-  
             lugar.find('.listaPaginada').eq(0).listaJSON(res,fFila,fFinal);
             lugar.find('.listaPaginada').append('<div class="numero_resultados">Número de resultados: '+res.numero_resultados+'</div>');
             
@@ -174,11 +168,7 @@ css.attr({
               
               lugar.find('.listaPaginada').find('.paginacion').append('<div class="texto_paginas">de '+total_paginas+'</div>');         
                   
-              //lugar.find('.listaPaginada').find('.paginacion').html(n_paginas);
             }
-            
-    
-                  
           },
           complete:function()
           {
@@ -353,8 +343,7 @@ css.attr({
     },
     enviarRegistro:function ()
     {
-      
-      
+    	
       var lista = $(this).data('padre');
       var ventana = $(this).data('ventana');
          
@@ -365,7 +354,7 @@ css.attr({
       ventana.find('input, select, .selectorEnder .elementoSeleccionado').css('background-color','');
       $('[requerido="true"]').each(function()
                                    {
-                                      
+    	  
                                       if($(this).val() =='' || $(this).val() == null || $(this).val()=="null")
                                       {
                                           if($(this).find('.elementoSeleccionado').length > 0)
@@ -380,6 +369,7 @@ css.attr({
                                           errores = true;
                                       }
                                    });
+      
       if(!errores)
       {
         var data = {};
@@ -420,8 +410,6 @@ css.attr({
         
   
         var sw_guardar = lista.data('sw_guardar');  
-  
-  
   
         ventana.dialog('close');
   
