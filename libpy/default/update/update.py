@@ -31,7 +31,7 @@ def actualizar(modo='post'):
         f_done = file(DONE, 'rb')
         try:
             for linea in f_done:
-                m_issue = re.search(r'^(\w+)\s+(pre|post)', linea)
+                m_issue = re.search(r'^([\w./-]+)\s+(pre|post)', linea)
                 if m_issue:
                     # 6729 post
                     current_issue = '%s %s' % (m_issue.group(1),
