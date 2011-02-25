@@ -1,19 +1,25 @@
 # -*- coding: utf-8 -*-
 
+import os
 import smtplib
+from email import Encoders
 from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
 
 def enviar_email(remitente, destinatarios, asunto, mensaje, 
-                 servidor, login, password):
+                 servidor, login, password, ficheros=[], html=''):
     """
     IN
-      remitente (<email>, <nombre>)
-      destinatarios [(<email>, <nombre>), ...]
-      asunto <str>
-      mensaje <str>
-      servidor <str>
-      login <str>
-      password <str>
+      remitente      (<email>, <nombre>)
+      destinatarios  [(<email>, <nombre>), ...]
+      asunto         <str>
+      mensaje        <str>
+      servidor       <str>
+      login          <str>
+      password       <str>
+      ficheros       [<str>, ...] (opcional)
+      html           <str>        (opcional)
       
       Por ejemplo,
         enviar_email(('pperez@gmail.com', 'Pepe Pérez'),
@@ -25,6 +31,40 @@ def enviar_email(remitente, destinatarios, asunto, mensaje,
     """
     
     msg = MIMEText(mensaje)
+    
+    msg_root = None
+    if html:
+        msg_root = MIMEMultipart('related')
+        msg_root.preamble = 'This is a multi-part message in MIME format.'
+        
+        if html:
+            msg_alt = MIMEMultipart('alternative')
+            
+            msg_alt.attach(msg)
+            
+            msg_html = MIMEText(html)
+            msg_html.set_type('text/html')
+
+            msg_alt.attach(msg_html)
+            
+            msg_root.attach(msg_alt)
+            
+        msg = msg_root
+        
+    if ficheros:
+        if not msg_root:
+            msg_root = MIMEMultipart()
+            msg_root.attach(msg)
+            msg = msg_root
+            
+        for f in ficheros:
+            part = MIMEBase('application', 'octet-stream')
+            part.set_payload(open(f, 'rb').read())
+            Encoders.encode_base64(part)
+            part.add_header('Content-Disposition', 
+                            'attachment; filename="%s"' % os.path.basename(f))
+            msg.attach(part)
+            
     msg['Subject'] = asunto
     msg['From'] = '%s <%s>' % (remitente[1], remitente[0])
     
@@ -59,19 +99,3 @@ def enviar_email(remitente, destinatarios, asunto, mensaje,
             
     except Exception, e:
         print str(e)
-    
-if __name__ == '__main__':
-    
-    import cStringIO
-    
-    mensaje = cStringIO.StringIO()    
-    mensaje.write('ESTO ES OTRA pruebita')
-    mensaje.seek(0)
-    
-    r = enviar_email(('leon.domingo@ender.es', 'León Domingo Ortín'),
-                     [('tengounplanb@gmail.com', 'León Domingo Ortín'),
-                      ('leon.domingo@gmail.com', 'Pepe Pérez')],
-                     'Esto es una prueba', mensaje.read(),
-                     'smtp.gmail.com', 'leon.domingo@ender.es', '5390ld')
-    
-    print r
