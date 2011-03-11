@@ -229,6 +229,9 @@ class DataSet(object):
     
     def __getitem__(self, index):
         return self.datos[index]
+    
+    def __str__(self):
+        return self.tostring()
 
     def tostring(self, width=None, fit_width=True):
         """
