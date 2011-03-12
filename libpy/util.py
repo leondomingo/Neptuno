@@ -228,7 +228,7 @@ def strtobool(s):
     if s.lower() == 'true':
         return True
     elif s.lower() == 'false':
-        return False    
+        return False
     else:
         raise TypeError('No es un tipo booleano')
     

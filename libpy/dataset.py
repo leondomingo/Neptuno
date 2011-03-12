@@ -5,6 +5,7 @@ from ficherocsv import FicheroCSV
 import simplejson
 import datetime
 from libpy.util import default_fmt_float
+import re
 
 COLUMNAS = 'columnas'
 NUM_RESULTADOS = 'numero_resultados'
@@ -33,6 +34,8 @@ def tojson(func):
     
     return __tojson
 
+def quitar_especiales(texto):
+    return re.sub(r'[^a-zA-Z0-9\-_\s]', '_', texto)
 
 class DataSetRowIterator(object):
     
@@ -113,8 +116,23 @@ class DataSet(object):
     true_const = True
     false_const = False
 
-    def __init__(self, columnas, limite=None, totales=None):
-        self.columnas = columnas
+    def __init__(self, columnas, types=None, limite=None, totales=None):
+        
+        self.columnas = []
+        self.labels = []
+        self.types = []
+        
+        for col in columnas:
+            if isinstance(col, tuple):
+                # (<col>, <etiqueta>, <tipo>,) 
+                self.columnas.append(col[0])
+                self.labels.append(col[1] or col[0])
+                self.types.append(col[2])
+            else:
+                self.columnas.append(col)
+                self.labels.append(col)
+                self.types.append('')
+
         self.limite_resultados = limite
         self.datos = []
         self.numero_resultados = 0
@@ -232,7 +250,19 @@ class DataSet(object):
     
     def __str__(self):
         return self.tostring()
-
+    
+    def getlabel(self, i):
+        if not isinstance(i, int):
+            i = self.columnas.index(i)
+        
+        return self.label
+    
+    def gettype(self, i):
+        if not isinstance(i, int):
+            i = self.columnas.index(i)
+            
+        return self.types[i]
+    
     def tostring(self, width=None, fit_width=True):
         """
         Devuelve los datos del DataSet en un cadena con formato tabular.
@@ -264,19 +294,18 @@ class DataSet(object):
                     if len(str(d[c])) > widths[i]:
                         widths[i] = len(str(d[c]))
                         
-                if len(self.columnas[i]) > widths[i]:
-                    widths[i] = len(self.columnas[i])
+                if len(self.labels[i]) > widths[i]:
+                    widths[i] = len(self.labels[i])
 
-                if width: 
-                    if widths[i] > width:
-                        widths[i] = width
+                if width and widths[i] > width:
+                    widths[i] = width
         else:
             widths = [width or 10] * len(self.columnas)
             
         resultado = ''
         
         cabecera = '|'
-        for c, i in zip(self.columnas, range(len(self.columnas))):
+        for i, c in enumerate(self.labels):
             cabecera += str(c)[:widths[i]].center(widths[i]) + '|'
             
         l = len(cabecera)-2
@@ -372,7 +401,7 @@ class DataSet(object):
         """
         
         datos = {
-                 COLUMNAS: self.columnas,
+                 COLUMNAS: self.labels,
                  NUM_RESULTADOS: (self.numero_resultados or len(self)),
                  LIMITE_RESULTADOS: len(self),
                  DATOS: [],
@@ -438,7 +467,7 @@ class DataSet(object):
         else:
             return simplejson.dumps(datos)
         
-    def to_csv(self, encoding=None):
+    def to_csv(self, encoding=None, mostrar_ids=False):
         """
         Devuelve en una cadena con formato CSV el contenido del DataSet.
         
@@ -457,13 +486,18 @@ class DataSet(object):
         fichero_csv.float_fmt = self.float_fmt
         
         columnas = []
-        for c in self.columnas:
-            if isinstance(c, unicode):
-                columnas.append(c.encode('utf-8'))
-            else:
-                columnas.append(c)
+        labels = []
+        for i, c in enumerate(self.columnas):
+            
+            label = self.labels[i]
+            if isinstance(label, unicode):
+                label = label.encode('utf-8')
+                
+            if not c.startswith('id') or mostrar_ids:
+                columnas.append(quitar_especiales(self.columnas[i]))
+                labels.append(label)
         
-        fichero_csv.add(columnas)
+        fichero_csv.add(labels)
         
         totales = self.init_totales()
         
@@ -471,16 +505,20 @@ class DataSet(object):
             
             # totalizar
             if self.totales:
-                for idx, c in enumerate(self.columnas):
+                for idx, c in enumerate(columnas):
                     if totales.has_key(c):
-                        totales[c] = self.acumular(totales[c], dato[idx]) 
+                        totales[c] = self.acumular(totales[c], dato[idx])
+                        
+            fila = []
+            for col in columnas:
+                fila.append(dato[col])                 
             
-            fichero_csv.add(dato)
+            fichero_csv.add(fila)
             
         # añadir línea con el total
         if self.totales:
             fila_totales = []
-            for c in self.columnas:
+            for c in columnas:
                 if totales.has_key(c):
                     fila_totales.append(self.float_fmt(totales[c]))
                     
@@ -577,10 +615,14 @@ class DataSet(object):
             for c in query.columns:
                 if c.name != 'busqueda':
                     if not c.name.startswith('id_'):
-                        cols.append(c.name.encode('utf-8'))
+                        cols.append((quitar_especiales(c.name),
+                                     c.name.encode('utf-8'),
+                                     '',))
                         
                     elif mostrar_ids:
-                        cols.append(c.name.encode('utf-8'))
+                        cols.append((quitar_especiales(c.name),
+                                     c.name.encode('utf-8'),
+                                     '',))
 
         ds = DataSet(columnas=cols, limite=limite_resultados)
         ds.numero_resultados = conector.conexion.execute(query).rowcount
