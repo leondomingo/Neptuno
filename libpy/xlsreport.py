@@ -8,11 +8,11 @@ from genshi.template.loader import TemplateLoader
 from libpy.util import strtodate, strtotime
 from nucleo.config import VARIABLES
 
-def dstoxls(ds, template, filename, kw_tmpl):
+def xlsreport(template, params, filename):
     """
     IN
-      ds        <DataSet>
       template  <str>
+      params   <dict>
       filename  <str>
       
     OUT
@@ -44,7 +44,7 @@ def dstoxls(ds, template, filename, kw_tmpl):
             
     tl = TemplateLoader([VARIABLES['ruta_templates']])
     tmpl = tl.load(template)
-    informe = tmpl.generate(**kw_tmpl)
+    informe = tmpl.generate(**params)
     informe_xml = informe.render('xml')
     
     root = etree.fromstring(informe_xml)
