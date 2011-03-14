@@ -5,7 +5,7 @@ from lxml import etree
 from xlwt import Workbook, Formula
 from xlwt.Style import easyxf
 from genshi.template.loader import TemplateLoader
-from libpy.util import strtodate, strtotime
+from libpy.util import strtodate, strtotime, strtobool
 from nucleo.config import VARIABLES
 
 def xlsreport(template, params, filename):
@@ -136,15 +136,19 @@ def xlsreport(template, params, filename):
                         # color
                         if fuente.attrib.get('color', None):
                             color = fuente.attrib['color']
-                            font.append('color_index %s' % color)
+                            font.append('color %s' % color)
                             
                         # bold
                         if fuente.attrib.get('bold', None):
-                            font.append('bold on')
+                            font.append('bold %s' % fuente.attrib['bold'])
                         
                         # italic
                         if fuente.attrib.get('italic', None):
-                            font.append('italic on')
+                            font.append('italic %s' % fuente.attrib['italic'])
+                            
+                        # underline
+                        if fuente.attrib.get('underline', None):
+                            font.append('underline %s' % fuente.attrib['underline'])
                         
                         # añadir "font"
                         if font:
@@ -171,14 +175,130 @@ def xlsreport(template, params, filename):
                     pattern = []
                     
                     # bgcolor
+                    patron_relleno = ''
+                    if estilo.attrib.get('pattern', None):
+                        patron_relleno = estilo.attrib['pattern']
+                        pattern.append('pattern %s' % patron_relleno)
+                    
                     if estilo.attrib.get('bgcolor', None):
-                        pattern.append('solid')
+                        if not patron_relleno:
+                            pattern.append('pattern solid')
+                            
                         pattern.append('fore-color %s' % estilo.attrib['bgcolor'])
                         
                     if pattern:
                         style.append('pattern: %s' % (','.join(pattern)))
                         
-                #print style
+                    border = []
+                    if estilo.find('border') != None:
+                        borde = estilo.find('border')
+                        
+                        # color
+                        color_borde = ''
+                        if borde.attrib.get('color', None):
+                            color_borde = borde.attrib['color']
+                        
+                        # line
+                        linea_borde = 'thin'
+                        if borde.attrib.get('line', None):
+                            linea_borde = borde.attrib['line']
+                        
+                        # top
+                        top_color = ''
+                        top_line = ''
+                        if borde.find('top') != None:
+                            tp = borde.find('top')
+                            if tp.attrib.get('color', None):
+                                top_color = tp.attrib['color']
+                                
+                            elif color_borde:
+                                top_color = color_borde
+                                
+                            if tp.attrib.get('line', None):
+                                top_line = tp.attrib['line']
+                            
+                            elif linea_borde:
+                                top_line = linea_borde
+                                
+                        if top_color:
+                            border.append('top_color %s' % top_color)
+                            
+                        if top_line:
+                            border.append('top %s' % top_line)
+                        
+                        # bottom
+                        bottom_color = ''
+                        bottom_line = ''
+                        if borde.find('bottom') != None:
+                            bt = borde.find('bottom')
+                            if bt.attrib.get('color', None):
+                                bottom_color = bt.attrib['color']
+                                
+                            elif color_borde:
+                                bottom_color = color_borde
+                                
+                            if bt.attrib.get('line', None):
+                                bottom_line = bt.attrib['line']
+                            
+                            elif linea_borde:
+                                bottom_line = linea_borde
+
+                        if bottom_color:
+                            border.append('bottom_color %s' % bottom_color)
+                            
+                        if bottom_line:
+                            border.append('bottom %s' % bottom_line)
+                        
+                        # left
+                        left_color = ''
+                        left_line = ''
+                        if borde.find('left') != None:
+                            lf = borde.find('left')
+                            if lf.attrib.get('color', None):
+                                left_color = lf.attrib['color']
+                                
+                            elif color_borde:
+                                left_color = color_borde
+                                
+                            if lf.attrib.get('line', None):
+                                left_line = lf.attrib['line']
+                            
+                            elif linea_borde:
+                                left_line = linea_borde
+
+                        if left_color:
+                            border.append('left_color %s' % left_color)
+                            
+                        if left_line:
+                            border.append('left %s' % left_line)
+
+                        # right
+                        right_color = ''
+                        right_line = ''
+                        if borde.find('right') != None:
+                            rt = borde.find('right')
+                            if rt.attrib.get('color', None):
+                                right_color = rt.attrib['color']
+                                
+                            elif color_borde:
+                                right_color = color_borde
+                                
+                            if rt.attrib.get('line', None):
+                                right_line = rt.attrib['line']
+                            
+                            elif linea_borde:
+                                right_line = linea_borde
+
+                        if right_color:
+                            border.append('right_color %s' % right_color)
+                            
+                        if right_line:
+                            border.append('right %s' % right_line)
+
+                        if border:
+                            style.append('border: %s' % (','.join(border)))
+                                            
+#                print style
                 ws.write(util.current_line(), col, dato, 
                          easyxf(';'.join(style), num_format_str=num_format))
             
