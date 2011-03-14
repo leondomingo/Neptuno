@@ -68,8 +68,8 @@ class DataSetRow(object):
         
     def __str__(self):
         resultado = []
-        for col in self.columnas:
-            resultado.append('%s=%s' % (col, self.attr[col]))
+        for k, v in self.attr.iteritems():
+            resultado.append('%s=%s' % (k, v))
             
         return ', '.join(resultado)
         
