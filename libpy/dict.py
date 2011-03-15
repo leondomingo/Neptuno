@@ -9,18 +9,31 @@ class Dict(dict):
             elif isinstance(v, list):
                 v2 = []
                 for item in v:
-                    v2.append(Dict(**item))
+                    if isinstance(v, dict) or isinstance(v, Dict):
+                        v2.append(Dict(**item))
+                        
+                    else:
+                        v2.append(item)
                     
                 self[k] = v2
 
             elif isinstance(v, tuple):
                 v2 = None
                 for item in v:
-                    if not v2:
-                        v2 = (Dict(**item),)
-                        
+                    
+                    if isinstance(v, dict) or isinstance(v, Dict):
+                        if not v2:
+                            v2 = (Dict(**item),)
+                            
+                        else:
+                            v2 = v2 + (Dict(**item),)
+                            
                     else:
-                        v2 = v2 + (Dict(**item),)
+                        if not v2:
+                            v2 = (item,)
+                            
+                        else:
+                            v2 = v2 + (item,)
                     
                 self[k] = v2
 
