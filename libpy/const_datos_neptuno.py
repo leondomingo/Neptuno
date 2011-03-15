@@ -66,5 +66,5 @@ MESSAGE = 'message'
 EXPIRATION = 'expiration'
 
 # idiomas
-LANG_ESP = 1
-LANG_ENG = 2
+LANG_ES_ES = 0
+LANG_EN_UK = 1
