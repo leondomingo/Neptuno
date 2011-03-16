@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import re
+import xlrd
 from lxml import etree
 from xlwt import Workbook, Formula
 from xlwt.Style import easyxf
 from genshi.template.loader import TemplateLoader
-from libpy.util import strtodate, strtotime, strtobool
+from libpy.util import strtodate, strtotime
 from nucleo.config import VARIABLES
 
 def xlsreport(template, params, filename):
@@ -91,8 +92,9 @@ def xlsreport(template, params, filename):
                         def parsear_formula(texto):
                             def evaluar(m):
                                 # esto sólo está aquí para que se pueda
-                                # referenciar "util" en la expresión de la fórmula
+                                # referenciar "util" y "xlrd" en la expresión de la fórmula
                                 util.current_line()
+                                xlrd
                                 expr = m.group(1).replace('{', '').replace('}', '')
                                 return str(eval(expr))
                             
