@@ -8,7 +8,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 
 def enviar_email(remitente, destinatarios, asunto, mensaje, 
-                 servidor, login, password, ficheros=[], html=''):
+                 servidor, login, password, ficheros=[], html='', charset='iso-8859-1'):
     """
     IN
       remitente      (<email>, <nombre>)
@@ -31,6 +31,8 @@ def enviar_email(remitente, destinatarios, asunto, mensaje,
     """
     
     msg = MIMEText(mensaje)
+    msg.set_type('text/plain')
+    msg.set_charset(charset)
     
     msg_root = None
     if html:
@@ -44,6 +46,7 @@ def enviar_email(remitente, destinatarios, asunto, mensaje,
             
             msg_html = MIMEText(html)
             msg_html.set_type('text/html')
+            msg_html.set_charset(charset)
 
             msg_alt.attach(msg_html)
             
