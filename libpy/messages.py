@@ -9,31 +9,31 @@ def message(func):
             return mensaje.encode('utf-8')
         
         else:
-            return func(_self).get(1).encode('utf-8')
+            return func(_self).get(0).encode('utf-8')
     
     return _message
 
 class MessagesNeptuno(object):
     
-    def __init__(self, idioma=const.LANG_ESP):
+    def __init__(self, idioma=const.LANG_ES_ES):
         self.idioma = idioma
         
     @message
     def getSesionIncorrecta(self):
-        return {const.LANG_ESP: u'Sesión incorrecta',
-                const.LANG_ENG: u'Incorrect session'}
+        return {const.LANG_ES_ES: u'Sesión incorrecta',
+                const.LANG_EN_UK: u'Incorrect session'}
     
     @message
     def getNoExisteUsuario(self):
-        return {const.LANG_ESP: u'El usuario no existe',
-                const.LANG_ENG: u'The user does not exist'}
+        return {const.LANG_ES_ES: u'El usuario no existe',
+                const.LANG_EN_UK: u'The user does not exist'}
         
     @message
     def getLoginIncorrecto(self):
-        return {const.LANG_ESP: u'Login incorrecto',
-                const.LANG_ENG: u'Incorrect login'}
+        return {const.LANG_ES_ES: u'Login incorrecto',
+                const.LANG_EN_UK: u'Incorrect login'}
         
     @message
     def getErrorGeneral(self):
-        return {const.LANG_ESP: u'Ha ocurrido un error',
-                const.LANG_ENG: u'An error has occurred',}        
+        return {const.LANG_ES_ES: u'Ha ocurrido un error',
+                const.LANG_EN_UK: u'An error has occurred',}        
