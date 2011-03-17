@@ -10,19 +10,10 @@ from libpy.util import strtodate, strtotime
 from nucleo.config import VARIABLES
 from libpy.log import NeptunoLogger
 
-def xlsreport(template, params, filename):
-    """
-    IN
-      template  <str>
-      params   <dict>
-      filename  <str>
-      
-    OUT
-      <str>
-    """
-    
-    logger = NeptunoLogger.get_logger('xlsreport')
+__all__ = ['XLSReport']
 
+class XLSReport(object):
+    
     class Util(object):
         
         def __init__(self):
@@ -45,8 +36,12 @@ def xlsreport(template, params, filename):
             
         def bookmark(self, name):
             return self.marks[name]
-            
-    def calcular_estilo(estilo):
+
+    def __init__(self, template):
+        tl = TemplateLoader([VARIABLES['ruta_templates']])
+        self.tmpl = tl.load(template)
+
+    def calcular_estilo(self, estilo):
         
         style = []
         
@@ -231,134 +226,136 @@ def xlsreport(template, params, filename):
                     style.append('border: %s' % (','.join(border)))
                     
         return style
-                    
-    logger.debug(0)
     
-    tl = TemplateLoader([VARIABLES['ruta_templates']])
-    tmpl = tl.load(template)
-    logger.debug('Template cargado!')
-    
-    informe = tmpl.generate(**params)    
-    logger.debug('Template generado!')
-    
-    informe_xml = informe.render('xml')
-    logger.debug('Informe XML generado!')
-    
-    logger.debug(1)
-    
-    root = etree.fromstring(informe_xml)
-    
-    wb = Workbook()
-    
-    estilos = {}
-    
-    logger.debug(2)
-    
-    n_sheet = 0
-    for sheet in root.iter('sheet'):
+    def create(self, params, filename=None):
+        """
+        IN
+          params    <dict>
+          filename  <str> (opcional)
+          
+        OUT
+          El XML del informe
+          <str>
+        """
         
-        n_sheet += 1
+        logger = NeptunoLogger.get_logger('XLSReport/create')
+    
+        informe = self.tmpl.generate(**params)    
         
-        # title
-        title = 'Sheet-%d' % n_sheet
-        if sheet.attrib.has_key('title') and sheet.attrib['title']:
-            title = sheet.attrib['title']
-            
-        ws = wb.add_sheet(title, True)
+        informe_xml = informe.render('xml')
         
-        util = Util()
-        for item in sheet:
+        root = etree.fromstring(informe_xml)
+        
+        wb = Workbook()
+        
+        estilos = {}
+        
+        n_sheet = 0
+        for sheet in root.iter('sheet'):
             
-            # style
-            if item.tag == 'style':
-                logger.debug('<style>')
-                
-                estilos[item.attrib['name']] = easyxf(';'.join(calcular_estilo(item))) 
+            n_sheet += 1
             
-            # cell
-            if item.tag == 'cell':
-                logger.debug('<cell>')
+            # title
+            title = 'Sheet-%d' % n_sheet
+            if sheet.attrib.has_key('title') and sheet.attrib['title']:
+                title = sheet.attrib['title']
                 
-                col = int(item.attrib['col'])
+            ws = wb.add_sheet(title, True)
+            
+            util = self.Util()
+            for item in sheet:
                 
-                num_format = None
-                
-                value = item.find('value')
-                dato = value.text
-                # type: aplicar una conversión (str, int, float, ...)
-                if item.attrib.has_key('type') and item.attrib['type']:
-                    tipo = item.attrib['type'].split(';')
+                # style
+                if item.tag == 'style':
+                    logger.debug('<style>')
                     
-                    # date
-                    if tipo[0] == 'date':
-                        dato = strtodate(dato)
-
-                    # time
-                    elif tipo[0] == 'time':
-                        dato = strtotime(dato, fmt='%H:%M:%S')
+                    estilos[item.attrib['name']] = easyxf(';'.join(self.calcular_estilo(item))) 
+                
+                # cell
+                if item.tag == 'cell':
+                    logger.debug('<cell>')
                     
-                    # formula
-                    elif tipo[0] == 'formula':
-                        def parsear_formula(texto):
-                            def evaluar(m):
-                                # esto sólo está aquí para que se pueda
-                                # referenciar "util" y "xlrd" en la expresión de la fórmula
-                                util.current_line()
-                                xlrd
-                                expr = m.group(1).replace('{', '').replace('}', '')
-                                return str(eval(expr))
+                    col = int(item.attrib['col'])
+                    
+                    num_format = None
+                    
+                    value = item.find('value')
+                    dato = value.text
+                    # type: aplicar una conversión (str, int, float, ...)
+                    if item.attrib.has_key('type') and item.attrib['type']:
+                        tipo = item.attrib['type'].split(';')
+                        
+                        # date
+                        if tipo[0] == 'date':
+                            dato = strtodate(dato)
+    
+                        # time
+                        elif tipo[0] == 'time':
+                            dato = strtotime(dato, fmt='%H:%M:%S')
+                        
+                        # formula
+                        elif tipo[0] == 'formula':
+                            def parsear_formula(texto):
+                                def evaluar(m):
+                                    # esto sólo está aquí para que se pueda
+                                    # referenciar "util" y "xlrd" en la expresión de la fórmula
+                                    util.current_line()
+                                    xlrd
+                                    expr = m.group(1).replace('{', '').replace('}', '')
+                                    return str(eval(expr))
+                                
+                                # {{<fórmula>}}
+                                return re.sub(r'({{[^\{\}]+}})', evaluar, texto)
+                                
+                            dato = Formula(parsear_formula(dato))
+                        
+                        # resto de tipos
+                        else:
+                            try:
+                                f = lambda t,v: t(v)
+                                dato = f(eval(tipo[0]), dato)
+                            except:
+                                dato = 'ERROR!'
+                        
+                        # date;dd/mm/yyyy
+                        # date;dd/mmm/yyyy
+                        # date;NN D MMMM YYYY
+                        # time;hh:mm
+                        # float;#,##0.00
+                        # float;+#,##0.00
+                        # float;#,##0.00;[RED]-#,##0.00
+                        if len(tipo) > 1:
+                            num_format = ';'.join(tipo[1:])
+    
+                    # style: aplicar un estilo
+                    estilo = item.find('style')
+                    xfs = None
+                    if estilo != None:
+                        if not estilos.has_key(estilo.attrib['name']):
+                            xfs = easyxf(';'.join(self.calcular_estilo(estilo))) 
+        
+                            estilos[estilo.attrib['name']] = xfs
                             
-                            # {{<fórmula>}}
-                            return re.sub(r'({{[^\{\}]+}})', evaluar, texto)
+                        else:
+                            xfs = estilos[estilo.attrib['name']]
                             
-                        dato = Formula(parsear_formula(dato))
-                    
-                    # resto de tipos
-                    else:
-                        try:
-                            f = lambda t,v: t(v)
-                            dato = f(eval(tipo[0]), dato)
-                        except:
-                            dato = 'ERROR!'
-                    
-                    # date;dd/mm/yyyy
-                    # date;dd/mmm/yyyy
-                    # date;NN D MMMM YYYY
-                    # time;hh:mm
-                    # float;#,##0.00
-                    # float;+#,##0.00
-                    # float;#,##0.00;[RED]-#,##0.00
-                    if len(tipo) > 1:
-                        num_format = ';'.join(tipo[1:])
-
-                # style: aplicar un estilo
-                estilo = item.find('style')
-                xfs = None
-                if estilo != None:
-                    if not estilos.has_key(estilo.attrib['name']):
-                        xfs = easyxf(';'.join(calcular_estilo(estilo))) 
+                    if num_format:
+                        if not xfs:
+                            xfs = XFStyle()
+                            
+                        xfs.num_format_str = num_format
     
-                        estilos[estilo.attrib['name']] = xfs
-                        
-                    else:
-                        xfs = estilos[estilo.attrib['name']]
-                        
-                if num_format:
-                    if not xfs:
-                        xfs = XFStyle()
-                        
-                    xfs.num_format_str = num_format
-
-                ws.write(util.current_line(), col, dato, xfs)
-            
-            elif item.tag == 'line_feed':
-                logger.debug('<line_feed>')
-                util.line_feed()
+                    ws.write(util.current_line(), col, dato, xfs)
                 
-            elif item.tag == 'bookmark':
-                logger.debug('<bookmark>')
-                util.add_bookmark(item.attrib['name'])
-            
-    wb.save(filename)
-    
-    return informe_xml
+                elif item.tag == 'line_feed':
+                    logger.debug('<line_feed>')
+                    util.line_feed()
+                    
+                elif item.tag == 'bookmark':
+                    logger.debug('<bookmark>')
+                    util.add_bookmark(item.attrib['name'])
+                
+        if filename:
+            wb.save(filename)
+        
+        return informe_xml
