@@ -6,6 +6,7 @@ from email import Encoders
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
+from email.header import Header
 
 def enviar_email(remitente, destinatarios, asunto, mensaje, 
                  servidor, login, password, ficheros=[], html='', charset='iso-8859-1'):
@@ -68,7 +69,7 @@ def enviar_email(remitente, destinatarios, asunto, mensaje,
                             'attachment; filename="%s"' % os.path.basename(f))
             msg.attach(part)
             
-    msg['Subject'] = asunto
+    msg['Subject'] = Header(asunto, charset)
     msg['From'] = '%s <%s>' % (remitente[1], remitente[0])
     
     nombres = ['%s <%s>' % (dst[1], dst[0]) for dst in destinatarios]
@@ -102,3 +103,30 @@ def enviar_email(remitente, destinatarios, asunto, mensaje,
             
     except Exception, e:
         print str(e)
+        
+def normalizar_a_html(texto):
+    return texto.\
+        replace('\'', '&#39;').\
+        replace('&', '&amp;').\
+        replace('#', '&#35;').\
+        replace('á', '&aacute;').\
+        replace('Á', '&Aacute;').\
+        replace('é', '&eacute;').\
+        replace('É', '&Eacute;').\
+        replace('í', '&iacute;').\
+        replace('Í', '&Iacute;').\
+        replace('ó', '&oacute;').\
+        replace('Ó', '&Oacute;').\
+        replace('ú', '&uacute;').\
+        replace('Ú', '&Uacute;').\
+        replace('ü', '&uuml;').\
+        replace('Ü', '&Uuml;').\
+        replace('ñ', '&ntilde;').\
+        replace('Ñ', '&Ntilde;').\
+        replace('<', '&lt;').\
+        replace('>', '&gt;').\
+        replace('¡', '&iexcl;').\
+        replace('?', '&iquest;').\
+        replace('"', '&quot;').\
+        replace('%', '&#37;')
+        
