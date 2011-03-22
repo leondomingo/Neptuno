@@ -5,10 +5,9 @@ import xlrd
 from lxml import etree
 from xlwt import Workbook, Formula
 from xlwt.Style import easyxf, XFStyle
-from genshi.template.loader import TemplateLoader
 from libpy.util import strtodate, strtotime
-from nucleo.config import VARIABLES
 from libpy.log import NeptunoLogger
+from libpy.template import get_template
 
 __all__ = ['XLSReport']
 
@@ -22,6 +21,7 @@ class XLSReport(object):
             
         def init_count(self):
             self.n = 0
+            self.marks = {}
             
         def current_line(self):
             return self.n
@@ -38,8 +38,7 @@ class XLSReport(object):
             return self.marks[name]
 
     def __init__(self, template):
-        tl = TemplateLoader([VARIABLES['ruta_templates']])
-        self.tmpl = tl.load(template)
+        self.tmpl = get_template(template)
 
     def calcular_estilo(self, estilo):
         
@@ -239,10 +238,12 @@ class XLSReport(object):
         """
         
         logger = NeptunoLogger.get_logger('XLSReport/create')
-    
-        informe = self.tmpl.generate(**params)    
         
-        informe_xml = informe.render('xml')
+        util = self.Util()
+        params['util'] = util
+        params['xlrd'] = xlrd
+    
+        informe_xml = self.tmpl.render(**params).encode('utf-8')
         
         root = etree.fromstring(informe_xml)
         
@@ -262,7 +263,7 @@ class XLSReport(object):
                 
             ws = wb.add_sheet(title, True)
             
-            util = self.Util()
+            util.init_count()
             for item in sheet:
                 
                 # style
@@ -301,11 +302,10 @@ class XLSReport(object):
                                     # referenciar "util" y "xlrd" en la expresión de la fórmula
                                     util.current_line()
                                     xlrd
-                                    expr = m.group(1).replace('{', '').replace('}', '')
-                                    return str(eval(expr))
+                                    return str(eval(m.group(1)))
                                 
                                 # {{<fórmula>}}
-                                return re.sub(r'({{[^\{\}]+}})', evaluar, texto)
+                                return re.sub(r'\$\{([^\{\}]+)\}', evaluar, texto)
                                 
                             dato = Formula(parsear_formula(dato))
                         
@@ -350,6 +350,7 @@ class XLSReport(object):
                 elif item.tag == 'line_feed':
                     logger.debug('<line_feed>')
                     util.line_feed()
+#                    print util.current_line()
                     
                 elif item.tag == 'bookmark':
                     logger.debug('<bookmark>')
