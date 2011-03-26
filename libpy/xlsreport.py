@@ -240,9 +240,9 @@ class XLSReport(object):
         logger = NeptunoLogger.get_logger('XLSReport/create')
         
         util = self.Util()
-        params['util'] = util
-        params['xlrd'] = xlrd
-    
+        self.tmpl.globals['util'] = util
+        self.tmpl.globals['xlrd'] = xlrd
+
         informe_xml = self.tmpl.render(**params).encode('utf-8')
         
         root = etree.fromstring(informe_xml)
@@ -296,18 +296,7 @@ class XLSReport(object):
                         
                         # formula
                         elif tipo[0] == 'formula':
-                            def parsear_formula(texto):
-                                def evaluar(m):
-                                    # esto sólo está aquí para que se pueda
-                                    # referenciar "util" y "xlrd" en la expresión de la fórmula
-                                    util.current_line()
-                                    xlrd
-                                    return str(eval(m.group(1)))
-                                
-                                # {{<fórmula>}}
-                                return re.sub(r'\$\{([^\{\}]+)\}', evaluar, texto)
-                                
-                            dato = Formula(parsear_formula(dato))
+                            dato = Formula(dato)
                         
                         # resto de tipos
                         else:
@@ -315,7 +304,7 @@ class XLSReport(object):
                                 f = lambda t,v: t(v)
                                 dato = f(eval(tipo[0]), dato)
                             except:
-                                dato = 'ERROR!'
+                                dato = 'ERROR! (%s)' % dato
                         
                         # date;dd/mm/yyyy
                         # date;dd/mmm/yyyy
