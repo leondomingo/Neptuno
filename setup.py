@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from distutils.core import setup
+from setuptools import setup
 
 setup(name='Neptuno',
       version='1.0',
@@ -11,4 +11,9 @@ setup(name='Neptuno',
                 'libpy.excepciones',  
                 'libpy.firebird', 
                 'libpy.firebird.exc',
-                'libpy.postgres'])
+                'libpy.postgres'],
+      install_requires=[
+        'xlrd',
+        'xlwt',
+        'simplejson'],
+     )
