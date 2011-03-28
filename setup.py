@@ -13,7 +13,11 @@ setup(name='Neptuno',
                 'libpy.firebird.exc',
                 'libpy.postgres'],
       install_requires=[
+        'SQLAlchemy==0.5.8',
+        'lxml==2.2.7',
         'xlrd',
         'xlwt',
-        'simplejson'],
+        'simplejson',
+        'readline',
+      ],
      )
