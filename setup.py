@@ -19,5 +19,6 @@ setup(name='Neptuno',
         'xlwt',
         'simplejson',
         'readline',
+        'jinja2',
       ],
      )
