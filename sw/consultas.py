@@ -49,7 +49,11 @@ def lanzarconsulta(req):
         parametros = get_param(req.form, 'parametros', simplejson.loads, 
                                opcional=True)
         
-        time_out = get_param(req.form, 'time_out', int, opcional=True)    
+        time_out = get_param(req.form, 'time_out', int, opcional=True)
+        
+        req.content_type = 'application/pdf'
+        req.headers_out['Content-Disposition'] = \
+            'Content-Disposition: attachment; filename="%s.pdf"' % nombreinforme    
 
         return lanzar_consulta(cod_usuario=user.id_usuarios_usuarioperfil,
                                servidor=conector.config[CONF_HOST],
