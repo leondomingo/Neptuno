@@ -130,13 +130,17 @@ def lanzar_consulta(cod_usuario, servidor, base, cod_consulta, nombreinforme, \
                 if m_wine:
                     cmd = [m_wine.group(1), m_wine.group(2), nombre_xml, 
                            (log or '')]
+                    
+                    # incluir variables de entorno necesarias para ejecutar Wine
+                    os.environ['DISPLAY'] = ':0'
+                    os.environ['WINEDEBUG'] = '-all'
                 
                 else:
                     cmd = [nombre_aplicacion, nombre_xml, (log or '')]
                     
             logger.debug('Comando para lanzar consulta: "%s"' % cmd)
 
-            # abrir proceso
+            # ejecutar proceso
             p = sp.Popen(cmd)
             
             # "time out" al lanzar una consulta
