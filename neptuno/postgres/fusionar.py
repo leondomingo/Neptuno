@@ -2,7 +2,6 @@
 
 from sqlalchemy.schema import Table, MetaData
 from sqlalchemy.sql.expression import select
-from libpy.conexion import Conexion
 
 class ENoExisteRegistro(Exception):
     def __init__(self, id_reg):
@@ -12,7 +11,7 @@ class ENoExisteRegistro(Exception):
     def __repr__(self):
         return 'No existe el registro %d' % self.id_reg
 
-def merge(nombre_tabla, id_destino, otros_ids, conector=None):
+def merge(nombre_tabla, id_destino, otros_ids, session):
     """
     Fusiona uno o más registros (otros_ids) en otro (id_destino), siendo todos ellos
     de la tabla 'nombre_tabla'.
@@ -35,21 +34,18 @@ def merge(nombre_tabla, id_destino, otros_ids, conector=None):
       ENoExisteRegistro: Cuando no existe alguno de los registros (origen o destino)
     """
     
-    if conector is None:
-        conector = Conexion()
-
-    meta = MetaData(bind=conector.engine, reflect=True)
+    meta = MetaData(bind=session.bind, reflect=True)
     tabla = Table(nombre_tabla, meta, autoload=True)                
                         
     # comprobar que existe el registro "destino"
-    alumno = conector.conexion.execute(select([tabla], tabla.c.id == id_destino)).fetchone()
+    alumno = session.execute(select([tabla], tabla.c.id == id_destino)).fetchone()
     if alumno is None:
         raise ENoExisteRegistro(id_destino)
     
     # comprobar que existen los "otros" registros
     for id_otro in otros_ids:
         
-        otro = conector.conexion.execute(select([tabla], tabla.c.id == id_otro)).fetchone()
+        otro = session.execute(select([tabla], tabla.c.id == id_otro)).fetchone()
         if otro is None:
             raise ENoExisteRegistro(id_otro)
             
@@ -65,8 +61,8 @@ def merge(nombre_tabla, id_destino, otros_ids, conector=None):
         resultado['id_origen'] = id_otro
         
         # obtener datos de los dos registros
-        alumno = conector.conexion.execute(select([tabla], tabla.c.id == id_destino)).fetchone()
-        otro = conector.conexion.execute(select([tabla], tabla.c.id == id_otro)).fetchone()
+        alumno = session.execute(select([tabla], tabla.c.id == id_destino)).fetchone()
+        otro = session.execute(select([tabla], tabla.c.id == id_otro)).fetchone()
         
         # claves foráneas que hacen referencia a esta tabla
         for t in meta.sorted_tables:
@@ -74,9 +70,9 @@ def merge(nombre_tabla, id_destino, otros_ids, conector=None):
                 if fk.references(tabla):
                     # actualizar los registros que apuntan a "origen" -> "destino"
                     qry_update = t.update(fk.parent == id_otro, values={fk.parent: id_destino})
-                    conector.conexion.execute(qry_update)
+                    session.execute(qry_update)
         
-        conector.conexion.commit()
+        session.commit()
         
         # cambiar datos de la tabla
         datos = {}
@@ -97,11 +93,11 @@ def merge(nombre_tabla, id_destino, otros_ids, conector=None):
         if datos != {}:
             # actualizar "destino"
             qry_update = tabla.update(tabla.c.id == id_destino, values=datos)
-            conector.conexion.execute(qry_update)
+            session.execute(qry_update)
 
         # borrar "otro"
         qry_delete = tabla.delete(tabla.c.id == id_otro)
-        conector.conexion.execute(qry_delete)
-        conector.conexion.commit()                    
+        session.execute(qry_delete)
+        session.commit()                    
     
     return resultado
