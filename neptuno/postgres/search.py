@@ -17,9 +17,9 @@ class Busqueda(object):
         
         if not columnas_trans:
             self.cols_trans = [re.sub(r'[^a-z0-9]*', '', self.quitar_acentos(col))
-                               for col in self.columnas]
+                               for col in self.cols]
         else:
-            self.cols_trans = columnas_trans        
+            self.cols_trans = columnas_trans
 
         if texto_busqueda:
             self.condicion = self.condicion_busqueda(texto_busqueda)
