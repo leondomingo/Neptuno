@@ -444,4 +444,4 @@ def search(session, table_name, q=None, rp=100, offset=0):
     if order:
         qry = qry.order_by(order)
         
-    return DataSet.procesar_resultado(qry, rp, offset)
+    return DataSet.procesar_resultado(session, qry, rp, offset)
