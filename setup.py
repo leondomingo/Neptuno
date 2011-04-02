@@ -15,7 +15,6 @@ setup(name='Neptuno2',
       ],
       url='www.ender.es',      
       packages=['neptuno',
-                'neptuno.excepciones',  
                 'neptuno.postgres'],
       install_requires=[
         'psycopg2',
