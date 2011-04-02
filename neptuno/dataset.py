@@ -526,7 +526,7 @@ class DataSet(object):
         self.data.sort(cmp=compara)
     
     @staticmethod
-    def procesar_resultado(session, query, limit=None, pos=None):
+    def procesar_resultado(session, query, limit=None, pos=None, show_ids=False):
         """
         IN
           session  <sqlalchemy.orm.session.Session>
@@ -540,7 +540,7 @@ class DataSet(object):
         
         cols = []
         for c in query.columns:
-            if not c.name.startswith('id_'):
+            if show_ids or not c.name.startswith('id_'):
                 cols.append((remove_specials(c.name).lower(), # name
                              c.name, # label
                              '',)) # type

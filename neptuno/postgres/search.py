@@ -402,7 +402,7 @@ class Busqueda(object):
         
         return sql
 
-def search(session, table_name, q=None, rp=100, offset=0):
+def search(session, table_name, q=None, rp=100, offset=0, show_ids=False):
     """
     IN
       session     <sqlalchemy.orm.session.Session>
@@ -439,4 +439,4 @@ def search(session, table_name, q=None, rp=100, offset=0):
     if order:
         qry = qry.order_by(order)
         
-    return DataSet.procesar_resultado(session, qry, rp, offset)
+    return DataSet.procesar_resultado(session, qry, rp, offset, show_ids)
