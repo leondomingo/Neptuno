@@ -2,10 +2,17 @@
 
 from setuptools import setup
 
-setup(name='Neptuno',
-      version='2.0',
+setup(name='Neptuno2',
+      version='1.0',
       author='León Domingo',
       author_email='leon.domingo@ender.es',
+      descripcion=('A little set of utilities that Ender has been using in their web projects'),
+      #license=???,
+      keywords='neptuno ender web',
+      classifiers=[
+        'Development Status :: 5 - Production/Stable',
+        'Topic :: Utilities',
+      ],
       url='www.ender.es',      
       packages=['neptuno',
                 'neptuno.excepciones',  
