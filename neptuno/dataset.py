@@ -554,7 +554,7 @@ class DataSet(object):
         for fila in session.execute(query.limit(limit).offset(pos)):
             row = []
             for c in query.columns:
-                if not c.name.startswith('id_'):
+                if show_ids or not c.name.startswith('id_'):
                     row.append(fila[c])
 
             ds.append(row)
