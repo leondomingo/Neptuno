@@ -5,7 +5,7 @@ import datetime
 #import simplejson
 from decimal import Decimal
 from neptuno.util import default_fmt_float
-#from neptuno.ficherocsv import FicheroCSV
+from neptuno.ficherocsv import FicheroCSV
 
 COLUMNAS = 'columnas'
 COUNT = 'count'
@@ -134,7 +134,7 @@ class DataSet(object):
                 self.types.append('')
 
         self.limite_resultados = limite
-        self.datos = []
+        self.data = []
         self.count = 0
         self.float_fmt = default_fmt_float
         self.totales = totales
@@ -164,7 +164,7 @@ class DataSet(object):
         """
         
         if isinstance(dato, DataSetRow):
-            self.datos.append(dato)
+            self.data.append(dato)
             
         elif isinstance(dato, dict):
             # comparar claves y columnas
@@ -191,11 +191,11 @@ class DataSet(object):
         else:
             self.append([None] * len(self.cols))        
         
-        self.datos[-1].cols = self.cols        
-        return self.datos[-1]
+        self.data[-1].cols = self.cols        
+        return self.data[-1]
     
     def __iter__(self):
-        return iter(self.datos)
+        return iter(self.data)
     
     def reversed(self):
         """Devuelve un iterador para recorrer la lista del final al principio
@@ -216,7 +216,7 @@ class DataSet(object):
          item0
         ]
         """
-        return reversed(self.datos)
+        return reversed(self.data)
     
     def ereversed(self):
         """
@@ -243,10 +243,10 @@ class DataSet(object):
         return zip(range(len(self)-1, -1, -1), self.reversed())
     
     def __len__(self):
-        return len(self.datos)
+        return len(self.data)
     
     def __getitem__(self, index):
-        return self.datos[index]
+        return self.data[index]
     
     def __str__(self):
         return self.to_str()
@@ -290,7 +290,7 @@ class DataSet(object):
             widths = [0] * len(self.cols)
             
             for i, c in enumerate(self.cols):
-                for d in self.datos: 
+                for d in self.data: 
                     if len(str(d[c])) > widths[i]:
                         widths[i] = len(str(d[c]))
                         
@@ -316,7 +316,7 @@ class DataSet(object):
         
         totales = self.init_totales()
         
-        for dato in self.datos:
+        for dato in self.data:
             linea = '|'
             for i, c in enumerate(self.cols):
                 valor = dato[c]
@@ -377,103 +377,13 @@ class DataSet(object):
             
         return resultado
         
-#    def to_json(self, encoding=None):
-#        """
-#        Devuelve los datos del DataSet en una cadena con formato JSON.
-#        
-#        IN
-#          encoding <str> (opcional)
-#          
-#        OUT
-#          <str>
-#          
-#          {
-#           "numero_resultados": <int>,
-#           "limite_resultados": <int>,
-#           "columnas":          [<str>, <str>, ...],
-#           "datos":             [
-#                                 [d11, d12, ...],
-#                                 [d21, d22, ...],
-#                                 ...                     
-#                                ],
-#           "totales":           [<float>, ...]
-#          }
-#        """
-#        
-#        datos = {
-#                 COLUMNAS: self.labels,
-#                 COUNT: (self.count or len(self)),
-#                 LIMITE_RESULTADOS: len(self),
-#                 DATOS: [],
-#                 TOTALES: None
-#                }
-#        
-#                    
-#        totales = self.init_totales()
-#        
-#        for d in self.datos:
-#            dato = []
-#            for idx, i in enumerate(d):
-#                
-#                # totalizaciones
-#                if self.totales:
-#                    if totales.has_key(self.cols[idx]): 
-#                        totales[self.cols[idx]] = self.acumular(totales[self.cols[idx]], i)
-#                
-#                # date
-#                if isinstance(i, datetime.date):
-#                    dato.append(i.strftime(self.date_fmt))
-#                    
-#                # time
-#                elif isinstance(i, datetime.time):
-#                    dato.append(i.strftime(self.time_fmt))
-#                
-#                # datetime
-#                elif isinstance(i, datetime.datetime):
-#                    dato.append(i.strftime(self.datetime_fmt))
-#                    
-#                # float, Decimal
-#                elif isinstance(i, float) or isinstance(i, Decimal):
-#                    dato.append(self.float_fmt(i))
-#                    
-#                # bool
-#                elif isinstance(i, bool):
-#                    dato.append(self.true_const if i else self.false_const)
-#                    
-#                # int
-#                elif isinstance(i, int):
-#                    dato.append(i)
-#                
-#                elif isinstance(i, unicode):
-#                    dato.append(i.encode(encoding or 'utf-8'))
-#                    
-#                else:
-#                    dato.append(str(i or ''))
-#                    
-#            datos[DATOS].append(dato)
-#            
-#        if self.totales:
-#            datos[TOTALES] = []
-#            for c in self.cols:
-#                if c in self.totales:
-#                    datos[TOTALES].append(self.float_fmt(totales[c]))
-#                    
-#                else:
-#                    datos[TOTALES].append(None)
-#        
-#        if encoding:
-#            return simplejson.dumps(datos, encoding=encoding)
-#        
-#        else:
-#            return simplejson.dumps(datos)
-
     def to_data(self, encoding=None):
         """
         """
         
         data = []
         
-        for row in self.datos:
+        for row in self.data:
             dato = []
             for item in row:
                 
@@ -513,67 +423,67 @@ class DataSet(object):
             
         return data
         
-#    def to_csv(self, encoding=None, mostrar_ids=False):
-#        """
-#        Devuelve en una cadena con formato CSV el contenido del DataSet.
-#        
-#        IN
-#          encoding <str> (opcional)
-#          
-#        OUT
-#          <str> (csv)
-#        """
-#        
-#        fichero_csv = FicheroCSV()
-#        fichero_csv.date_fmt = self.date_fmt
-#        fichero_csv.time_fmt = self.time_fmt
-#        fichero_csv.true_const = self.true_const
-#        fichero_csv.false_const = self.false_const
-#        fichero_csv.float_fmt = self.float_fmt
-#        
-#        columnas = []
-#        labels = []
-#        for item, c in enumerate(self.cols):
-#            
-#            label = self.labels[item]
-#            if isinstance(label, unicode):
-#                label = label.encode('utf-8')
-#                
-#            if not c.startswith('id') or mostrar_ids:
-#                columnas.append(remove_specials(self.cols[item]))
-#                labels.append(label)
-#        
-#        fichero_csv.add(labels)
-#        
-#        totales = self.init_totales()
-#        
-#        for dato in self.datos:
-#            
-#            # totalizar
-#            if self.totales:
-#                for idx, c in enumerate(columnas):
-#                    if totales.has_key(c):
-#                        totales[c] = self.acumular(totales[c], dato[idx])
-#                        
-#            fila = []
-#            for col in columnas:
-#                fila.append(dato[col])                 
-#            
-#            fichero_csv.add(fila)
-#            
-#        # añadir línea con el total
-#        if self.totales:
-#            fila_totales = []
-#            for c in columnas:
-#                if totales.has_key(c):
-#                    fila_totales.append(self.float_fmt(totales[c]))
-#                    
-#                else:
-#                    fila_totales.append(None)
-#                    
-#            fichero_csv.add(fila_totales)
-#        
-#        return fichero_csv.read(encoding)
+    def to_csv(self, encoding=None, mostrar_ids=False):
+        """
+        Devuelve en una cadena con formato CSV el contenido del DataSet.
+        
+        IN
+          encoding <str> (opcional)
+          
+        OUT
+          <str> (csv)
+        """
+        
+        fichero_csv = FicheroCSV()
+        fichero_csv.date_fmt = self.date_fmt
+        fichero_csv.time_fmt = self.time_fmt
+        fichero_csv.true_const = self.true_const
+        fichero_csv.false_const = self.false_const
+        fichero_csv.float_fmt = self.float_fmt
+        
+        columnas = []
+        labels = []
+        for item, c in enumerate(self.cols):
+            
+            label = self.labels[item]
+            if isinstance(label, unicode):
+                label = label.encode('utf-8')
+                
+            if not c.startswith('id') or mostrar_ids:
+                columnas.append(remove_specials(self.cols[item]))
+                labels.append(label)
+        
+        fichero_csv.add(labels)
+        
+        totales = self.init_totales()
+        
+        for dato in self.datos:
+            
+            # totalizar
+            if self.totales:
+                for idx, c in enumerate(columnas):
+                    if totales.has_key(c):
+                        totales[c] = self.acumular(totales[c], dato[idx])
+                        
+            fila = []
+            for col in columnas:
+                fila.append(dato[col])                 
+            
+            fichero_csv.add(fila)
+            
+        # añadir línea con el total
+        if self.totales:
+            fila_totales = []
+            for c in columnas:
+                if totales.has_key(c):
+                    fila_totales.append(self.float_fmt(totales[c]))
+                    
+                else:
+                    fila_totales.append(None)
+                    
+            fichero_csv.add(fila_totales)
+        
+        return fichero_csv.read(encoding)
     
     def order(self, claves):
         """
@@ -613,7 +523,7 @@ class DataSet(object):
             else:
                 return 1
             
-        self.datos.sort(cmp=compara)
+        self.data.sort(cmp=compara)
     
     @staticmethod
     def procesar_resultado(session, query, limit=None, pos=None):
