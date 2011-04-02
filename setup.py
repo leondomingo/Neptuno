@@ -11,6 +11,7 @@ setup(name='Neptuno',
                 'neptuno.excepciones',  
                 'neptuno.postgres'],
       install_requires=[
+        'psycopg2',
         'SQLAlchemy==0.6.6',
         'lxml==2.2.7',
         'xlrd',

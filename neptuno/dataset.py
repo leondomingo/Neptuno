@@ -35,7 +35,7 @@ def tojson(func):
     return __tojson
 
 def remove_specials(texto):
-    return re.sub(r'[^a-zA-Z0-9\-_\s]', '_', texto)
+    return re.sub(r'[^a-zA-Z0-9_]', '_', texto)
 
 class DataSetRowIterator(object):
     
@@ -619,7 +619,7 @@ class DataSet(object):
     def procesar_resultado(session, query, limit=None, pos=None):
         """
         IN
-          session  <>
+          session  <sqlalchemy.orm.session.Session>
           query    <>
           limit    <int>
           pos      <int>
@@ -631,9 +631,9 @@ class DataSet(object):
         cols = []
         for c in query.columns:
             if not c.name.startswith('id_'):
-                cols.append((remove_specials(c.name),
-                             c.name.encode('utf-8'),
-                             '',))
+                cols.append((remove_specials(c.name).lower(), # name
+                             c.name, # label
+                             '',)) # type
                     
         ds = DataSet(cols)
         ds.count = session.execute(query).rowcount

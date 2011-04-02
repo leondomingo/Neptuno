@@ -3,11 +3,11 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from const_datos_neptuno import CONF_HOST, CONF_DB, CONF_USER, CONF_PASSW
-from neptuno.const_datos_neptuno import IMPLTYPE_FIREBIRD
+from neptuno.const_datos_neptuno import IMPLTYPE_FIREBIRD, IMPLTYPE_POSTGRESQL
 
 class Conexion(object):
     
-    def __init__(self, config=None, impl_type=None):
+    def __init__(self, config, impl_type=IMPLTYPE_POSTGRESQL):
         """
         IN
           config {
@@ -30,7 +30,7 @@ class Conexion(object):
                                     pool_size=1, pool_recycle=30)
         
         Session = sessionmaker(bind=self.engine)
-        self.conexion = Session()
+        self.session = Session()
         
     def connectionstr(self, config):
         """
@@ -48,5 +48,5 @@ class Conexion(object):
              config[CONF_HOST], config[CONF_DB])
 
     def __del__(self):        
-        self.conexion.close()        
+        self.session.close()        
         self.engine.dispose()

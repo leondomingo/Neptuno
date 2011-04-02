@@ -405,7 +405,7 @@ class Busqueda(object):
 def search(session, table_name, q=None, rp=100, offset=0):
     """
     IN
-      session     <Session>
+      session     <sqlalchemy.orm.session.Session>
       table_name  <str>
       q           <str>
       rp          <int>
@@ -416,12 +416,7 @@ def search(session, table_name, q=None, rp=100, offset=0):
     """ 
     
     meta = MetaData(bind=session.bind)
-    
-    try:
-        tbl = Table(table_name, meta, autoload=True)
-            
-    except NoSuchTableError:
-        raise
+    tbl = Table(table_name, meta, autoload=True)
     
     sql = None
     order = ''
