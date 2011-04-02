@@ -548,6 +548,9 @@ class DataSet(object):
         ds = DataSet(cols)
         ds.count = session.execute(query).rowcount
         
+        if limit == 0:
+            limit = None
+        
         for fila in session.execute(query.limit(limit).offset(pos)):
             row = []
             for c in query.columns:

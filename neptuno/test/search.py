@@ -13,8 +13,8 @@ if __name__ == '__main__':
            CONF_PASSW: '5390post'}
     
     conn = Conexion(config=cfg)
-    print type(conn.session)
+    #print type(conn.session)
     
-    ds = search(conn.session, 'vista_busqueda_alumnos', q='perez')
-    print ds.cols
-    print ds.labels    
+    ds = search(conn.session, 'vista_busqueda_personal', rp=0)
+    print ds
+    print ds.count    
