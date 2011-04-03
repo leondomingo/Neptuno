@@ -281,15 +281,15 @@ def inicio_fin_mes(fecha):
     
     return (inicio, fin,)
     
-def format_float(valor, separador_miles=',', separador_decimal='.',
-                 mostrar_signo=False, n_decimales=2):
+def format_float(value, thousands_sep=',', decimal_sep='.',
+                 show_sign=False, n_dec=2):
     """
     IN
-      valor              <float> / <str>
-      separador_miles    <str>  (opcional => ',')
-      separador_decimal  <str>  (opcional => '.')
-      mostrar_signo      <bool> (opcional => False)
-      n_decimales        <int>  (opcional => 2)
+      value          <float> / <str>
+      thousands_sep  <str>  (opcional => ',')
+      decimal_sep    <str>  (opcional => '.')
+      show_sign      <bool> (opcional => False)
+      n_dec          <int>  (opcional => 2)
       
     OUT
       <str>
@@ -299,48 +299,48 @@ def format_float(valor, separador_miles=',', separador_decimal='.',
       -x,xxx.xx      
     """
     
-    fmt = '%%%d.%df' % (n_decimales, n_decimales)
+    fmt = '%%+%d.%df' % (n_dec, n_dec)
     
-    if isinstance(valor, int):
-        valor = float(valor)
+    if isinstance(value, int):
+        value = float(value)
     
-    if isinstance(valor, float) or isinstance(valor, Decimal):
-        texto = fmt % valor
+    if isinstance(value, float) or isinstance(value, Decimal):
+        text = fmt % value
         
-    elif isinstance(valor, str) or valor is None:
-        texto = fmt % float(valor or 0)
+    elif isinstance(value, str) or value is None:
+        text = fmt % float(value or 0)
     
-    m = re.search(r'([\+-]?)0*(\d*)\.(\d+)', texto)
-
-    signo = m.group(1)
-    if signo and signo != '-':
-        if not mostrar_signo:
-            signo = ''
+    m = re.search(r'([\+-]?)0*(\d*)\.(\d+)', text)
     
-    entero = m.group(2)
-    decimal = m.group(3)
+    sign = m.group(1)
+    if sign and sign != '-':
+        if not show_sign:
+            sign = ''
     
-    if entero:
-        parte_entera = range(len(entero))
+    int_part = m.group(2)
+    dec_part = m.group(3)
+    
+    if int_part:
+        parte_entera = range(len(int_part))
         parte_entera.reverse()
         
         j = 0
-        resultado = ''
-        for i, j in zip(parte_entera, range(len(entero))):
+        result = ''
+        for i, j in zip(parte_entera, range(len(int_part))):
             if j != 0 and j % 3 == 0:
-                resultado = separador_miles + resultado
+                result = thousands_sep + result
                 
-            resultado = entero[i] + resultado
+            result = int_part[i] + result
             
     else:
-        resultado = '0'        
+        result = '0'        
     
     # 1,234.56
-    return '%(signo)s%(p_entera)s%(sep)s%(p_decimal)s' % \
-                dict(signo=signo or '',
-                     p_entera=resultado, 
-                     sep=separador_decimal, 
-                     p_decimal=decimal)
+    return '%(sign)s%(int_part)s%(sep)s%(dec_part)s' % \
+                dict(sign=sign or '',
+                     int_part=result, 
+                     sep=decimal_sep, 
+                     dec_part=dec_part)
 
-def default_fmt_float(valor):
-    return format_float(valor, separador_miles='.', separador_decimal=',')
+def default_fmt_float(value):
+    return format_float(value, thousands_sep='.', decimal_sep=',')
