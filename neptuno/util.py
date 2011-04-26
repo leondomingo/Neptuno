@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime, date, time
+from datetime import date, time
 import simplejson
 import re
 from decimal import Decimal
@@ -14,7 +14,7 @@ def get_parametros(req, parametros):
         if valor != None:
             valor = valor.value
             
-        resultado[p] = valor            
+        resultado[p] = valor
             
     return resultado
 
@@ -222,7 +222,7 @@ def strtodate2(s):
     return strtodate(s, no_exc=True)
 
 def strtotime(s):
-    m = re.search(r'^(\d{2}):(\d{2}):?(\d{2})?', s)
+    m = re.search(r'^(\d{1,2}):(\d{1,2}):?(\d{1,2})?', s)
     return time(int(m.group(1)), int(m.group(2)), int(m.group(3) or 0))
 
 def strtobool(s):
