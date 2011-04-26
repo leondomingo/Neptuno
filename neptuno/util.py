@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime, date
+from datetime import datetime, date, time
 import simplejson
 import re
 from decimal import Decimal
@@ -221,8 +221,9 @@ def strtodate(s, no_exc=False):
 def strtodate2(s):
     return strtodate(s, no_exc=True)
 
-def strtotime(s, fmt='%H:%M'):
-    return datetime.strptime(s, fmt).time()
+def strtotime(s):
+    m = re.search(r'^(\d{2}):(\d{2}):?(\d{2})?', s)
+    return time(int(m.group(1)), int(m.group(2)), int(m.group(3) or 0))
 
 def strtobool(s):
     if s.lower() == 'true':
