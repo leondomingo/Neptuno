@@ -169,17 +169,8 @@ class EFechaIncorrecta(Exception):
     def __str__(self):
         return 'La fecha "%s" es incorrecta' % self.s
 
-def strtodate(s, no_exc=False):
+def strtodate(s, fmt='%d/%m/%Y', no_exc=False):
     """
-    Devuelve la fecha representada por la cadena 's'.
-    Formatos posibles para 's':
-      d/m/yyyy (1/2/1970, 01/2/1970, 1/02/1970, 01/02/1970)
-      d-m-yyyy (1-2-1970, 01-2-1970, 1-02-1970, 01-02-1970)
-      yyyy/m/d (1970/2/1, 1970/2/01, 1970/02/1, 1970/02/01)
-      yyyy-m-d (1970-2-1, 1970-2-01, 1970-02-1, 1970-02-01)
-      
-      *(d y m representados con 1 ó 2 dos dígitos)     
-    
     IN
       s <str>
       
@@ -187,36 +178,72 @@ def strtodate(s, no_exc=False):
       <date>
     """
     
-    # dd/mm/yyyy
-    # dd-mm-yyyy
-    m1 = re.search(r'^\s*(\d{1,2})[/-](\d{1,2})[/-](\d{4})\s*$', s)
+    # build regex
+    regex = r'^\s*%s\s*$' % (fmt.replace('%d', r'(?P<day>\d{1,2})').\
+                             replace('%m', r'(?P<month>\d{1,2})').\
+                             replace('%Y', r'(?P<year>\d{4})'))
+        
+    m1 = re.search(regex, s)
     if m1:
         try:
-            return date(int(m1.group(3)),
-                        int(m1.group(2)),
-                        int(m1.group(1))
-                        )
-        except:
-            if no_exc: return None
-            raise EFechaIncorrecta(s)
+            day = int(m1.groupdict().get('day') or 1)
+            month = int(m1.groupdict().get('month') or 1)
+            year = int(m1.groupdict().get('year') or 1)
+            
+            return date(year, month, day)
         
-    else:
-        # yyyy/mm/dd
-        # yyyy-mm-dd
-        m2 = re.search(r'^\s*(\d{4})[/-](\d{1,2})[/-](\d{1,2})\s*$', s)
-        
-        if m2:
-            try:        
-                return date(int(m2.group(1)),
-                            int(m2.group(2)),
-                            int(m2.group(3))
-                            )
-            except:
-                if no_exc: return None
-                raise EFechaIncorrecta(s)
-        else:
+        except Exception:
             if no_exc: return None
-            raise EFechaIncorrecta(s)
+            raise Exception('Fecha incorrecta: "%s"' % s)
+
+#def strtodate(s, no_exc=False, month_day=False):
+#    """
+#    Devuelve la fecha representada por la cadena 's'.
+#    Formatos posibles para 's':
+#      d/m/yyyy (1/2/1970, 01/2/1970, 1/02/1970, 01/02/1970)
+#      d-m-yyyy (1-2-1970, 01-2-1970, 1-02-1970, 01-02-1970)
+#      yyyy/m/d (1970/2/1, 1970/2/01, 1970/02/1, 1970/02/01)
+#      yyyy-m-d (1970-2-1, 1970-2-01, 1970-02-1, 1970-02-01)
+#      
+#      *(d y m representados con 1 ó 2 dos dígitos)     
+#    
+#    IN
+#      s <str>
+#      
+#    OUT
+#      <date>
+#    """
+#    
+#    # dd/mm/yyyy
+#    # dd-mm-yyyy
+#    m1 = re.search(r'^\s*(\d{1,2})[/-](\d{1,2})[/-](\d{4})\s*$', s)
+#    if m1:
+#        try:
+#            return date(int(m1.group(3)),
+#                        int(m1.group(2)),
+#                        int(m1.group(1))
+#                        )
+#        except:
+#            if no_exc: return None
+#            raise EFechaIncorrecta(s)
+#        
+#    else:
+#        # yyyy/mm/dd
+#        # yyyy-mm-dd
+#        m2 = re.search(r'^\s*(\d{4})[/-](\d{1,2})[/-](\d{1,2})\s*$', s)
+#        
+#        if m2:
+#            try:        
+#                return date(int(m2.group(1)),
+#                            int(m2.group(2)),
+#                            int(m2.group(3))
+#                            )
+#            except:
+#                if no_exc: return None
+#                raise EFechaIncorrecta(s)
+#        else:
+#            if no_exc: return None
+#            raise EFechaIncorrecta(s)
         
 def strtodate2(s):
     return strtodate(s, no_exc=True)

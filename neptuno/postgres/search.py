@@ -10,10 +10,13 @@ from neptuno.dataset import DataSet
 
 class Busqueda(object):
     
-    def __init__(self, tabla, texto_busqueda, columnas_trans=None):
+    def __init__(self, tabla, texto_busqueda, columnas_trans=None, strtodatef=None):
         self.tabla = tabla
         self.cols = [col.name for col in self.tabla.columns]
         self.cache_campo = {}
+        
+        # string to date conversion function
+        self.strtodatef = strtodatef
         
         if not columnas_trans:
             self.cols_trans = [re.sub(r'[^a-z0-9]*', '', self.quitar_acentos(col))
@@ -215,7 +218,7 @@ class Busqueda(object):
                     expresiones = []
                     
                     expresion_novacio = 'TRIM(COALESCE(CAST("%s" as Text), \'\')) <> \'\'' % c.encode('utf-8')
-                                               
+
                     for termino2 in terminos2:
                         termino2 = self.sin_acentos(termino2)
                         
@@ -223,6 +226,15 @@ class Busqueda(object):
                         if isinstance(col.type, DATE) or \
                         isinstance(col.type, TIME) or \
                         isinstance(col.type, DATETIME):
+
+                            # convert to date
+                            if self.strtodatef:
+                                try:
+                                    termino2 = self.strtodatef(termino2).strftime('%Y-%m-%d')
+                                    #print termino2
+                                    
+                                except:
+                                    pass
                         
                             if operador in ['=', '<>']:
                                 expresion_novacio = None
@@ -232,7 +244,7 @@ class Busqueda(object):
                                     (c.encode('utf-8'),
                                      operador.encode('utf-8'),
                                      termino2)
-                                                
+
                             else:
                                 # <, >, <=, >=
                                 expresion_novacio = '"%s" IS NOT NULL' % c.encode('utf-8')
@@ -402,7 +414,7 @@ class Busqueda(object):
         
         return sql
 
-def search(session, table_name, q=None, rp=100, offset=0, show_ids=False):
+def search(session, table_name, q=None, rp=100, offset=0, show_ids=False, strtodatef=None):
     """
     IN
       session     <sqlalchemy.orm.session.Session>
@@ -423,7 +435,7 @@ def search(session, table_name, q=None, rp=100, offset=0, show_ids=False):
     if q != None:
         
         # process "q"
-        qres = Busqueda(tbl, q)
+        qres = Busqueda(tbl, q, strtodatef=strtodatef)
         
         # apply search conditions    
         sql = and_(qres.condicion, sql)
