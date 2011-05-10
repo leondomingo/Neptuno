@@ -414,7 +414,8 @@ class Busqueda(object):
         
         return sql
 
-def search(session, table_name, q=None, rp=100, offset=0, show_ids=False, strtodatef=None):
+def search(session, table_name, q=None, rp=100, offset=0, show_ids=False, 
+           strtodatef=None, filters=None):
     """
     IN
       session     <sqlalchemy.orm.session.Session>
@@ -443,7 +444,45 @@ def search(session, table_name, q=None, rp=100, offset=0, show_ids=False, strtod
         # apply order
         if qres.orden:
             order = qres.orden
-    
+         
+    # apply filters
+    if filters:
+        filters_tuple = (sql,)
+        for f in filters:
+            if len(f) > 2:
+                # (<field name>, <field value>, <operator>,)
+                # different
+                if f[2] == '!=':
+                    filters_tuple += (tbl.c[f[0]] != f[1],)
+                    
+                # greater
+                elif f[2] == '>':
+                    filters_tuple += (tbl.c[f[0]] > f[1],)
+                
+                # greater or equal
+                elif f[2] == '>=':
+                    filters_tuple += (tbl.c[f[0]] >= f[1],)
+                    
+                # less
+                elif f[2] == '<':
+                    filters_tuple += (tbl.c[f[0]] < f[1],)
+                    
+                # less or equal
+                elif f[2] == '<=':
+                    filters_tuple += (tbl.c[f[0]] <= f[1],)
+                    
+                # equal (and anything else...)
+                else:
+                    filters_tuple += (tbl.c[f[0]] == f[1],)
+                    
+            else:
+                # (<field name>, <field value>,)
+                # equal (by default) 
+                filters_tuple += (tbl.c[f[0]] == f[1],)
+        
+        sql = and_(*filters_tuple)
+        #print sql
+
     # where
     qry = tbl.select(whereclause=sql)
     
