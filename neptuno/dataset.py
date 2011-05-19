@@ -453,8 +453,8 @@ class DataSet(object):
         for item, c in enumerate(self.cols):
             
             label = self.labels[item]
-            if isinstance(label, unicode):
-                label = label.encode('utf-8')
+#            if isinstance(label, unicode):
+#                label = label.encode('utf-8')
                 
             if not c.startswith('id') or mostrar_ids:
                 columnas.append(remove_specials(self.cols[item]))
