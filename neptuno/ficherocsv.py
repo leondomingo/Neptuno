@@ -37,29 +37,29 @@ class FicheroCSV(object):
         for i in row:
             
             if isinstance(i, float) or isinstance(i, Decimal):
-                row_resultado.append(unicode(float_fmt(i)))
+                row_resultado.append(float_fmt(i))
                 
             elif isinstance(i, bool):
-                row_resultado.append(unicode((self.true_const if i else self.false_const)))                 
+                row_resultado.append((self.true_const if i else self.false_const))                 
 
             elif isinstance(i, int):
-                row_resultado.append(u'%d' % i)
+                row_resultado.append('%d' % i)
 
             elif isinstance(i, datetime.datetime):
                 datetime_fmt = '%s %s' % (self.date_fmt, self.time_fmt)
-                row_resultado.append(unicode(i.strftime(datetime_fmt)))
+                row_resultado.append(i.strftime(datetime_fmt))
 
             elif isinstance(i, datetime.date):                
-                row_resultado.append(datetostr(i, fmt=self.date_fmt).decode('utf-8'))
+                row_resultado.append(datetostr(i, fmt=self.date_fmt))
                 
             elif isinstance(i, datetime.time):
-                row_resultado.append(timetostr(i, fmt=self.time_fmt).decode('utf-8'))
+                row_resultado.append(timetostr(i, fmt=self.time_fmt))
                 
             elif isinstance(i, unicode):
-                row_resultado.append(i)
+                row_resultado.append(i.encode('utf-8'))
 
             else:
-                row_resultado.append(str(i or '').decode('utf-8'))
+                row_resultado.append(str(i or '')) #.decode('utf-8'))
                 
         self.w_csv.writerow(row_resultado)
     
