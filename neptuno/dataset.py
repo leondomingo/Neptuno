@@ -87,8 +87,12 @@ class DataSetRow(object):
             k = self.cols[key]
             if isinstance(k, unicode):
                 k = k.encode('utf-8')
-                
-            return self.attr[k]
+            
+            if self.attr.has_key(k):
+                return self.attr[k]
+            
+            else:
+                return None
         
         elif self.attr.has_key(key):
             return self.attr[key]
@@ -292,7 +296,7 @@ class DataSet(object):
             for i, c in enumerate(self.cols):
                 for d in self.data: 
                     if len(str(d[c])) > widths[i]:
-                        widths[i] = len(str(d[c]))
+                        widths[i] = len(unicode(d[c]))
                         
                 if len(self.labels[i]) > widths[i]:
                     widths[i] = len(self.labels[i])
@@ -306,7 +310,7 @@ class DataSet(object):
         
         cabecera = '|'
         for i, c in enumerate(self.labels):
-            cabecera += str(c)[:widths[i]].center(widths[i]) + '|'
+            cabecera += unicode(c)[:widths[i]].center(widths[i]) + '|'
             
         l = len(cabecera)-2
             
@@ -321,7 +325,7 @@ class DataSet(object):
             for i, c in enumerate(self.cols):
                 valor = dato[c]
                 if valor is None:
-                    valor = ''
+                    valor = u''
                     
                 w = widths[i]
                 
@@ -330,29 +334,32 @@ class DataSet(object):
                     if totales.has_key(c):
                         totales[c] = self.acumular(totales[c], valor)
                 
+                # float/Decimal
                 if isinstance(dato[c], float) or isinstance(dato[c], Decimal):
-                    linea += self.float_fmt(dato[c])[:w].rjust(w)
+                    linea += unicode(self.float_fmt(dato[c]))[:w].rjust(w)
                     
+                # bool
                 elif isinstance(dato[c], bool):
-                    linea += (self.true_const if dato[c] else self.false_const).rjust(w)                   
+                    linea += unicode((self.true_const if dato[c] else self.false_const)).rjust(w)                   
 
-                elif isinstance(dato[c], int):
-                    linea += ('%d' % dato[c])[:w].rjust(w)
-                    
+                # int/long
                 elif isinstance(dato[c], int) or isinstance(dato[c], long):
-                    linea += str(dato[c])[:w].rjust(w)
+                    linea += unicode(dato[c])[:w].rjust(w)
 
+                # datetime
                 elif isinstance(dato[c], datetime.datetime):
-                    linea += dato[c].strftime('%s %s' % (self.date_fmt, self.time_fmt))[:w].rjust(w)
+                    linea += unicode(dato[c].strftime('%s %s' % (self.date_fmt, self.time_fmt)))[:w].rjust(w)
 
+                # date
                 elif isinstance(dato[c], datetime.date):
-                    linea += dato[c].strftime(self.date_fmt)[:w].rjust(w)
+                    linea += unicode(dato[c].strftime(self.date_fmt))[:w].rjust(w)
 
+                # time
                 elif isinstance(dato[c], datetime.time):
-                    linea += dato[c].strftime(self.time_fmt)[:w].rjust(w)
+                    linea += unicode(dato[c].strftime(self.time_fmt))[:w].rjust(w)
 
                 else:
-                    linea += str(valor).decode('utf-8').replace('\n', '')[:w].ljust(w)
+                    linea += unicode(valor).replace('\n', '')[:w].ljust(w)
                      
                 linea += '|'
             
@@ -389,19 +396,19 @@ class DataSet(object):
                 
                 # date
                 if isinstance(item, datetime.date):
-                    dato.append(item.strftime(self.date_fmt))
+                    dato.append(item.strftime(self.date_fmt).decode('utf-8'))
                     
                 # time
                 elif isinstance(item, datetime.time):
-                    dato.append(item.strftime(self.time_fmt))
+                    dato.append(item.strftime(self.time_fmt).decode('utf-8'))
                 
                 # datetime
                 elif isinstance(item, datetime.datetime):
-                    dato.append(item.strftime(self.datetime_fmt))
+                    dato.append(item.strftime(self.datetime_fmt).decode('utf-8'))
                     
                 # float, Decimal
                 elif isinstance(item, float) or isinstance(item, Decimal):
-                    dato.append(self.float_fmt(item))
+                    dato.append(self.float_fmt(item).decode('utf-8'))
                     
                 # bool
                 elif isinstance(item, bool):
