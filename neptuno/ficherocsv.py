@@ -79,8 +79,8 @@ class FicheroCSV(object):
             encoding = 'iso-8859-1'
         
         self.fichero_csv.seek(0)
-        #resultado = self.fichero_csv.read().decode('utf-8').encode(encoding)
-        resultado = self.fichero_csv.read()
+        resultado = self.fichero_csv.read().decode('utf-8').encode(encoding)
+        #resultado = self.fichero_csv.read()
         
         return resultado
     
