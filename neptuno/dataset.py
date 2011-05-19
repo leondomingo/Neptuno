@@ -464,7 +464,7 @@ class DataSet(object):
         
         totales = self.init_totales()
         
-        for dato in self.datos:
+        for dato in self.data:
             
             # totalizar
             if self.totales:

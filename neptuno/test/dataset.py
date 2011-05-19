@@ -28,6 +28,14 @@ if __name__ == '__main__':
     ds.append(dato=dict(uno=dt.date.today(), dos=dt.time(10, 30, 25), tres=dt.datetime.now()))
     ds.append(dato=dict(tres=3.3))
     
+    print '\nto_str()'
     print ds.to_str(width=20, fit_width=False)
+    
+    print '\nlabels'
     print ds.labels
+    
+    print '\nto_data()'
     print ds.to_data()
+    
+    print '\nCSV'
+    print ds.to_csv()
