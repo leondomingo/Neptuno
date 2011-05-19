@@ -6,3 +6,4 @@ config.py
 *~
 Neptuno2.egg-info/
 dist/
+build/
