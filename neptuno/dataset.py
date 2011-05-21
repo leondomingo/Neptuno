@@ -3,11 +3,12 @@
 import re
 import datetime
 #import simplejson
+from jinja2 import Environment, PackageLoader
 from decimal import Decimal
+from sqlalchemy.types import INTEGER, NUMERIC, DATE, TIME, BOOLEAN, BIGINT
 from neptuno.util import default_fmt_float
 from neptuno.ficherocsv import FicheroCSV
-from sqlalchemy.types import INTEGER, VARCHAR, NUMERIC, DATE, TIME, BOOLEAN,\
-    BIGINT
+from neptuno.xlsreport import XLSReport
 
 COLUMNAS = 'columnas'
 COUNT = 'count'
@@ -176,7 +177,7 @@ class DataSet(object):
             # comparar claves y columnas
             for k in dato.keys():
                 if k not in self.cols:
-                    raise Exception('La clave "%s" no es correcta' % k)
+                    raise Exception('The key "%s" is not correct' % k)
             
             self.append(DataSetRow(**dato))
 
@@ -494,6 +495,14 @@ class DataSet(object):
         
         return fichero_csv.read(encoding)
     
+    def to_xls(self, title, filename):
+        pl = PackageLoader('neptuno', 'templates')
+        env = Environment(loader=pl)
+        template = env.get_template('dstoxls.xml')
+        
+        xr = XLSReport(template)
+        return xr.create(dict(title=title, ds=self), filename=filename)
+    
     def order(self, claves):
         """
         IN
@@ -548,6 +557,7 @@ class DataSet(object):
         """
         
         cols = []
+        col_names = []
         for c in query.columns:
             if show_ids or not c.name.startswith('id_'):
                 
@@ -568,8 +578,17 @@ class DataSet(object):
                     type = 'bool'
                     
                 #print c.type, type
+                
+                # avoid col name repeat
+                name = remove_specials(c.name).lower()
+                i = 1
+                while name in col_names:
+                    name = u'%s_%d' % (name, i)
+                    i += 1
                     
-                cols.append((remove_specials(c.name).lower(), # name
+                col_names.append(name)
+                    
+                cols.append((name, # name
                              c.name, # label
                              type,))
                     
@@ -582,8 +601,15 @@ class DataSet(object):
         for fila in session.execute(query.limit(limit).offset(pos)):
             row = []
             for c in query.columns:
+                data = fila[c]
                 if show_ids or not c.name.startswith('id_'):
-                    row.append(fila[c])
+                    if isinstance(data, str):
+                        data = data.decode('utf-8')
+                        
+                    if isinstance(data, unicode):
+                        data = data.replace(u'\u000B', ' ')
+                    
+                    row.append(data)
 
             ds.append(row)
                         

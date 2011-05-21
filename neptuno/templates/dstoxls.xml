@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xlsreport>
+    <sheet title="{{title}}">
+        {% for col in ds.labels %}
+            <cell col="{{loop.index0}}">
+                <value><![CDATA[{{col}}]]></value>
+                <style name="col-label" bgcolor="dark_teal">
+                    <font bold="true" color="white"/>
+                    <align hor="center"/>
+                </style>
+            </cell>
+        {% endfor %}
+        
+        <line_feed>
+          {{util.line_feed()}}
+        </line_feed>
+        
+        {% for row in ds.data %}
+            {% set div_by_2 = loop.index is divisibleby 2 %}
+
+            {% for dt in row %}
+            
+            {% set type = ds.types[loop.index0] %}
+            {% if type == 'float' %}
+                {% set type = 'float;#,##0.00' %}
+            {% elif type == 'time' %}
+                {% set type = 'time;HH:MM' %}
+            {% endif %}
+            <cell col="{{loop.index0}}" {% if type != '' %} type="{{type}}" {% endif %}>
+            <value><![CDATA[{{dt or ''}}]]></value>
+            {% if div_by_2 %}
+                <style name="cell-2" bgcolor="gray_ega">
+                    <font color="white"/>
+                </style>
+            {% endif %}
+            </cell>
+            
+            {% endfor %}
+            
+            <line_feed>
+                {{util.line_feed()}}
+            </line_feed>
+        {% endfor %}
+    </sheet>
+</xlsreport>

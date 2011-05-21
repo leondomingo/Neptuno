@@ -5,8 +5,6 @@ from lxml import etree
 from xlwt import Workbook, Formula
 from xlwt.Style import easyxf, XFStyle
 from neptuno.util import strtodate, strtotime
-#from .log import NeptunoLogger
-#from libpy.template import get_template
 
 __all__ = ['XLSReport']
 
@@ -37,7 +35,7 @@ class XLSReport(object):
             return self.marks[name]
 
     def __init__(self, template):
-        self.tmpl = template #get_template(template)
+        self.tmpl = template
 
     def calcular_estilo(self, estilo):
         
@@ -236,13 +234,15 @@ class XLSReport(object):
           <str>
         """
         
-        #logger = NeptunoLogger.get_logger('XLSReport/create')
-        
         util = self.Util()
         self.tmpl.globals['util'] = util
         self.tmpl.globals['xlrd'] = xlrd
 
         informe_xml = self.tmpl.render(**params).encode('utf-8')
+        
+#        f = file('/home/leon/informe.xml', 'wb')
+#        f.write(informe_xml)
+#        f.close()
         
         root = etree.fromstring(informe_xml)
         
@@ -269,12 +269,10 @@ class XLSReport(object):
                 
                 # style
                 if item.tag == 'style':
-#                    logger.debug('<style>')
                     estilos[item.attrib['name']] = easyxf(';'.join(self.calcular_estilo(item))) 
                 
                 # cell
                 if item.tag == 'cell':
-#                    logger.debug('<cell>')
                     
                     col = int(item.attrib['col'])
                     
@@ -288,11 +286,17 @@ class XLSReport(object):
                         
                         # date
                         if tipo[0] == 'date':
-                            dato = strtodate(dato)
+                            try:
+                                dato = strtodate(dato)
+                            except:
+                                dato = None
     
                         # time
                         elif tipo[0] == 'time':
-                            dato = strtotime(dato, fmt='%H:%M:%S')
+                            try:
+                                dato = strtotime(dato)
+                            except:
+                                dato = None
                         
                         # formula
                         elif tipo[0] == 'formula':
@@ -300,11 +304,12 @@ class XLSReport(object):
                         
                         # resto de tipos
                         else:
-                            try:
-                                f = lambda t,v: t(v)
-                                dato = f(eval(tipo[0]), dato)
-                            except:
-                                dato = 'ERROR! (%s)' % dato
+                            if dato:
+                                try:
+                                    f = lambda t,v: t(v)
+                                    dato = f(eval(tipo[0]), dato)
+                                except:
+                                    dato = 'ERROR! (%s)' % dato
                         
                         # date;dd/mm/yyyy
                         # date;dd/mmm/yyyy
@@ -315,6 +320,8 @@ class XLSReport(object):
                         # float;#,##0.00;[RED]-#,##0.00
                         if len(tipo) > 1:
                             num_format = ';'.join(tipo[1:])
+                            
+                        #print dato, tipo, num_format
     
                     # style: aplicar un estilo
                     estilo = item.find('style')
@@ -327,22 +334,20 @@ class XLSReport(object):
                             
                         else:
                             xfs = estilos[estilo.attrib['name']]
-                            
+                        
+                    xfs.num_format_str = 'General'    
                     if num_format:
                         if not xfs:
                             xfs = XFStyle()
-                            
+
                         xfs.num_format_str = num_format
-    
+                        
                     ws.write(util.current_line(), col, dato, xfs)
                 
                 elif item.tag == 'line_feed':
-#                    logger.debug('<line_feed>')
                     util.line_feed()
-#                    print util.current_line()
                     
                 elif item.tag == 'bookmark':
-#                    logger.debug('<bookmark>')
                     util.add_bookmark(item.attrib['name'])
                 
         if filename:
