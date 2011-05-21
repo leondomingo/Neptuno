@@ -5,19 +5,24 @@ from neptuno.const_datos_neptuno import CONF_DB, CONF_HOST, CONF_PASSW,\
     CONF_USER
 from neptuno.dataset import DataSet
 import datetime as dt
+from neptuno.postgres.search import search
 
 if __name__ == '__main__':
     
-    cfg = {CONF_DB: 'lanser-sapns',
+    cfg = {CONF_DB: 'tandem',
            CONF_HOST: 'localhost',
            CONF_USER: 'postgres',
            CONF_PASSW: '5390post'}
     
     conn = Conexion(config=cfg)
     
-    columnas = [('uno', u'Uno', '',),
-                ('dos', u'Dos', '',),
-                ('tres', u'Unicode: á è ï ŧ', '',),
+    ds_clientes = search(conn.session, 'clases_de_grupos', rp=5, show_ids=True)
+    print ds_clientes
+    print ds_clientes.types
+    
+    columnas = [(u'uno', u'Uno', '',),
+                (u'dos', u'Dos', '',),
+                (u'tres', u'Unicode: á è ï ñ Ñ', '',),
                 ]
     
     ds = DataSet(columnas)
@@ -38,4 +43,4 @@ if __name__ == '__main__':
     print ds.to_data()
     
     print '\nCSV'
-    print ds.to_csv()
+    print ds.to_csv(encoding="utf-8")

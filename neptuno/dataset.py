@@ -6,6 +6,8 @@ import datetime
 from decimal import Decimal
 from neptuno.util import default_fmt_float
 from neptuno.ficherocsv import FicheroCSV
+from sqlalchemy.types import INTEGER, VARCHAR, NUMERIC, DATE, TIME, BOOLEAN,\
+    BIGINT
 
 COLUMNAS = 'columnas'
 COUNT = 'count'
@@ -548,9 +550,28 @@ class DataSet(object):
         cols = []
         for c in query.columns:
             if show_ids or not c.name.startswith('id_'):
+                
+                type = ''
+                if isinstance(c.type, INTEGER) or isinstance(c.type, BIGINT):
+                    type = 'int'
+                    
+                elif isinstance(c.type, NUMERIC):
+                    type = 'float'
+                    
+                elif isinstance(c.type, DATE):
+                    type = 'date'
+                    
+                elif isinstance(c.type, TIME):
+                    type = 'time'
+                    
+                elif isinstance(c.type, BOOLEAN):
+                    type = 'bool'
+                    
+                #print c.type, type
+                    
                 cols.append((remove_specials(c.name).lower(), # name
                              c.name, # label
-                             '',)) # type
+                             type,))
                     
         ds = DataSet(cols)
         ds.count = session.execute(query).rowcount

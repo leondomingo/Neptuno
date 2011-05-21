@@ -37,7 +37,7 @@ class XLSReport(object):
             return self.marks[name]
 
     def __init__(self, template):
-        self.tmpl = tmpl #get_template(template)
+        self.tmpl = template #get_template(template)
 
     def calcular_estilo(self, estilo):
         
@@ -250,6 +250,8 @@ class XLSReport(object):
         
         estilos = {}
         
+        xfs0 = XFStyle()
+        
         n_sheet = 0
         for sheet in root.iter('sheet'):
             
@@ -316,7 +318,7 @@ class XLSReport(object):
     
                     # style: aplicar un estilo
                     estilo = item.find('style')
-                    xfs = None
+                    xfs = xfs0
                     if estilo != None:
                         if not estilos.has_key(estilo.attrib['name']):
                             xfs = easyxf(';'.join(self.calcular_estilo(estilo))) 
