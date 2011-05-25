@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import sys
 import re
 import datetime
 #import simplejson
@@ -88,8 +89,9 @@ class DataSetRow(object):
     def __getitem__(self, key):
         if isinstance(key, int):
             k = self.cols[key]
-            if isinstance(k, unicode):
-                k = k.encode('utf-8')
+            if sys.version_info < (2, 6):
+                if isinstance(k, unicode):
+                    k = k.encode('utf-8')
             
             if self.attr.has_key(k):
                 return self.attr[k]
@@ -103,12 +105,17 @@ class DataSetRow(object):
     def __setitem__(self, key, value):
         if isinstance(key, int):
             k = self.cols[key]
-            if isinstance(k, unicode):
-                k = k.encode('utf-8')
+            if sys.version_info < (2, 6):
+                if isinstance(k, unicode):
+                    k = k.encode('utf-8')
                             
             self.attr[k] = value
         
         else:
+            if sys.version_info < (2, 6):
+                if isinstance(key, unicode):
+                    key = key.encode('utf-8')
+                    
             if self.attr.has_key(key):
                 self.attr[key] = value
                 
@@ -174,12 +181,19 @@ class DataSet(object):
             self.data.append(dato)
             
         elif isinstance(dato, dict):
-            # comparar claves y columnas
-            for k in dato.keys():
+            # compare keys and columns
+            d = {}
+            for k, v in dato.iteritems():
                 if k not in self.cols:
                     raise Exception('The key "%s" is not correct' % k)
+                
+                if sys.version < (2, 6):
+                    if isinstance(k, unicode):
+                        k = k.encode('utf-8')
+                        
+                d[k] = v
             
-            self.append(DataSetRow(**dato))
+            self.append(DataSetRow(**d))
 
         elif isinstance(dato, DataSet):
             for d in dato:
@@ -188,8 +202,9 @@ class DataSet(object):
         elif isinstance(dato, list) or hasattr(dato, '__iter__'):
             d = {}
             for col, v in zip(self.cols, dato):
-                if isinstance(col, unicode):
-                    col = col.encode('utf-8')
+                if sys.version_info < (2, 6):
+                    if isinstance(col, unicode):
+                        col = col.encode('utf-8')
                     
                 d[col] = v
                 
