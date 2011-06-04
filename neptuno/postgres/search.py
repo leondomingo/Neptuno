@@ -2,7 +2,6 @@
 
 import re
 from sqlalchemy import Table, MetaData
-from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.sql.expression import and_
 from sqlalchemy.types import DATE, TIME, DATETIME, INTEGER, NUMERIC, \
     BOOLEAN, BIGINT
@@ -415,7 +414,7 @@ class Busqueda(object):
         return sql
 
 def search(session, table_name, q=None, rp=100, offset=0, show_ids=False, 
-           strtodatef=None, filters=None):
+           strtodatef=None, filters=None, collection=None):
     """
     IN
       session     <sqlalchemy.orm.session.Session>
@@ -423,6 +422,10 @@ def search(session, table_name, q=None, rp=100, offset=0, show_ids=False,
       q           <str>
       rp          <int>
       offset      <int>
+      show_ids    <bool> (opcional=False)
+      strtodatef  <function> (opcional=None)
+      filters     [<tuple>, ...]
+      collecion   <tuple> (<str>, <str>, <int>,)
       
     OUT
       <DataSet>
@@ -481,7 +484,24 @@ def search(session, table_name, q=None, rp=100, offset=0, show_ids=False,
                 filters_tuple += (tbl.c[f[0]] == f[1],)
         
         sql = and_(*filters_tuple)
-        #print sql
+    
+    if collection:
+        
+        from sqlalchemy import select, exists
+        
+        child_table_name = collection[0]
+        child_attr = collection[1]
+        parent_id = collection[2]
+        
+        child_table = Table(child_table_name, meta, autoload=True)
+        
+        sel = select([child_table.c.id], from_obj=child_table,
+                     whereclause=and_(child_table.c[child_attr] == parent_id,
+                                      child_table.c.id == tbl.c.id,
+                                      ),
+                     ).correlate(tbl)
+        
+        sql = and_(sql, exists(sel))
 
     # where
     qry = tbl.select(whereclause=sql)

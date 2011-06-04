@@ -21,10 +21,11 @@ if __name__ == '__main__':
         return strtodate(s, fmt='%m/%d/%Y', no_exc=True)
     
     ds = search(conn.session, 'vista_busqueda_cursos', rp=0, strtodatef=f,
-                filters=[('id_clientes_propietario', 474,),
-                         #('Fecha inicio', dt.date(2010, 1, 1),),
-                         #('id', 35,),
-                         ],
+#                filters=[('id_clientes_propietario', 474,),
+#                         #('Fecha inicio', dt.date(2010, 1, 1),),
+#                         #('id', 35,),
+#                         ],
+                collection=('cursos', 'id_clientes_propietario', 9)
                 #q='fechai = 15/10/2009'
                 #q='fechai >= 1/15/2011, +fechai'
                 )
