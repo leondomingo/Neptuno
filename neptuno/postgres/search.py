@@ -501,8 +501,12 @@ def search(session, table_name, q=None, rp=100, offset=0, show_ids=False,
                                       ),
                      ).correlate(tbl)
         
-        sql = and_(sql, exists(sel))
-
+        if str(sql) != '':
+            sql = and_(sql, exists(sel))
+            
+        else:
+            sql = exists(sel)
+            
     # where
     qry = tbl.select(whereclause=sql)
     
