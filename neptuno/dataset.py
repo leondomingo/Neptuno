@@ -89,7 +89,7 @@ class DataSetRow(object):
     def __getitem__(self, key):
         if isinstance(key, int):
             k = self.cols[key]
-            if sys.version_info < (2, 6):
+            if sys.version_info < (2, 6, 6):
                 if isinstance(k, unicode):
                     k = k.encode('utf-8')
             
@@ -105,14 +105,14 @@ class DataSetRow(object):
     def __setitem__(self, key, value):
         if isinstance(key, int):
             k = self.cols[key]
-            if sys.version_info < (2, 6):
+            if sys.version_info < (2, 6, 6):
                 if isinstance(k, unicode):
                     k = k.encode('utf-8')
                             
             self.attr[k] = value
         
         else:
-            if sys.version_info < (2, 6):
+            if sys.version_info < (2, 6, 6):
                 if isinstance(key, unicode):
                     key = key.encode('utf-8')
                     
@@ -202,7 +202,7 @@ class DataSet(object):
         elif isinstance(dato, list) or hasattr(dato, '__iter__'):
             d = {}
             for col, v in zip(self.cols, dato):
-                if sys.version_info < (2, 6):
+                if sys.version_info < (2, 6, 6):
                     if isinstance(col, unicode):
                         col = col.encode('utf-8')
                     
