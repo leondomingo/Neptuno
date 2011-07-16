@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name='Neptuno2',
-      version='1.0.25',
+      version='1.0.26',
       author='León Domingo',
       author_email='leon.domingo@ender.es',
       description=('A little set of utilities that Ender has been using in their web projects'),
@@ -30,7 +30,7 @@ setup(name='Neptuno2',
       install_requires=[
         'psycopg2',
         'SQLAlchemy==0.6.7',
-        'lxml>=2.2.7',
+        'lxml==2.2.7',
         'xlrd',
         'xlwt',
         'simplejson',
