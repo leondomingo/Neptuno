@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from datetime import date, time
-import simplejson
 import re
+import simplejson
+import datetime as dt
+from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 
 def get_parametros(req, parametros):
@@ -190,7 +191,7 @@ def strtodate(s, fmt='%d/%m/%Y', no_exc=False):
             month = int(m1.groupdict().get('month') or 1)
             year = int(m1.groupdict().get('year') or 1)
             
-            return date(year, month, day)
+            return dt.date(year, month, day)
         
         except Exception:
             if no_exc: return None
@@ -250,7 +251,7 @@ def strtodate2(s):
 
 def strtotime(s):
     m = re.search(r'^(\d{1,2}):(\d{1,2}):?(\d{1,2})?', s)
-    return time(int(m.group(1)), int(m.group(2)), int(m.group(3) or 0))
+    return dt.time(int(m.group(1)), int(m.group(2)), int(m.group(3) or 0))
 
 def strtobool(s):
     if s.lower() == 'true':
@@ -300,16 +301,12 @@ def inicio_fin_mes(fecha):
       (<date>, <date>)
     """
     
-    inicio = date(fecha.year, fecha.month, 1)
-    
-    mes_siguiente = date.fromordinal(inicio.toordinal() + 31)
-    fin = date.fromordinal(date(mes_siguiente.year, 
-                                mes_siguiente.month, 
-                                1).toordinal() - 1)
-    
+    inicio = dt.date(fecha.year, fecha.month, 1)
+    fin = inicio + relativedelta(months=+1, days=-1)
+
     return (inicio, fin,)
     
-def format_float(value, thousands_sep=',', decimal_sep='.',
+def format_float(value, thousands_sep=',', decimal_sep='.', 
                  show_sign=False, n_dec=2):
     """
     IN
