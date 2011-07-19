@@ -3,7 +3,6 @@
 import re
 import simplejson
 import datetime as dt
-from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 
 def get_parametros(req, parametros):
@@ -290,7 +289,7 @@ def timetostr(t, fmt='%H:%M'):
     else:
         return t.strftime(fmt)
     
-def inicio_fin_mes(fecha):
+def inicio_fin_mes(d):
     """
     Devuelve el primer y el último día del mes en la fecha 'fecha'.
     
@@ -301,9 +300,25 @@ def inicio_fin_mes(fecha):
       (<date>, <date>)
     """
     
-    inicio = dt.date(fecha.year, fecha.month, 1)
-    fin = inicio + relativedelta(months=+1, days=-1)
+    inicio = dt.date(d.year, d.month, 1)
+    mes_siguiente = inicio + dt.timedelta(days=31)
+    fin = dt.date(mes_siguiente.year, mes_siguiente.month, 1) - dt.timedelta(days=1)
 
+    return (inicio, fin,)
+
+def inicio_fin_semana(d):
+    """
+    Returns monday and sunday of the week for the given date. 
+    IN
+      d  <date>
+      
+    OUT
+      (<date>, <date>,)
+    """
+    
+    inicio = d - dt.timedelta(d.weekday())
+    fin = inicio + dt.timedelta(days=6)
+    
     return (inicio, fin,)
     
 def format_float(value, thousands_sep=',', decimal_sep='.', 

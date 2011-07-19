@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name='Neptuno2',
-      version='1.0.27',
+      version='1.0.28',
       author='León Domingo',
       author_email='leon.domingo@ender.es',
       description=('A little set of utilities that Ender has been using in their web projects'),
@@ -36,6 +36,6 @@ setup(name='Neptuno2',
         'simplejson',
         #'readline',
         'jinja2',
-        'python-dateutil==1.5',
+        #'python-dateutil==1.5',
       ],
      )
