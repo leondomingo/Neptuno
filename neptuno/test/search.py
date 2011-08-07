@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import sqlalchemy as sa
+import datetime as dt
 from neptuno.conexion import Conexion
 from neptuno.const_datos_neptuno import CONF_DB, CONF_HOST, CONF_PASSW,\
     CONF_USER
 from neptuno.postgres.search import search
 from neptuno.util import strtodate
-import datetime as dt
+from neptuno.dataset import DataSet
 
 if __name__ == '__main__':
     
@@ -30,5 +32,28 @@ if __name__ == '__main__':
                 #q='fechai = 15/10/2009'
                 #q='fechai >= 1/15/2011, +fechai'
                 )
-    print ds
-    print 'Nº de registros: %d' % ds.count
+    #print ds
+    #print 'Nº de registros: %d' % ds.count
+    
+    meta = sa.MetaData(bind=conn.engine)
+    tbl_alu = sa.Table('alumnos', meta, autoload=True)
+    tbl_aeg = sa.Table('alumnos_en_grupos', meta, autoload=True)
+    
+    qry = tbl_alu.\
+        join(tbl_aeg,
+             tbl_aeg.c.id_alumnos_alumno == tbl_alu.c.id)
+        
+    # condiciones
+    where_ = sa.and_(tbl_alu.c.nombre.like('A%'),
+                     tbl_alu.c.apellido1.like('A%'),
+                     tbl_alu.c.e_mail != None,
+                     tbl_alu.c.apellido2 != None,
+                    )
+    
+    order_ = (tbl_alu.c.e_mail,)
+        
+    sel = sa.select([tbl_alu], from_obj=qry, 
+                    whereclause=where_).order_by(*order_)
+    
+    ds = DataSet.procesar_resultado(conn.session, sel)
+    print ds.to_data()
