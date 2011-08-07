@@ -22,19 +22,6 @@ if __name__ == '__main__':
     def f(s):
         return strtodate(s, fmt='%m/%d/%Y', no_exc=True)
     
-    ds = search(conn.session, 'vista_busqueda_grupos', rp=0, strtodatef=f,
-                q='iber',
-#                filters=[('id_clientes_propietario', 474,),
-#                         #('Fecha inicio', dt.date(2010, 1, 1),),
-#                         #('id', 35,),
-#                         ],
-                collection=('grupos', 'id_cursos_cursodelgrupo', 22)
-                #q='fechai = 15/10/2009'
-                #q='fechai >= 1/15/2011, +fechai'
-                )
-    #print ds
-    #print 'Nº de registros: %d' % ds.count
-    
     meta = sa.MetaData(bind=conn.engine)
     tbl_alu = sa.Table('alumnos', meta, autoload=True)
     tbl_aeg = sa.Table('alumnos_en_grupos', meta, autoload=True)
@@ -43,23 +30,18 @@ if __name__ == '__main__':
         join(tbl_aeg,
              tbl_aeg.c.id_alumnos_alumno == tbl_alu.c.id)
         
-    # condiciones
-    where_ = sa.and_(tbl_alu.c.nombre.like('A%'),
-                     tbl_alu.c.apellido1.like('A%'),
-                     tbl_alu.c.e_mail != None,
-                     tbl_alu.c.apellido2 != None,
-                    )
-    
-    order_ = (tbl_alu.c.e_mail,)
-        
-    sel = sa.select([(tbl_alu.c.apellido1 + ', ' + tbl_alu.c.nombre).label('nombre_completo'),
-                     tbl_alu], from_obj=qry, 
-                    whereclause=where_).order_by(*order_)
+    sel = sa.select([tbl_alu.c.nombre,
+                     tbl_alu.c.apellido1,
+                     tbl_alu.c.apellido2,
+                     tbl_alu.c.e_mail], from_obj=qry) 
                     
-    print dir(sel)
-    print sel.columns
-    print sel.columns['nombre_completo'].type
-    print sel.columns['nombre'].type
+#    print type(sel)
+#    print dir(sel)
+#    print sel.columns
+#    print dir(sel.columns['nombre_completo'])
+#    print str(sel.columns['nombre_completo'].scalar)
+#    print sel.columns['nombre_completo'].type
+#    print sel.columns['nombre'].type
                     
-    ds = DataSet.procesar_resultado(conn.session, sel)
+    ds = search(conn.session, sel, q='+email', rp=5)
     print ds

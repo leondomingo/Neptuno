@@ -2,10 +2,11 @@
 
 import re
 from sqlalchemy import Table, MetaData
-from sqlalchemy.sql.expression import and_
+from sqlalchemy.sql.expression import and_, Select
 from sqlalchemy.types import DATE, TIME, DATETIME, INTEGER, NUMERIC, \
     BOOLEAN, BIGINT
 from neptuno.dataset import DataSet
+from types import NoneType
 
 class Busqueda(object):
     
@@ -22,7 +23,7 @@ class Busqueda(object):
                                for col in self.cols]
         else:
             self.cols_trans = columnas_trans
-
+            
         if texto_busqueda:
             self.condicion = self.condicion_busqueda(texto_busqueda)
             self.orden = self.orden_busqueda(texto_busqueda)
@@ -432,7 +433,12 @@ def search(session, table_name, q=None, rp=100, offset=0, show_ids=False,
     """ 
     
     meta = MetaData(bind=session.bind)
-    tbl = Table(table_name, meta, autoload=True)
+    
+    if isinstance(table_name, Select):
+        tbl = table_name
+        
+    else:
+        tbl = Table(table_name, meta, autoload=True)
     
     sql = None
     order = ''
@@ -508,7 +514,15 @@ def search(session, table_name, q=None, rp=100, offset=0, show_ids=False,
             sql = exists(sel)
             
     # where
-    qry = tbl.select(whereclause=sql)
+    if isinstance(tbl, Select):
+        qry = tbl
+        
+    if not isinstance(sql, NoneType):
+        if isinstance(tbl, Select):
+            qry = qry.where(sql)
+                        
+        else:
+            qry = tbl.select(whereclause=sql)
     
     # order by
     if order:
