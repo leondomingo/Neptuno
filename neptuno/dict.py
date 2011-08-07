@@ -3,18 +3,22 @@
 class Dict(dict):
     def __init__(self, **kw):
         for k, v in kw.iteritems():
+            #print type(v)
             if isinstance(v, dict) or isinstance(v, Dict):
                 self[k] = Dict(**v)
                 
             elif isinstance(v, list):
                 v2 = []
                 for item in v:
-                    if isinstance(v, dict) or isinstance(v, Dict):
+                    #print type(item)
+                    if isinstance(item, dict) or isinstance(item, Dict):
+                        #print 'v =', v
                         v2.append(Dict(**item))
                         
                     else:
+                        #print '*v=', v
                         v2.append(item)
-                    
+                        
                 self[k] = v2
 
             elif isinstance(v, tuple):

@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name='Neptuno2',
-      version='1.0.32',
+      version='1.0.33',
       author='León Domingo',
       author_email='leon.domingo@ender.es',
       description=('A little set of utilities that Ender has been using in their web projects'),
