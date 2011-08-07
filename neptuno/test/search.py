@@ -44,7 +44,7 @@ if __name__ == '__main__':
 ##    print sel.columns['nombre_completo'].type
 ##    print sel.columns['nombre'].type
 #
-    ds = search(conn.session, 'vista_busqueda_alumnos', q='+nombrec, raul', rp=5)
+    ds = search(conn.session, 'vista_busqueda_alumnos', rp=5)
     print ds
 #                    
 #    ds = search(conn.session, sel, q='+email, raul', rp=5)
@@ -89,3 +89,7 @@ if __name__ == '__main__':
 
     doclist = search(conn.session, sel)
     print doclist
+    
+    ds = search(conn.session, 'sp_attributes', q='name=descript', 
+                collection=('sp_attributes', 'id_class', 7))
+    print ds

@@ -6,7 +6,6 @@ from sqlalchemy.sql.expression import and_, Select
 from sqlalchemy.types import DATE, TIME, DATETIME, INTEGER, NUMERIC, \
     BOOLEAN, BIGINT
 from neptuno.dataset import DataSet
-from types import NoneType
 
 class Busqueda(object):
     
@@ -440,7 +439,7 @@ def search(session, table_name, q=None, rp=100, offset=0, show_ids=False,
     else:
         tbl = Table(table_name, meta, autoload=True)
     
-    sql = None
+    sql = True
     order = ''
     if q != None:
         
@@ -507,19 +506,11 @@ def search(session, table_name, q=None, rp=100, offset=0, show_ids=False,
                                       ),
                      ).correlate(tbl)
         
-        if not isinstance(sql, NoneType): #str(sql) != '':
-            sql = and_(sql, exists(sel))
-            
-        else:
-            sql = exists(sel)
+        sql = and_(sql, exists(sel))
             
     # where
     if isinstance(tbl, Select):
-        if not isinstance(sql, NoneType):
-            qry = tbl.where(and_(sql, True))
-
-        else:
-            qry = tbl.where(True)
+        qry = tbl.where(sql)
             
     else:
         qry = tbl.select(whereclause=sql)
