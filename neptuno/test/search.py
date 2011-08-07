@@ -52,8 +52,14 @@ if __name__ == '__main__':
     
     order_ = (tbl_alu.c.e_mail,)
         
-    sel = sa.select([tbl_alu], from_obj=qry, 
+    sel = sa.select([(tbl_alu.c.apellido1 + ', ' + tbl_alu.c.nombre).label('nombre_completo'),
+                     tbl_alu], from_obj=qry, 
                     whereclause=where_).order_by(*order_)
-    
+                    
+    print dir(sel)
+    print sel.columns
+    print sel.columns['nombre_completo'].type
+    print sel.columns['nombre'].type
+                    
     ds = DataSet.procesar_resultado(conn.session, sel)
-    print ds.to_data()
+    print ds
