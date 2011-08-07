@@ -6,7 +6,6 @@ from sqlalchemy.sql.expression import and_, Select
 from sqlalchemy.types import DATE, TIME, DATETIME, INTEGER, NUMERIC, \
     BOOLEAN, BIGINT
 from neptuno.dataset import DataSet
-from types import NoneType
 
 class Busqueda(object):
     
@@ -515,15 +514,15 @@ def search(session, table_name, q=None, rp=100, offset=0, show_ids=False,
             
     # where
     if isinstance(tbl, Select):
-        qry = tbl
-        
-    if not isinstance(sql, NoneType):
-        if isinstance(tbl, Select):
-            qry = qry.where(sql)
-                        
+        if str(sql) != '':
+            qry = tbl.where(sql)
+
         else:
-            qry = tbl.select(whereclause=sql)
-    
+            qry = tbl.where(True)
+            
+    else:
+        qry = tbl.select(whereclause=sql)
+
     # order by
     if order:
         qry = qry.order_by(order)

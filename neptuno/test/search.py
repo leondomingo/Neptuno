@@ -30,10 +30,11 @@ if __name__ == '__main__':
         join(tbl_aeg,
              tbl_aeg.c.id_alumnos_alumno == tbl_alu.c.id)
         
-    sel = sa.select([tbl_alu.c.nombre,
-                     tbl_alu.c.apellido1,
-                     tbl_alu.c.apellido2,
-                     tbl_alu.c.e_mail], from_obj=qry) 
+    sel = sa.select([tbl_alu.c.nombre.label('nombre'),
+                     tbl_alu.c.apellido1.label('apellido1'),
+                     tbl_alu.c.apellido2.label('apellido2'),
+                     tbl_alu.c.e_mail.label('e_mail'),
+                     ], from_obj=qry, whereclause=tbl_alu.c.nombre.like('R%')) 
                     
 #    print type(sel)
 #    print dir(sel)
@@ -42,6 +43,9 @@ if __name__ == '__main__':
 #    print str(sel.columns['nombre_completo'].scalar)
 #    print sel.columns['nombre_completo'].type
 #    print sel.columns['nombre'].type
+
+    ds = search(conn.session, 'alumnos', q='+apellido1', rp=5)
+    print ds
                     
-    ds = search(conn.session, sel, q='+email', rp=5)
+    ds = search(conn.session, sel, q='+apellido1', rp=5)
     print ds
