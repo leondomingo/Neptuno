@@ -287,7 +287,7 @@ class XLSReport(object):
                         # date
                         if tipo[0] == 'date':
                             try:
-                                dato = strtodate(dato)
+                                dato = strtodate(dato, fmt='%Y-%m-%d')
                             except:
                                 dato = None
     

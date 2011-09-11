@@ -121,7 +121,7 @@ class DataSetRow(object):
                 
             else:
                 self.attr[key] = value
-
+                
 class DataSet(object):
     
     date_fmt = '%d/%m/%Y'
@@ -129,12 +129,34 @@ class DataSet(object):
     datetime_fmt = '%d/%m/%Y %H:%M:%S'
     true_const = True
     false_const = False
+    int_fmt = '%d'
+    float_fmt = default_fmt_float
 
-    def __init__(self, cols, types=None, limite=None, totales=None):
+    def __init__(self, cols, types=None, limite=None, totales=None, **fmt):
         
         self.cols = []
         self.labels = []
         self.types = []
+        
+        # date
+        if fmt.has_key('date_fmt'):
+            self.date_fmt = fmt['date_fmt']
+            
+        # time
+        if fmt.has_key('time_fmt'):
+            self.time_fmt = fmt['time_fmt']
+            
+        # datetime
+        if fmt.has_key('datetime_fmt'):
+            self.datetime_fmt = fmt['datetime_fmt']
+            
+        # int
+        if fmt.has_key('int_fmt'):
+            self.int_fmt = fmt['int_fmt']
+        
+        # float
+        if fmt.has_key('float_fmt'):
+            self.float_fmt = fmt['float_fmt']
         
         for col in cols:
             if isinstance(col, tuple):
@@ -150,7 +172,7 @@ class DataSet(object):
         self.limite_resultados = limite
         self.data = []
         self.count = 0
-        self.float_fmt = default_fmt_float
+        #self.float_fmt = default_fmt_float
         self.totales = totales
         
     def init_totales(self):
@@ -285,6 +307,32 @@ class DataSet(object):
             
         return self.types[i]
     
+    def _format(self, fmt, value):
+
+        if isinstance(fmt, (str, unicode,)):
+            s = unicode(fmt % value)
+            
+        elif hasattr(fmt, '__call__'):
+            s = unicode(fmt(value))
+            
+        else:
+            s = unicode(value or '')
+            
+        return s
+    
+    def _formatdt(self, fmt, value):
+
+        if isinstance(fmt, (str, unicode,)):
+            s = unicode(value.strftime(fmt))
+            
+        elif hasattr(fmt, '__call__'):
+            s = unicode(fmt(value))
+            
+        else:
+            s = unicode(value or '')
+            
+        return s
+
     def to_str(self, width=None, fit_width=True):
         """
         Devuelve los datos del DataSet en un cadena con formato tabular.
@@ -353,28 +401,30 @@ class DataSet(object):
                         totales[c] = self.acumular(totales[c], valor)
                 
                 # float/Decimal
-                if isinstance(dato[c], float) or isinstance(dato[c], Decimal):
-                    linea += unicode(self.float_fmt(dato[c]))[:w].rjust(w)
+                if isinstance(dato[c], (float, Decimal,)):
+                    linea += self._format(self.float_fmt, dato[c])[:w].rjust(w)
                     
                 # bool
                 elif isinstance(dato[c], bool):
                     linea += unicode((self.true_const if dato[c] else self.false_const)).rjust(w)                   
 
                 # int/long
-                elif isinstance(dato[c], int) or isinstance(dato[c], long):
-                    linea += unicode(dato[c])[:w].rjust(w)
+                elif isinstance(dato[c], (int, long,)):
+                    linea += self._format(self.int_fmt, dato[c])[:w].rjust(w)
 
                 # datetime
                 elif isinstance(dato[c], datetime.datetime):
-                    linea += unicode(dato[c].strftime('%s %s' % (self.date_fmt, self.time_fmt)))[:w].rjust(w)
+                    #linea += unicode(dato[c].strftime('%s %s' % (self.date_fmt, self.time_fmt)))[:w].rjust(w)
+                    linea += unicode(self._formatdt(self.datetime_fmt, dato[c]))[:w].rjust(w)
 
                 # date
                 elif isinstance(dato[c], datetime.date):
-                    linea += unicode(dato[c].strftime(self.date_fmt))[:w].rjust(w)
+                    linea += unicode(self._formatdt(self.date_fmt, dato[c]))[:w].rjust(w)
 
                 # time
                 elif isinstance(dato[c], datetime.time):
-                    linea += unicode(dato[c].strftime(self.time_fmt))[:w].rjust(w)
+                    #linea += unicode(dato[c].strftime(self.time_fmt))[:w].rjust(w)
+                    linea += unicode(self._formatdt(self.time_fmt, dato[c]))[:w].rjust(w)
 
                 else:
                     linea += unicode(valor).replace('\n', '')[:w].ljust(w)
@@ -414,27 +464,27 @@ class DataSet(object):
                 
                 # date
                 if isinstance(item, datetime.date):
-                    dato.append(item.strftime(self.date_fmt).decode('utf-8'))
+                    dato.append(self._formatdt(self.date_fmt, item))
                     
                 # time
                 elif isinstance(item, datetime.time):
-                    dato.append(item.strftime(self.time_fmt).decode('utf-8'))
+                    dato.append(self._formatdt(self.time_fmt, item))
                 
                 # datetime
                 elif isinstance(item, datetime.datetime):
-                    dato.append(item.strftime(self.datetime_fmt).decode('utf-8'))
+                    dato.append(self._formatdt(self.datetime_fmt, item))
                     
                 # float, Decimal
-                elif isinstance(item, float) or isinstance(item, Decimal):
-                    dato.append(self.float_fmt(item).decode('utf-8'))
+                elif isinstance(item, (float, Decimal,)):
+                    dato.append(self._format(self.float_fmt, item))
                     
                 # bool
                 elif isinstance(item, bool):
                     dato.append(self.true_const if item else self.false_const)
                     
-                # int
+                # int, long
                 elif isinstance(item, int):
-                    dato.append(item)
+                    dato.append(self._format(self.int_fmt, item))
                 
                 # unicode
                 elif isinstance(item, unicode):
@@ -510,13 +560,27 @@ class DataSet(object):
         
         return fichero_csv.read(encoding)
     
-    def to_xls(self, title, filename):
+    def to_xls(self, title, filename, fmt=None):
         pl = PackageLoader('neptuno', 'templates')
         env = Environment(loader=pl)
         template = env.get_template('dstoxls.xml')
         
         xr = XLSReport(template)
-        return xr.create(dict(title=title, ds=self), filename=filename)
+        
+        date_fmt = self.date_fmt.replace('%d', 'dd').\
+            replace('%m', 'mm').\
+            replace('%Y', 'yyyy')
+            
+        time_fmt = self.time_fmt.\
+            replace('%H', 'HH').\
+            replace('%M', 'MM').\
+            replace('%S', 'SS')
+        
+        _fmt = dict(date=date_fmt, time=time_fmt)
+        _fmt.update(fmt or {})
+            
+        params = dict(title=title, ds=self, fmt=_fmt)
+        return xr.create(params, filename=filename)
     
     def order(self, claves):
         """

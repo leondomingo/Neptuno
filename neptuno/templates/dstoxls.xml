@@ -22,9 +22,11 @@
             
             {% set type = ds.types[loop.index0] %}
             {% if type == 'float' %}
-                {% set type = 'float;#,##0.00' %}
+                {% set type = 'float;%s'|format(fmt.float or '#,##0.00') %}
+            {% elif type == 'date' %}
+                {% set type = 'date;%s'|format(fmt.date or "mm/dd/yyyy") %}
             {% elif type == 'time' %}
-                {% set type = 'time;HH:MM' %}
+                {% set type = 'time;%s'|format(fmt.time or 'HH:MM') %}
             {% endif %}
             <cell col="{{loop.index0}}" {% if type != '' %} type="{{type}}" {% endif %}>
             <value><![CDATA[{{dt or ''}}]]></value>
