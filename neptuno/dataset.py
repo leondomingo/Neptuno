@@ -130,8 +130,10 @@ class DataSet(object):
     true_const = True
     false_const = False
     int_fmt = '%d'
-    float_fmt = default_fmt_float
-
+    
+    def float_fmt(self, value):
+        return default_fmt_float(value)
+    
     def __init__(self, cols, types=None, limite=None, totales=None, **fmt):
         
         self.cols = []
@@ -172,9 +174,8 @@ class DataSet(object):
         self.limite_resultados = limite
         self.data = []
         self.count = 0
-        #self.float_fmt = default_fmt_float
         self.totales = totales
-        
+
     def init_totales(self):
         if self.totales:
             totales = dict(zip(self.totales, [None] * len(self.totales)))
@@ -639,22 +640,21 @@ class DataSet(object):
         col_names = []
         for c in query.columns:
             if show_ids or not c.name.startswith('id_'):
-                
-                type = ''
+                type_ = ''
                 if isinstance(c.type, INTEGER) or isinstance(c.type, BIGINT):
-                    type = 'int'
+                    type_ = 'int'
                     
                 elif isinstance(c.type, NUMERIC):
-                    type = 'float'
+                    type_ = 'float'
                     
                 elif isinstance(c.type, DATE):
-                    type = 'date'
+                    type_ = 'date'
                     
                 elif isinstance(c.type, TIME):
-                    type = 'time'
+                    type_ = 'time'
                     
                 elif isinstance(c.type, BOOLEAN):
-                    type = 'bool'
+                    type_ = 'bool'
                     
                 #print c.type, type
                 
@@ -669,7 +669,7 @@ class DataSet(object):
                     
                 cols.append((name, # name
                              c.name, # label
-                             type,))
+                             type_,))
                     
         ds = DataSet(cols)
         ds.count = session.execute(query).rowcount
@@ -692,4 +692,28 @@ class DataSet(object):
 
             ds.append(row)
                         
+        return ds
+    
+    @staticmethod
+    def query(dbs, query, cols, limit=None, pos=None, show_ids=False):
+        """
+        IN
+          session  <sqlalchemy.orm.session.Session>
+          query    <sqlalchemy.orm.query.Query>
+          limit    <int>
+          pos      <int>
+          
+        OUT
+          <DataSet>
+        """
+        
+        ds = DataSet(cols, limite=limit)
+        ds.count = dbs.execute(query).rowcount
+        
+        if limit == 0:
+            limit = None
+        
+        for row in dbs.execute(query.limit(limit).offset(pos)):
+            ds.append(row.values())
+
         return ds
