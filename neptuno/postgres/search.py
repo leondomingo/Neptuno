@@ -2,7 +2,7 @@
 
 import re
 from sqlalchemy import Table, MetaData
-from sqlalchemy.sql.expression import and_, Select
+from sqlalchemy.sql.expression import and_, Select, or_
 from sqlalchemy.types import DATE, TIME, DATETIME, INTEGER, NUMERIC, \
     BOOLEAN, BIGINT
 from neptuno.dataset import DataSet
@@ -439,7 +439,7 @@ def search(session, table_name, q=None, rp=100, offset=0, show_ids=False,
     else:
         tbl = Table(table_name, meta, autoload=True)
     
-    sql = True
+    sql = None
     order = ''
     if q != None:
         
@@ -483,10 +483,13 @@ def search(session, table_name, q=None, rp=100, offset=0, show_ids=False,
                 else:
                     filters_tuple += (tbl.c[f[0]] == f[1],)
                     
-            else:
+            elif len(f) == 2:
                 # (<field name>, <field value>,)
                 # equal (by default) 
                 filters_tuple += (tbl.c[f[0]] == f[1],)
+                
+            elif len(f) == 1:
+                filters_tuple += (f[0],)
         
         sql = and_(*filters_tuple)
     
@@ -515,8 +518,138 @@ def search(session, table_name, q=None, rp=100, offset=0, show_ids=False,
     else:
         qry = tbl.select(whereclause=sql)
         
+    print qry
+        
     # order by
     if order:
         qry = qry.order_by(order)
         
     return DataSet.procesar_resultado(session, qry, rp, offset, show_ids)
+
+class Search(object):
+    
+    def __init__(self, session, table_name, strtodatef=None):
+        self.session = session
+        self.table_name = table_name
+        
+        self.meta = MetaData(bind=self.session.bind)
+        self.strtodatef = strtodatef
+        self.sql = None
+        self.order = ''
+        
+        if isinstance(self.table_name, Select):
+            self.tbl = self.table_name
+            
+        else:
+            self.tbl = Table(self.table_name, self.meta, autoload=True)
+            
+    def apply_qry(self, q):
+        
+        if q != None:
+            
+            # process "q"
+            qres = Busqueda(self.tbl, q, strtodatef=self.strtodatef)
+            
+            # apply search conditions    
+            self.sql = and_(qres.condicion, self.sql)
+            
+            # apply order
+            if qres.orden:
+                self.order = qres.orden
+                
+    def and_(self, *cond):
+        self.sql = and_(self.sql, *cond)
+        
+    def or_(self, cond):
+        self.sql = or_(self.sql, cond)
+                
+    def apply_filters(self, filters):
+        
+        tbl = self.tbl
+        
+        # apply filters
+        if filters:
+            filters_tuple = (self.sql,)
+            for f in filters:
+                if len(f) > 2:
+                    # (<field name>, <field value>, <operator>,)
+                    # different
+                    if f[2] == '!=':
+                        filters_tuple += (tbl.c[f[0]] != f[1],)
+                        
+                    # greater
+                    elif f[2] == '>':
+                        filters_tuple += (tbl.c[f[0]] > f[1],)
+                    
+                    # greater or equal
+                    elif f[2] == '>=':
+                        filters_tuple += (tbl.c[f[0]] >= f[1],)
+                        
+                    # less
+                    elif f[2] == '<':
+                        filters_tuple += (tbl.c[f[0]] < f[1],)
+                        
+                    # less or equal
+                    elif f[2] == '<=':
+                        filters_tuple += (tbl.c[f[0]] <= f[1],)
+                        
+                    # equal (and anything else...)
+                    else:
+                        filters_tuple += (tbl.c[f[0]] == f[1],)
+                        
+                elif len(f) == 2:
+                    # (<field name>, <field value>,)
+                    # equal (by default) 
+                    filters_tuple += (tbl.c[f[0]] == f[1],)
+                    
+                elif len(f) == 1:
+                    filters_tuple += (f[0],)
+            
+            self.sql = and_(*filters_tuple)
+        
+    def __call__(self, rp=100, offset=0, show_ids=False, collection=None):
+        """
+        IN
+          rp          <int>
+          offset      <int>
+          show_ids    <bool> (opcional=False)
+          strtodatef  <function> (opcional=None)
+          filters     [<tuple>, ...]
+          collecion   <tuple> (<str>, <str>, <int>,)
+          
+        OUT
+          <DataSet>
+        """ 
+        
+        sql = self.sql
+        if collection:
+            
+            from sqlalchemy import select, exists
+            
+            child_table_name = collection[0]
+            child_attr = collection[1]
+            parent_id = collection[2]
+            
+            child_table = Table(child_table_name, self.meta, autoload=True)
+            
+            sel = select([child_table.c.id], from_obj=child_table,
+                         whereclause=and_(child_table.c[child_attr] == parent_id,
+                                          child_table.c.id == self.tbl.c.id,
+                                          ),
+                         ).correlate(self.tbl)
+            
+            sql = and_(sql, exists(sel))
+                
+        # where
+        if isinstance(self.tbl, Select):
+            qry = self.tbl.where(sql)
+                
+        else:
+            qry = self.tbl.select(whereclause=sql)
+            
+        # order by
+        if self.order:
+            qry = qry.order_by(self.order)
+            
+        return DataSet.procesar_resultado(self.session, qry, rp, offset, show_ids)
+    
