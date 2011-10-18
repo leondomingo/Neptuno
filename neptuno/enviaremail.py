@@ -77,32 +77,28 @@ def enviar_email(remitente, destinatarios, asunto, mensaje,
     
     s = smtplib.SMTP(servidor)
     try:
-        try:
-            s.set_debuglevel(False)
-            
-            # autenticarse con el servidor
-            s.ehlo()
-            
-            # tiene STARTTLS?
-            if s.has_extn('STARTTLS'):
-                s.starttls()
-                s.ehlo() # re-identify ourselves over TLS connection
-                
-            # login
-            s.login(login, password)
-            
-            emails_destino = [dst[0] for dst in destinatarios]
-            
-            # enviar e-mail
-            resultado = s.sendmail(remitente[0], emails_destino, msg.as_string())
-            
-            return resultado
+        s.set_debuglevel(False)
         
-        finally:
-            s.quit()
+        # autenticarse con el servidor
+        s.ehlo()
+        
+        # tiene STARTTLS?
+        if s.has_extn('STARTTLS'):
+            s.starttls()
+            s.ehlo() # re-identify ourselves over TLS connection
             
-    except Exception, e:
-        print str(e)
+        # login
+        s.login(login, password)
+        
+        emails_destino = [dst[0] for dst in destinatarios]
+        
+        # enviar e-mail
+        resultado = s.sendmail(remitente[0], emails_destino, msg.as_string())
+        
+        return resultado
+    
+    finally:
+        s.quit()
         
 def normalizar_a_html(texto):
     return texto.\
