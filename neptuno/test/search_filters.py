@@ -26,3 +26,7 @@ if __name__ == '__main__':
     ds = s()
     print ds
     #print ds.count
+    
+    s = Search(dbs, 'sp_attributes')
+    s.apply_qry('')
+    print s(collection=('sp_attributes', 'id_class', 10))

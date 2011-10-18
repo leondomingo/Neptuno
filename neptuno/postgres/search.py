@@ -441,12 +441,12 @@ def search(session, table_name, q=None, rp=100, offset=0, show_ids=False,
     
     sql = None
     order = ''
-    if q != None:
+    if q:
         
         # process "q"
         qres = Busqueda(tbl, q, strtodatef=strtodatef)
         
-        # apply search conditions    
+        # apply search conditions
         sql = and_(qres.condicion, sql)
         
         # apply order
@@ -518,8 +518,6 @@ def search(session, table_name, q=None, rp=100, offset=0, show_ids=False,
     else:
         qry = tbl.select(whereclause=sql)
         
-    print qry
-        
     # order by
     if order:
         qry = qry.order_by(order)
@@ -545,7 +543,7 @@ class Search(object):
             
     def apply_qry(self, q):
         
-        if q != None:
+        if q:
             
             # process "q"
             qres = Busqueda(self.tbl, q, strtodatef=self.strtodatef)
