@@ -20,6 +20,7 @@ def enviar_email(remitente, destinatarios, asunto, mensaje,
       login          <str>
       password       <str>
       ficheros       [<str>, ...] (opcional)
+                     [(<StringIO>, <str>), ...] (opcional)
       html           <str>        (opcional)
       
       Por ejemplo,
@@ -63,10 +64,18 @@ def enviar_email(remitente, destinatarios, asunto, mensaje,
             
         for f in ficheros:
             part = MIMEBase('application', 'octet-stream')
-            part.set_payload(open(f, 'rb').read())
+            if isinstance(f, str):
+                f = open(f, 'rb')
+                f_name = os.path.basename(f)
+                
+            else:
+                # tupla (<fichero>, <nombre>,)
+                f, f_name = f
+                
+            part.set_payload(f.read())
             Encoders.encode_base64(part)
             part.add_header('Content-Disposition', 
-                            'attachment; filename="%s"' % os.path.basename(f))
+                            'attachment; filename="%s"' % f_name)
             msg.attach(part)
             
     msg['Subject'] = Header(asunto, charset)
