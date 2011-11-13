@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import re
-from sqlalchemy import Table, MetaData
-from sqlalchemy.sql.expression import and_, Select, or_
-from sqlalchemy.types import DATE, TIME, DATETIME, INTEGER, NUMERIC, \
-    BOOLEAN, BIGINT
 from neptuno.dataset import DataSet
+from sqlalchemy import Table, MetaData, select
+from sqlalchemy.sql.expression import and_, Select, or_, alias
+from sqlalchemy.types import DATE, TIME, DATETIME, INTEGER, NUMERIC, BOOLEAN, \
+    BIGINT
+import re
 
 class Busqueda(object):
     
@@ -495,7 +495,7 @@ def search(session, table_name, q=None, rp=100, offset=0, show_ids=False,
     
     if collection:
         
-        from sqlalchemy import select, exists
+        from sqlalchemy import exists
         
         child_table_name = collection[0]
         child_attr = collection[1]
@@ -540,6 +540,8 @@ class Search(object):
             
         else:
             self.tbl = Table(self.table_name, self.meta, autoload=True)
+        
+        self.from_ = self.tbl
             
     def apply_qry(self, q):
         
@@ -622,32 +624,26 @@ class Search(object):
         sql = self.sql
         if collection:
             
-            from sqlalchemy import select, exists
-            
             child_table_name = collection[0]
             child_attr = collection[1]
             parent_id = collection[2]
             
-            child_table = Table(child_table_name, self.meta, autoload=True)
+            child_table = alias(Table(child_table_name, self.meta, autoload=True))
             
-            sel = select([child_table.c.id], from_obj=child_table,
-                         whereclause=and_(child_table.c[child_attr] == parent_id,
-                                          child_table.c.id == self.tbl.c.id,
-                                          ),
-                         ).correlate(self.tbl)
+            self.from_ = self.from_.\
+                join(child_table,
+                     and_(child_table.c.id == self.tbl.c.id,
+                          child_table.c[child_attr] == parent_id))
             
-            sql = and_(sql, exists(sel))
-                
         # where
         if isinstance(self.tbl, Select):
             qry = self.tbl.where(sql)
                 
         else:
-            qry = self.tbl.select(whereclause=sql)
+            qry = select([self.tbl], from_obj=self.from_, whereclause=sql)
             
         # order by
         if self.order:
             qry = qry.order_by(self.order)
             
         return DataSet.procesar_resultado(self.session, qry, rp, offset, show_ids)
-    
