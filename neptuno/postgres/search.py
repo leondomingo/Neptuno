@@ -562,6 +562,12 @@ class Search(object):
         
     def or_(self, cond):
         self.sql = or_(self.sql, cond)
+        
+    def join(self, *args, **kwargs):
+        self.from_ = self.from_.join(*args, **kwargs)
+        
+    def outerjoin(self, *args, **kwargs):
+        self.from_ = self.from_.outerjoin(*args, **kwargs)
                 
     def apply_filters(self, filters):
         
@@ -645,5 +651,7 @@ class Search(object):
         # order by
         if self.order:
             qry = qry.order_by(self.order)
+            
+        #print qry
             
         return DataSet.procesar_resultado(self.session, qry, rp, offset, show_ids)

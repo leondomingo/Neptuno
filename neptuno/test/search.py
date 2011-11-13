@@ -40,3 +40,17 @@ if __name__ == '__main__':
     s3.apply_qry('+nombre')
     ds3 = s3(collection=('alumnos', 'id_cliente_actual', 480))
     print ds3
+    
+    # join
+    s4 = Search(dbs, '_view_alumnos')
+    meta = sa.MetaData(bind=conn.engine)
+    t_alumnos = sa.Table('alumnos', meta, autoload=True)
+    s4.join(t_alumnos, t_alumnos.c.id == s4.tbl.c.id)
+    print s4(rp=10)
+    
+    s5 = Search(dbs, '_view_alumnos')
+    t_clientes = sa.Table('clientes', meta, autoload=True)
+    s5.join(t_alumnos, t_alumnos.c.id == s4.tbl.c.id)
+    s5.join(t_clientes, t_clientes.c.id == t_alumnos.c.id_cliente_actual)
+    s5.and_(t_alumnos.c.id_cliente_actual == 480)
+    print s5(rp=10)

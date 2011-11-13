@@ -3,8 +3,8 @@
 from setuptools import setup
 
 setup(name='Neptuno2',
-      version='1.0.40',
-      author='León Domingo',
+      version='1.0.41',
+      author=u'León Domingo',
       author_email='leon.domingo@ender.es',
       description=('A little set of utilities that Ender has been using in their web projects'),
       #license=???,
@@ -34,8 +34,6 @@ setup(name='Neptuno2',
         'xlrd',
         'xlwt',
         'simplejson',
-        #'readline',
         'jinja2',
-        #'python-dateutil==1.5',
       ],
      )
