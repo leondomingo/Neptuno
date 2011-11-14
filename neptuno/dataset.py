@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import sys
-import re
-import datetime
-#import simplejson
-from jinja2 import Environment, PackageLoader
 from decimal import Decimal
-from sqlalchemy.types import INTEGER, NUMERIC, DATE, TIME, BOOLEAN, BIGINT
-from neptuno.util import default_fmt_float
+from jinja2 import Environment, PackageLoader
 from neptuno.ficherocsv import FicheroCSV
+from neptuno.util import default_fmt_float
 from neptuno.xlsreport import XLSReport
+from sqlalchemy.types import INTEGER, NUMERIC, DATE, TIME, BOOLEAN, BIGINT, \
+    DATETIME
+import datetime
+import re
+import sys
 
 COLUMNAS = 'columnas'
 COUNT = 'count'
@@ -653,6 +653,9 @@ class DataSet(object):
                 elif isinstance(c.type, TIME):
                     type_ = 'time'
                     
+                elif isinstance(c.type, DATETIME):
+                    type_ = 'datetime'
+                    
                 elif isinstance(c.type, BOOLEAN):
                     type_ = 'bool'
                     
@@ -670,7 +673,7 @@ class DataSet(object):
                 cols.append((name, # name
                              c.name, # label
                              type_,))
-                    
+                
         ds = DataSet(cols)
         ds.count = session.execute(query).rowcount
         
@@ -681,7 +684,7 @@ class DataSet(object):
             row = []
             for c in query.columns:
                 data = fila[c]
-                if show_ids or not c.name.startswith('id_'):
+                if show_ids or not (c.name.startswith('id_') or c.name.startswith('_')):
                     if isinstance(data, str):
                         data = data.decode('utf-8')
                         
