@@ -639,7 +639,7 @@ class DataSet(object):
         cols = []
         col_names = []
         for c in query.columns:
-            if show_ids or not c.name.startswith('id_'):
+            if show_ids or not (c.name.startswith('id_') or c.name.startswith('_')):
                 type_ = ''
                 if isinstance(c.type, INTEGER) or isinstance(c.type, BIGINT):
                     type_ = 'int'

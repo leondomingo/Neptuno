@@ -54,3 +54,7 @@ if __name__ == '__main__':
     s5.join(t_clientes, t_clientes.c.id == t_alumnos.c.id_cliente_actual)
     s5.and_(t_alumnos.c.id_cliente_actual == 480)
     print s5(rp=10)
+    
+    s6 = Search(dbs, 'niveles')
+    ds6 = s6(rp=10)
+    print ds6
