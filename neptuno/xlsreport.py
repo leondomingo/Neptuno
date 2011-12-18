@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import xlrd
 from lxml import etree
+from neptuno.util import strtodate, strtotime
 from xlwt import Workbook, Formula
 from xlwt.Style import easyxf, XFStyle
-from neptuno.util import strtodate, strtotime
+import re
+import xlrd
 
 __all__ = ['XLSReport']
 
@@ -342,7 +343,26 @@ class XLSReport(object):
 
                         xfs.num_format_str = num_format
                         
-                    ws.write(util.current_line(), col, dato, xfs)
+                    # merge
+                    if item.attrib.has_key('merge') and item.attrib['merge']:
+                        try:
+                            _merge = re.search(r'(\d+)\s+(\d+)', item.attrib['merge'], re.U)
+                            if _merge:
+                                hg = int(_merge.group(1))
+                                wd = int(_merge.group(2))
+                            
+                                _current_line = util.current_line()
+                                ws.write_merge(_current_line, _current_line + hg - 1,
+                                               col, col + wd -1, 
+                                               dato, xfs)
+                            else:
+                                raise Exception(u'merge: Invalid format')
+                        
+                        except Exception:
+                            ws.write(util.current_line(), col, dato, xfs)
+                            
+                    else:
+                        ws.write(util.current_line(), col, dato, xfs)
                 
                 elif item.tag == 'line_feed':
                     util.line_feed()

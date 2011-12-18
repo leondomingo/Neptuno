@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xlsreport>
+    <sheet title="Test MERGE">
+        <cell col="1" merge="1 10">
+            <value><![CDATA[León Domingo]]></value>
+            <style name="nombre1" bgcolor="blue">
+                <align hor="center"/>
+            </style>
+        </cell>
+        
+        <line_feed>
+            {{util.line_feed()}}
+        </line_feed>
+        
+        <cell col="1" merge="2 10">
+            <value><![CDATA[León Domingo]]></value>
+            <style name="nombre2" bgcolor="blue">
+                <align hor="center" ver="center"/>
+            </style>
+        </cell>
+    </sheet>
+</xlsreport>
