@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xlsreport>
+    <sheet title="Test MERGE">
+        <image col="0">
+            <path><![CDATA[/home/leon/workspace/neptuno/neptuno/templates/logo_sapns1.bmp]]></path>
+        </image>
+        
+        <line_feed n="10">{{ util.line_feed(10) }}</line_feed>
+        
+        <image col="10">
+            <path><![CDATA[/home/leon/workspace/neptuno/neptuno/templates/logo_sapns1.bmp]]></path>
+        </image>
+        
+        <line_feed>{{ util.line_feed() }}</line_feed>
+        
+        <cell col="1">
+            <value><![CDATA[Esto es una prueba]]></value>
+        </cell>
+    </sheet>
+</xlsreport>

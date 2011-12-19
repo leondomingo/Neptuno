@@ -24,8 +24,8 @@ class XLSReport(object):
         def current_line(self):
             return self.n
         
-        def line_feed(self):
-            self.n += 1
+        def line_feed(self, n=1):
+            self.n += n
             return self.n
         
         def add_bookmark(self, name):
@@ -270,7 +270,13 @@ class XLSReport(object):
                 
                 # style
                 if item.tag == 'style':
-                    estilos[item.attrib['name']] = easyxf(';'.join(self.calcular_estilo(item))) 
+                    estilos[item.attrib['name']] = easyxf(';'.join(self.calcular_estilo(item)))
+                    
+                # image
+                if item.tag == 'image':
+                    col = int(item.attrib.get('col', 0))
+                    bm_path = item.find('path').text
+                    ws.insert_bitmap(bm_path, util.current_line(), col) 
                 
                 # cell
                 if item.tag == 'cell':
@@ -365,7 +371,8 @@ class XLSReport(object):
                         ws.write(util.current_line(), col, dato, xfs)
                 
                 elif item.tag == 'line_feed':
-                    util.line_feed()
+                    n = int(item.attrib.get('n', 1))
+                    util.line_feed(n)
                     
                 elif item.tag == 'bookmark':
                     util.add_bookmark(item.attrib['name'])
