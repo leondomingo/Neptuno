@@ -7,7 +7,7 @@
         
         <line_feed n="10">{{ util.line_feed(10) }}</line_feed>
         
-        <image col="10">
+        <image col="10" scale_y="1.2">
             <path><![CDATA[/home/leon/workspace/neptuno/neptuno/templates/logo_sapns1.bmp]]></path>
         </image>
         

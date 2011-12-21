@@ -274,9 +274,11 @@ class XLSReport(object):
                     
                 # image
                 if item.tag == 'image':
-                    col = int(item.attrib.get('col', 0))
                     bm_path = item.find('path').text
-                    ws.insert_bitmap(bm_path, util.current_line(), col) 
+                    col = int(item.attrib.get('col', 0))
+                    scale_x = float(item.attrib.get('scale_x', '1'))
+                    scale_y = float(item.attrib.get('scale_y', '1'))
+                    ws.insert_bitmap(bm_path, util.current_line(), col, scale_x=scale_x, scale_y=scale_y) 
                 
                 # cell
                 if item.tag == 'cell':
