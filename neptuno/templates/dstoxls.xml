@@ -4,19 +4,19 @@
         {% for col in ds.labels %}
             <cell col="{{loop.index0}}">
                 <value><![CDATA[{{col}}]]></value>
-                <style name="col-label" bgcolor="dark_teal">
+                {#<style name="col-label" bgcolor="dark_teal">
                     <font bold="true" color="white"/>
                     <align hor="center"/>
-                </style>
+                </style>#}
             </cell>
         {% endfor %}
         
         <line_feed>
-          {{util.line_feed()}}
+            {{util.line_feed()}}
         </line_feed>
         
         {% for row in ds.data %}
-            {% set div_by_2 = loop.index is divisibleby 2 %}
+            {#{% set div_by_2 = loop.index is divisibleby 2 %}#}
 
             {% for dt in row %}
             
@@ -30,11 +30,11 @@
             {% endif %}
             <cell col="{{loop.index0}}" {% if type != '' %} type="{{type}}" {% endif %}>
             <value><![CDATA[{{dt or ''}}]]></value>
-            {% if div_by_2 %}
+            {#{% if div_by_2 %}
                 <style name="cell-2" bgcolor="gray_ega">
                     <font color="white"/>
                 </style>
-            {% endif %}
+            {% endif %}#}
             </cell>
             
             {% endfor %}
