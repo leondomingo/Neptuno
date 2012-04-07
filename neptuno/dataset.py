@@ -624,13 +624,15 @@ class DataSet(object):
         self.data.sort(cmp=compara)
     
     @staticmethod
-    def procesar_resultado(session, query, limit=None, pos=None, show_ids=False):
+    def procesar_resultado(session, query, limit=None, pos=None, no_count=False, show_ids=False):
         """
         IN
           session  <sqlalchemy.orm.session.Session>
           query    <>
           limit    <int>
           pos      <int>
+          no_count  <bool> = False
+          show_ids  <bool> = False
           
         OUT
           <DataSet>
@@ -675,7 +677,11 @@ class DataSet(object):
                              type_,))
                 
         ds = DataSet(cols)
-        ds.count = session.execute(query).rowcount
+        if not no_count:
+            ds.count = session.execute(query).rowcount
+            
+        else:
+            ds.count = 0
         
         if limit == 0:
             limit = None
@@ -694,6 +700,8 @@ class DataSet(object):
                     row.append(data)
 
             ds.append(row)
+            if not no_count:
+                ds.count += 1
                         
         return ds
     

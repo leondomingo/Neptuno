@@ -613,15 +613,15 @@ class Search(object):
             
             self.sql = and_(*filters_tuple)
         
-    def __call__(self, rp=100, offset=0, show_ids=False, collection=None):
+    def __call__(self, rp=100, offset=0, collection=None, no_count=False, show_ids=False):
         """
         IN
           rp          <int>
           offset      <int>
-          show_ids    <bool> (opcional=False)
-          strtodatef  <function> (opcional=None)
           filters     [<tuple>, ...]
           collecion   <tuple> (<str>, <str>, <int>,)
+          no_count    <bool> => False
+          show_ids    <bool> => False
           
         OUT
           <DataSet>
@@ -654,4 +654,5 @@ class Search(object):
             
         #print qry
             
-        return DataSet.procesar_resultado(self.session, qry, rp, offset, show_ids)
+        return DataSet.procesar_resultado(self.session, qry, rp, offset, 
+                                          no_count=no_count, show_ids=show_ids)
