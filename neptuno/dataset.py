@@ -700,7 +700,8 @@ class DataSet(object):
                     row.append(data)
 
             ds.append(row)
-            if not no_count:
+            
+            if no_count:
                 ds.count += 1
                         
         return ds
