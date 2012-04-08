@@ -9,7 +9,7 @@ import sqlalchemy as sa
 
 if __name__ == '__main__':
     
-    cfg = {CONF_DB: 'lanser',
+    cfg = {CONF_DB: 'ihmadrid',
            CONF_HOST: 'localhost',
            CONF_USER: 'postgres',
            CONF_PASSW: '5390post'}
@@ -58,3 +58,8 @@ if __name__ == '__main__':
     s6 = Search(dbs, 'niveles')
     ds6 = s6(rp=10)
     print ds6
+    
+    s7 = Search(dbs, '_view_grupos', strtodatef=f)
+    s7.apply_qry('fechainicio="15/01/2001", grupo=hachette')
+    ds7 = s7(rp=0)
+    print ds7

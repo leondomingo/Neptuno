@@ -258,18 +258,18 @@ class Busqueda(object):
                         elif isinstance(col.type, INTEGER) or \
                         isinstance(col.type, NUMERIC) or \
                         isinstance(col.type, BIGINT):
-                        
+
                             if operador in ['=', '<>']:
                                 # "Nº de alumnos" = 10                   
                                 expresion = '"%s" %s %s' % \
                                     (c.encode('utf-8'),
                                      operador.encode('utf-8'),
                                      termino2)
-                                                
+
                             else:
                                 # <, >, <=, >=
                                 expresion_novacio = '"%s" IS NOT NULL' % c.encode('utf-8')
-                                
+
                                 # "Nº de alumnos" >= 10
                                 expresion = '"%s" %s %s' % \
                                     (c.encode('utf-8'), 
@@ -281,32 +281,67 @@ class Busqueda(object):
                             if operador == '=':                            
                                 expresion = "UPPER(CAST(\"%s\" as Text)) SIMILAR TO UPPER('%%%s%%')" % \
                                                 (c.encode('utf-8'), termino2)
-                                                
+
                             elif operador == '<>':
                                 expresion = "UPPER(CAST(\"%s\" as Text)) NOT SIMILAR TO UPPER('%%%s%%')" % \
                                                 (c.encode('utf-8'), termino2)
-                                                
+
                             else:
                                 # <, >, <=, >=
                                 expresion_novacio = '"%s" IS NOT NULL' % c.encode('utf-8')
-                                
+
                                 expresion = "\"%s\" %s '%s'" % \
                                     (c.encode('utf-8'), operador.encode('utf-8'), termino2)
-                                        
+
                         expresiones.append(expresion)
                         
                     # explícitos ("---")
                     for exp in explicitos:
-                        if operador == '=':                            
-                            expresion = "UPPER(CAST(\"%s\" as Text)) LIKE UPPER('%%%s%%')" % \
-                                            (c.encode('utf-8'), exp.encode('utf-8'))
-                                            
-                        elif operador == '<>':
-                            expresion = "UPPER(CAST(\"%s\" as Text)) NOT LIKE UPPER('%%%s%%')" % \
-                                            (c.encode('utf-8'), exp.encode('utf-8'))
-                                            
-                        expresiones.append(expresion)
                         
+                        if not (isinstance(col.type, DATE) or 
+                                isinstance(col.type, TIME) or
+                                isinstance(col.type, DATETIME)):
+
+                            if operador == '=':
+                                expresion = "UPPER(CAST(\"%s\" as Text)) LIKE UPPER('%%%s%%')" % \
+                                                (c.encode('utf-8'), exp.encode('utf-8'))
+
+                            elif operador == '<>':
+                                expresion = "UPPER(CAST(\"%s\" as Text)) NOT LIKE UPPER('%%%s%%')" % \
+                                                (c.encode('utf-8'), exp.encode('utf-8'))
+
+                        else:
+                            # date, time and datetime
+
+                            # convert to date
+                            if self.strtodatef:
+                                try:
+                                    termino2 = self.strtodatef(termino2).strftime('%Y-%m-%d')
+                                    #print termino2
+
+                                except:
+                                    pass
+
+                            if operador in ['=', '<>']:
+                                expresion_novacio = None
+
+                                # "Fecha inicio" = '01/01/2010'
+                                expresion = '"%s" %s \'%s\'' % \
+                                    (c.encode('utf-8'), 
+                                     operador.encode('utf-8'), 
+                                     exp.encode('utf-8'))
+
+                            else:
+                                # <, >, <=, >=
+                                expresion_novacio = '"%s" IS NOT NULL' % c.encode('utf-8')
+
+                                # "Fecha inicio" >= '01/01/2010'
+                                expresion = '"%s" %s \'%s\'' % \
+                                    (c.encode('utf-8'), 
+                                     operador.encode('utf-8'), 
+                                     exp.encode('utf-8'))
+
+                        expresiones.append(expresion)
                     
                     expresion_novacio = ('%s AND \n(' % expresion_novacio 
                                          if expresion_novacio else '')
