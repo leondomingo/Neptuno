@@ -241,10 +241,6 @@ class XLSReport(object):
 
         informe_xml = self.tmpl.render(**params).encode('utf-8')
         
-#        f = file('/home/leon/informe.xml', 'wb')
-#        f.write(informe_xml)
-#        f.close()
-        
         root = etree.fromstring(informe_xml)
         
         wb = Workbook()
@@ -259,9 +255,7 @@ class XLSReport(object):
             n_sheet += 1
             
             # title
-            title = 'Sheet-%d' % n_sheet
-            if sheet.attrib.has_key('title') and sheet.attrib['title']:
-                title = sheet.attrib['title']
+            title = sheet.attrib.get('title', 'Sheet-%d' % n_sheet)
                 
             ws = wb.add_sheet(title, True)
             
@@ -287,11 +281,16 @@ class XLSReport(object):
                     
                     num_format = None
                     
+                    # width
+                    width = item.attrib.get('width')
+                    
+                    # value
                     value = item.find('value')
                     dato = value.text
                     # type: aplicar una conversión (str, int, float, ...)
-                    if item.attrib.has_key('type') and item.attrib['type']:
-                        tipo = item.attrib['type'].split(';')
+                    type_ = item.attrib.get('type')
+                    if type_:
+                        tipo = type_.split(';')
                         
                         # date
                         if tipo[0] == 'date':
@@ -371,6 +370,9 @@ class XLSReport(object):
                             
                     else:
                         ws.write(util.current_line(), col, dato, xfs)
+                        
+                    if width:
+                        ws.col(col).width = int(width)*256
                 
                 elif item.tag == 'line_feed':
                     n = int(item.attrib.get('n', 1))
