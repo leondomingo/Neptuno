@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xlsreport>
+    <sheet title="Test WIDTH">
+        <cell col="0" merge="1 10" width="100">
+            <value><![CDATA[Testing col width]]></value>
+            <style name="nombre1" bgcolor="blue">
+                <align hor="center"/>
+            </style>
+        </cell>
+    </sheet>
+</xlsreport>
