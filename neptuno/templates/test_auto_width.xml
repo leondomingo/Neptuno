@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xlsreport>
+    <sheet title="Test AUTO WIDTH" width="auto">
+        <cell col="0">
+            <value><![CDATA[En un lugar de la mancha de cuyo nombre no quiero acordarme]]></value>
+        </cell>
+        
+        <cell col="1" width="auto">
+            <value><![CDATA[casa perro amigo]]></value>
+        </cell>
+        
+        <line_feed>{{ util.line_feed() }}</line_feed>
+        
+        <cell col="1">
+            <value><![CDATA[caaaasaaaaa peeeeerroooooo aaaaaamiiiiiiiiiigooooooooooooo]]></value>
+        </cell>
+    </sheet>
+</xlsreport>
