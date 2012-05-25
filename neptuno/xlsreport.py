@@ -253,9 +253,13 @@ class XLSReport(object):
         for sheet in root.iter('sheet'):
             
             n_sheet += 1
+            cols_width = None
             
             # title
             title = sheet.attrib.get('title', 'Sheet-%d' % n_sheet)
+            
+            # auto-width
+            sheet_width = sheet.attrib.get('width')
                 
             ws = wb.add_sheet(title, True)
             
@@ -282,8 +286,16 @@ class XLSReport(object):
                     num_format = None
                     
                     # width
-                    width = item.attrib.get('width')
-                    
+                    width = item.attrib.get('width', sheet_width)
+                        
+                    if width is not None:
+                        if cols_width is None:
+                            cols_width = {}
+                            
+                        if not cols_width.get(col):
+                            cols_width[col] = dict(auto=width == 'auto', 
+                                                   width=int(width) if width != 'auto' else 0)
+                        
                     # value
                     value = item.find('value')
                     dato = value.text
@@ -312,7 +324,7 @@ class XLSReport(object):
                         
                         # resto de tipos
                         else:
-                            if dato:
+                            if dato is not None:
                                 try:
                                     f = lambda t,v: t(v)
                                     dato = f(eval(tipo[0]), dato)
@@ -371,17 +383,32 @@ class XLSReport(object):
                     else:
                         ws.write(util.current_line(), col, dato, xfs)
                         
-                    if width:
-                        ws.col(col).width = int(width)*256
-                
+                    # width
+                    colw = cols_width.get(col, None)
+                    if colw is not None:
+                        
+                        if colw['auto']:
+                            width_ = len(str(dato))
+                            if width_ > colw['width']:
+                                cols_width[col]['width'] = width_
+                                
                 elif item.tag == 'line_feed':
                     n = int(item.attrib.get('n', 1))
                     util.line_feed(n)
                     
                 elif item.tag == 'bookmark':
                     util.add_bookmark(item.attrib['name'])
+            
+            # width
+            if cols_width is not None:
+                for col, colw in cols_width.iteritems():
+                    
+                    if colw['width'] < 10:
+                        colw['width'] = colw['width'] + 2
+                        
+                    ws.col(col).width = colw['width']*256
                 
         if filename:
             wb.save(filename)
-        
+            
         return informe_xml

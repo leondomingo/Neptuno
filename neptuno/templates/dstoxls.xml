@@ -1,47 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xlsreport>
-    <sheet title="{{title}}">
-        {% for col in ds.labels %}
+    <sheet title="{{title}}" width="auto">
+        <!--{% for col in ds.labels %}-->
             <cell col="{{loop.index0}}">
-                <value><![CDATA[{{col}}]]></value>
-                {#<style name="col-label" bgcolor="dark_teal">
-                    <font bold="true" color="white"/>
-                    <align hor="center"/>
-                </style>#}
+                <value><![CDATA[{{ col }}]]></value>
             </cell>
-        {% endfor %}
+        <!--{% endfor %}-->
         
-        <line_feed>
-            {{util.line_feed()}}
-        </line_feed>
+        <line_feed>{{ util.line_feed() }}</line_feed>
         
-        {% for row in ds.data %}
-            {#{% set div_by_2 = loop.index is divisibleby 2 %}#}
-
-            {% for dt in row %}
+        <!--{% for row in ds.data %}-->
+            <!--{% for dt in row %}-->
             
-            {% set type = ds.types[loop.index0] %}
-            {% if type == 'float' %}
+            <!--{% set type_ = ds.types[loop.index0] %}
+            {% if type_ == 'float' %}
                 {% set type = 'float;%s'|format(fmt.float or '#,##0.00') %}
-            {% elif type == 'date' %}
+            {% elif type_ == 'date' %}
                 {% set type = 'date;%s'|format(fmt.date or "mm/dd/yyyy") %}
-            {% elif type == 'time' %}
+            {% elif type_ == 'time' %}
                 {% set type = 'time;%s'|format(fmt.time or 'HH:MM') %}
-            {% endif %}
+            {% endif %}-->
+            
             <cell col="{{loop.index0}}" {% if type != '' %} type="{{type}}" {% endif %}>
-            <value><![CDATA[{{dt or ''}}]]></value>
-            {#{% if div_by_2 %}
-                <style name="cell-2" bgcolor="gray_ega">
-                    <font color="white"/>
-                </style>
-            {% endif %}#}
+                <!--{% if type_ == 'float' or type_ == 'int' and dt != None %}-->
+                <value><![CDATA[{{ dt }}]]></value>
+                <!--{% else %}-->
+                <value><![CDATA[{{ dt or '' }}]]></value>
+                <!--{% endif %}-->
             </cell>
+            <!--{% endfor %}-->
             
-            {% endfor %}
-            
-            <line_feed>
-                {{util.line_feed()}}
-            </line_feed>
-        {% endfor %}
+            <line_feed>{{ util.line_feed() }}</line_feed>
+        <!--{% endfor %}-->
     </sheet>
 </xlsreport>

@@ -2,7 +2,7 @@
 
 import datetime as dt
 from neptuno.dataset import DataSet
-#from neptuno.util import strtodate
+from decimal import Decimal
 
 if __name__ == '__main__':
     
@@ -21,7 +21,13 @@ if __name__ == '__main__':
     
     #print strtodate('2011-12-31', fmt='%Y-%m-%d')
     
-    ds.append(dato=dict(uno=123, dos=2.2345, fecha=dt.date.today(),
+    ds.append(dato=dict(uno=1238888888888, dos=2.2345, fecha=dt.date.today(),
+                        hora=dt.datetime.now().time()))
+    
+    ds.append(dato=dict(uno=123, dos=0.0, fecha=dt.date.today(),
+                        hora=dt.datetime.now().time()))
+
+    ds.append(dato=dict(uno=123, dos=Decimal('0'), fecha=dt.date.today(),
                         hora=dt.datetime.now().time()))
     
     #print '\nto_str()'
