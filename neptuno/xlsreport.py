@@ -388,7 +388,11 @@ class XLSReport(object):
                     if colw is not None:
                         
                         if colw['auto']:
-                            width_ = len(str(dato))
+                            try:
+                                width_ = len(str(dato))
+                            except:
+                                width_ = len(unicode(dato))
+                                
                             if width_ > colw['width']:
                                 cols_width[col]['width'] = width_
                                 

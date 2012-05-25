@@ -2,7 +2,7 @@
 <xlsreport>
     <sheet title="Test AUTO WIDTH" width="auto">
         <cell col="0">
-            <value><![CDATA[En un lugar de la mancha de cuyo nombre no quiero acordarme]]></value>
+            <value><![CDATA[éñßEn un lugar de la mancha de cuyo nombre no quiero acordarme]]></value>
         </cell>
         
         <cell col="1" width="auto">

@@ -6,7 +6,8 @@ from decimal import Decimal
 
 if __name__ == '__main__':
     
-    columnas = [(u'uno', u'Uno', 'int',),
+    columnas = [(u'nombre', u'Nombréð', ''),
+                (u'uno', u'Uno', 'int',),
                 (u'dos', u'Dos', 'float',),
                 (u'fecha', u'Fecha', 'date'),
                 (u'hora', u'Hora', 'time'),
@@ -21,13 +22,13 @@ if __name__ == '__main__':
     
     #print strtodate('2011-12-31', fmt='%Y-%m-%d')
     
-    ds.append(dato=dict(uno=1238888888888, dos=2.2345, fecha=dt.date.today(),
+    ds.append(dato=dict(nombre=u'León Domingoð', uno=1238888888888, dos=2.2345, fecha=dt.date.today(),
                         hora=dt.datetime.now().time()))
     
-    ds.append(dato=dict(uno=123, dos=0.0, fecha=dt.date.today(),
+    ds.append(dato=dict(nombre='León Domingoð', uno=123, dos=0.0, fecha=dt.date.today(),
                         hora=dt.datetime.now().time()))
 
-    ds.append(dato=dict(uno=123, dos=Decimal('0'), fecha=dt.date.today(),
+    ds.append(dato=dict(nombre='Leon Domingo', uno=123, dos=Decimal('0'), fecha=dt.date.today(),
                         hora=dt.datetime.now().time()))
     
     #print '\nto_str()'
