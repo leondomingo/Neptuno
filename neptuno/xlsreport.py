@@ -260,6 +260,7 @@ class XLSReport(object):
             
             # auto-width
             sheet_width = sheet.attrib.get('width')
+            cols_width = {}
                 
             ws = wb.add_sheet(title, True)
             
@@ -289,9 +290,6 @@ class XLSReport(object):
                     width = item.attrib.get('width', sheet_width)
                         
                     if width is not None:
-                        if cols_width is None:
-                            cols_width = {}
-                            
                         if not cols_width.get(col):
                             cols_width[col] = dict(auto=width == 'auto', 
                                                    width=int(width) if width != 'auto' else 0)

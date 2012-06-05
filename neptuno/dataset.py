@@ -116,11 +116,7 @@ class DataSetRow(object):
                 if isinstance(key, unicode):
                     key = key.encode('utf-8')
                     
-            if self.attr.has_key(key):
-                self.attr[key] = value
-                
-            else:
-                self.attr[key] = value
+            self.attr[key] = value
                 
 class DataSet(object):
     
@@ -161,20 +157,24 @@ class DataSet(object):
             self.float_fmt = fmt['float_fmt']
         
         for col in cols:
-            if isinstance(col, tuple):
-                # (<col>, <etiqueta>, <tipo>,) 
-                self.cols.append(col[0])
-                self.labels.append(col[1] or col[0])
-                self.types.append(col[2])
-            else:
-                self.cols.append(col)
-                self.labels.append(col)
-                self.types.append('')
+            self.append_col(col)
 
         self.limite_resultados = limite
         self.data = []
         self.count = 0
         self.totales = totales
+        
+    def append_col(self, col):
+        if isinstance(col, tuple):
+            # (<col>, <etiqueta>, <tipo>,) 
+            self.cols.append(col[0])
+            self.labels.append(col[1] or col[0])
+            self.types.append(col[2])
+            
+        else:
+            self.cols.append(col)
+            self.labels.append(col)
+            self.types.append('')
 
     def init_totales(self):
         if self.totales:
