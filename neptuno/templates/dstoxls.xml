@@ -26,7 +26,7 @@
             {% endif %}-->
             
             <cell col="{{loop.index0}}" {% if type != '' %} type="{{type}}" {% endif %}>
-                <!--{% if type_ == 'float' or type_ == 'int' and dt != None %}-->
+                <!--{% if (type_ == 'float' or type_ == 'int') and dt != None %}-->
                 <value><![CDATA[{{ dt }}]]></value>
                 <!--{% else %}-->
                 <value><![CDATA[{{ dt or '' }}]]></value>

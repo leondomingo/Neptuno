@@ -322,12 +322,12 @@ class XLSReport(object):
                         
                         # resto de tipos
                         else:
-                            if dato is not None:
+                            if dato != '':
                                 try:
                                     f = lambda t,v: t(v)
                                     dato = f(eval(tipo[0]), dato)
                                 except:
-                                    dato = 'ERROR! (%s)' % dato
+                                    dato = None
                         
                         # date;dd/mm/yyyy
                         # date;dd/mmm/yyyy
