@@ -9,7 +9,8 @@ from email.mime.base import MIMEBase
 from email.header import Header
 
 def enviar_email(remitente, destinatarios, asunto, mensaje, 
-                 servidor, login, password, ficheros=[], html='', charset='iso-8859-1'):
+                 servidor, login, password, ficheros=[], html='', cc=[], bcc=[], 
+                 charset='iso-8859-1'):
     """
     IN
       remitente      (<email>, <nombre>)
@@ -22,6 +23,9 @@ def enviar_email(remitente, destinatarios, asunto, mensaje,
       ficheros       [<str>, ...] (opcional)
                      [(<StringIO>, <str>), ...] (opcional)
       html           <str>        (opcional)
+      cc             [(<e-mail>, <nombre>), ...]
+      bcc            [(<e-mail>, <nombre>), ...]
+      charset        <str> => iso-8859-1
       
       Por ejemplo,
         enviar_email(('pperez@gmail.com', 'Pepe Pérez'),
@@ -83,6 +87,12 @@ def enviar_email(remitente, destinatarios, asunto, mensaje,
     
     nombres = ['%s <%s>' % (dst[1], dst[0]) for dst in destinatarios]
     msg['To'] = ';'.join(nombres)
+    
+    if cc:
+        msg['Cc'] = ';'.join(['%s <%s>' % (dst[1], dst[0]) for dst in cc])
+        
+    if bcc:
+        msg['Bcc'] = ';'.join(['%s <%s>' % (dst[1], dst[0]) for dst in bcc])
     
     s = smtplib.SMTP(servidor)
     try:
