@@ -88,12 +88,8 @@ def enviar_email(remitente, destinatarios, asunto, mensaje,
     nombres = ['%s <%s>' % (dst[1], dst[0]) for dst in destinatarios]
     msg['To'] = ';'.join(nombres)
     
-    if cc:
-        msg['Cc'] = ';'.join(['%s <%s>' % (dst[1], dst[0]) for dst in cc])
+    msg['Cc'] = ';'.join(['%s <%s>' % (dst[1], dst[0]) for dst in cc])
         
-    if bcc:
-        msg['Bcc'] = ';'.join(['%s <%s>' % (dst[1], dst[0]) for dst in bcc])
-    
     s = smtplib.SMTP(servidor)
     try:
         s.set_debuglevel(False)
@@ -109,7 +105,11 @@ def enviar_email(remitente, destinatarios, asunto, mensaje,
         # login
         s.login(login, password)
         
-        emails_destino = [dst[0] for dst in destinatarios]
+        emails_destino_to = [dst[0] for dst in destinatarios]
+        emails_destino_cc = [dst[0] for dst in cc]
+        emails_destino_bcc = [dst[0] for dst in bcc]
+        
+        emails_destino = emails_destino_to + emails_destino_cc + emails_destino_bcc 
         
         # enviar e-mail
         resultado = s.sendmail(remitente[0], emails_destino, msg.as_string())

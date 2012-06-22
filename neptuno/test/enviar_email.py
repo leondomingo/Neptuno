@@ -6,6 +6,7 @@ import datetime as dt
 
 if __name__ == '__main__':
     print sys.executable
-    enviar_email(('leon.domingo@ender.es', 'León Domingo'), [('eledeweb@gmail.com', 'León Domingo')], 
-                 'prueba-%s' % dt.datetime.now(), 'mensaje', 'smtp.gmail.com', 'leon.domingo@ender.es', 'nitelite', 
+    enviar_email(('leon.domingo@ender.es', 'León Domingo'), [], 
+                 'prueba-%s' % dt.datetime.now(), 'mensaje', 'smtp.gmail.com', 'leon.domingo@ender.es', 'nitelite',
+                 cc=[('eledeweb@gmail.com', 'León Domingo')],
                  bcc=[('tengounplanb@gmail.com', 'León Domingo')], charset='utf-8')
