@@ -58,14 +58,14 @@ def send_mail(from_, to_, subject, message, server, login, password, files=[],
             msg_root.attach(msg_alt)
             
         msg = msg_root
-        
+
+    files_obj = []        
     if files:
         if not msg_root:
             msg_root = MIMEMultipart()
             msg_root.attach(msg)
             msg = msg_root
             
-        files_obj = []
         for f in files:
             part = MIMEBase('application', 'octet-stream')
             if isinstance(f, (str, unicode,)):
