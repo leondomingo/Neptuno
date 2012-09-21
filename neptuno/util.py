@@ -97,7 +97,7 @@ def get_paramw(params, nombre, tipo, opcional=False, por_defecto=None):
             try:
                 return tipo(params[nombre])
             except:
-                return por_defecto
+                raise EFaltaParametro(nombre)
                     
     else:
         if params.has_key(nombre):
