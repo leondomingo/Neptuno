@@ -31,8 +31,6 @@ class Busqueda(object):
             elif isinstance(texto_busqueda, unicode):
                 texto_busqueda = texto_busqueda.lower().encode('utf-8')
                 
-            print texto_busqueda
-            
             self.condicion = self.condicion_busqueda(texto_busqueda)
             self.orden = self.orden_busqueda(texto_busqueda)
             
