@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from neptuno.dataset import DataSet
-from sqlalchemy import Table, MetaData, select
+from sqlalchemy import Table, MetaData, select, exists
 from sqlalchemy.sql.expression import and_, Select, or_, alias
 from sqlalchemy.types import DATE, TIME, DATETIME, INTEGER, NUMERIC, BOOLEAN, \
     BIGINT
@@ -24,6 +24,15 @@ class Busqueda(object):
             self.cols_trans = columnas_trans
             
         if texto_busqueda:
+            
+            if isinstance(texto_busqueda, str):
+                texto_busqueda = texto_busqueda.decode('utf-8').lower().encode('utf-8')
+                
+            elif isinstance(texto_busqueda, unicode):
+                texto_busqueda = texto_busqueda.lower().encode('utf-8')
+                
+            print texto_busqueda
+            
             self.condicion = self.condicion_busqueda(texto_busqueda)
             self.orden = self.orden_busqueda(texto_busqueda)
             
@@ -33,11 +42,11 @@ class Busqueda(object):
     def sin_acentos(self, texto):
         
         resultado = texto
-        resultado = re.sub(r'(a|á)', '(a|á|ä)', resultado)
-        resultado = re.sub(r'(e|é)', '(e|é|ë)', resultado)
-        resultado = re.sub(r'(i|í)', '(i|í|ï)', resultado)
-        resultado = re.sub(r'(o|ó)', '(o|ó|ö)', resultado)
-        resultado = re.sub(r'(u|ú)', '(u|ú|ü)', resultado)
+        resultado = re.sub(r'(a|á|à|ä)', '(a|á|à|ä)', resultado)
+        resultado = re.sub(r'(e|é|è|ë)', '(e|é|è|ë)', resultado)
+        resultado = re.sub(r'(i|í|ì|ï)', '(i|í|ì|ï)', resultado)
+        resultado = re.sub(r'(o|ó|ò|ö)', '(o|ó|ò|ö)', resultado)
+        resultado = re.sub(r'(u|ú|ù|ü)', '(u|ú|ù|ü)', resultado)
         
         return resultado
         
@@ -530,8 +539,6 @@ def search(session, table_name, q=None, rp=100, offset=0, show_ids=False,
     
     if collection:
         
-        from sqlalchemy import exists
-        
         child_table_name = collection[0]
         child_attr = collection[1]
         parent_id = collection[2]
@@ -686,8 +693,6 @@ class Search(object):
         # order by
         if self.order:
             qry = qry.order_by(self.order)
-            
-        #print qry
             
         return DataSet.procesar_resultado(self.session, qry, rp, offset, 
                                           no_count=no_count, show_ids=show_ids)
