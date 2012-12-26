@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from neptuno.enviaremail import enviar_email
-import sys
+from neptuno.sendmail import send_mail
 import datetime as dt
 
 if __name__ == '__main__':
-    print sys.executable
-    enviar_email(('leon.domingo@ender.es', 'León Domingo'), [], 
-                 'prueba-%s' % dt.datetime.now(), 'mensaje', 'smtp.gmail.com', 'leon.domingo@ender.es', 'nitelite',
-                 cc=[('eledeweb@gmail.com', 'León Domingo')],
-                 bcc=[('tengounplanb@gmail.com', 'León Domingo')], charset='utf-8')
+    send_mail(('administracion@centrolinden.com', 'administracion@centrolinden.com'), 
+              [('leon.domingo@ender.es', 'León Domingo')],
+              'prueba-%s' % dt.datetime.now(), 'mensaje', 
+              'mail.webhostingpad.com',
+              #'mail.centrolinden.com',
+              'administracion@centrolinden.com', 'lindenatenea',
+              #cc=[('leon.domingo@ender.es', 'León Domingo')],
+              ssl=True)

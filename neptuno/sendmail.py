@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
 
-import os
-import smtplib
 from email import Encoders
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
 from email.header import Header
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import os
+import re
+import smtplib
 
 def send_mail(from_, to_, subject, message, server, login, password, files=[], 
-              html='', cc=[], bcc=[], charset='utf-8'):
+              html='', cc=[], bcc=[], charset='utf-8', ssl=False):
     """
     IN
       from_          (<e-mail address>, <name>)
       to_            [(<e-mail address>, <name>), ...]
       subject        <str>
       message        <str>
-      server         <str>
+      server         <str> (smtp.domain.com, smtp.domain.com:<port>)
       login          <str>
       password       <str>
       files          [<str>, ...] (optional)
@@ -25,6 +26,7 @@ def send_mail(from_, to_, subject, message, server, login, password, files=[],
       cc             [(<e-mail address>, <name>), ...]
       bcc            [(<e-mail address>, <name>), ...]
       charset        <str> => utf-8
+      ssl            <bool> => False
       
       For example,
         send_mail(('pperez@gmail.com', 'Pepe Pérez'),
@@ -92,8 +94,21 @@ def send_mail(from_, to_, subject, message, server, login, password, files=[],
     msg['To'] = ';'.join(nombres)
     
     msg['Cc'] = ';'.join(['%s <%s>' % (dst[1], dst[0]) for dst in cc])
+    
+    # identify the port in given host (smtp.domain.com:123)
+    m_server = re.search(r'^([\w\.]+)(:\d+)?', server)
+    port = m_server.group(2)
+    if port:
+        port = dict(port=int(port.replace(':', '')))
+
+    else:
+        port = {}
         
-    s = smtplib.SMTP(server)
+    SMTP_ = smtplib.SMTP
+    if ssl:
+        smtplib.SMTP_SSL
+        
+    s = SMTP_(m_server.group(1), **port)
     try:
         s.set_debuglevel(False)
         
