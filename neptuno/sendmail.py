@@ -10,7 +10,7 @@ import re
 import smtplib
 
 def send_mail(from_, to_, subject, message, server, login, password, files=[], 
-              html='', cc=[], bcc=[], charset='utf-8', ssl=False):
+              html='', cc=[], bcc=[], reply_to=None, charset='utf-8', ssl=False):
     """
     IN
       from_          (<e-mail address>, <name>)
@@ -25,6 +25,7 @@ def send_mail(from_, to_, subject, message, server, login, password, files=[],
       html           <str>        (optional)
       cc             [(<e-mail address>, <name>), ...]
       bcc            [(<e-mail address>, <name>), ...]
+      reply_to       <str> => None
       charset        <str> => utf-8
       ssl            <bool> => False
       
@@ -83,8 +84,7 @@ def send_mail(from_, to_, subject, message, server, login, password, files=[],
                 
             part.set_payload(f.read())
             Encoders.encode_base64(part)
-            part.add_header('Content-Disposition', 
-                            'attachment; filename="%s"' % f_name)
+            part.add_header('Content-Disposition', 'attachment; filename="%s"' % f_name)
             msg.attach(part)
             
     msg['Subject'] = Header(subject, charset)
@@ -92,11 +92,14 @@ def send_mail(from_, to_, subject, message, server, login, password, files=[],
     
     nombres = ['%s <%s>' % (dst[1], dst[0]) for dst in to_]
     msg['To'] = ';'.join(nombres)
-    
     msg['Cc'] = ';'.join(['%s <%s>' % (dst[1], dst[0]) for dst in cc])
     
+    # reply-to
+    if reply_to:
+        msg.add_header('Reply-to', reply_to)
+    
     # identify the port in given host (smtp.domain.com:123)
-    m_server = re.search(r'^([\w\.]+)(:\d+)?', server)
+    m_server = re.search(r'^([\w\-\.]+)(:\d+)?', server)
     port = m_server.group(2)
     if port:
         port = dict(port=int(port.replace(':', '')))
