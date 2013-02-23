@@ -324,7 +324,16 @@ class DataSet(object):
     def _formatdt(self, fmt, value):
 
         if isinstance(fmt, (str, unicode,)):
-            s = unicode(value.strftime(fmt))
+            if value >= datetime.date(1900, 1, 1):
+                s = unicode(value.strftime(fmt))
+                
+            else:
+                def _strftime(d, fmt):
+                    return fmt.replace('%d', '%.2d' % d.day).\
+                        replace('%m', '%.2d' % d.month).\
+                        replace('%Y', '%.4d' % d.year)
+                        
+                s = unicode(_strftime(value, fmt))
             
         elif hasattr(fmt, '__call__'):
             s = unicode(fmt(value))
