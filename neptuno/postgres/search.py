@@ -136,6 +136,7 @@ class Busqueda(object):
             q = int(m.group(4) or 0)
             t = m.group(5) or _CONSTANT_DAY
             
+            r = None
             if cons == _CONSTANT_DATE_TODAY:
                 r = dt.date.today()
             
@@ -163,52 +164,56 @@ class Busqueda(object):
             elif cons == _CONSTANT_DATE_END_YEAR:
                 today = dt.date.today()
                 r = dt.date(today.year, 12, 31)
-                
-            if s and q:
-                if t == _CONSTANT_DAY:
-                    if s == '-':
-                        n = -q
-                    else:
-                        n = q
+            
+            if r:    
+                if s and q:
+                    if t == _CONSTANT_DAY:
+                        if s == '-':
+                            n = -q
+                        else:
+                            n = q
+                        
+                        r = r + dt.timedelta(days=n)
+                            
+                    elif t == _CONSTANT_WEEK:
+                        if s == '-':
+                            n = -q*7
+                        else:
+                            n = q*7
+                        
+                        r = r + dt.timedelta(days=n)
                     
-                    r = r + dt.timedelta(days=n)
+                    elif t == _CONSTANT_MONTH:
                         
-                elif t == _CONSTANT_WEEK:
-                    if s == '-':
-                        n = -q*7
-                    else:
-                        n = q*7
-                    
-                    r = r + dt.timedelta(days=n)
-                
-                elif t == _CONSTANT_MONTH:
-                    
-                    r_ = r
-                    
-                    if s == '-':
-                        n = -1
-                    else:
-                        n = +1
+                        r_ = r
                         
-                    i = 0
-                    while abs(i) != q:
-                        next_month = r_ + dt.timedelta(days=30*n)
-                        r_ = dt.date(next_month.year, next_month.month, r.day)
+                        if s == '-':
+                            n = -1
+                        else:
+                            n = +1
+                            
+                        i = 0
+                        while abs(i) != q:
+                            next_month = r_ + dt.timedelta(days=30*n)
+                            r_ = dt.date(next_month.year, next_month.month, r.day)
+                            
+                            i += n
+                            
+                        r = r_
+                            
+                    elif t == _CONSTANT_YEAR:
+                        if s == '-':
+                            n = -q
+                            
+                        else:
+                            n = +q
+                            
+                        r = dt.date(r.year + n, r.month, r.day)
                         
-                        i += n
-                        
-                    r = r_
-                        
-                elif t == _CONSTANT_YEAR:
-                    if s == '-':
-                        n = -q
-                        
-                    else:
-                        n = +q
-                        
-                    r = dt.date(r.year + n, r.month, r.day)
-                    
-            return r.strftime('%Y-%m-%d')
+                return r.strftime('%Y-%m-%d')
+            
+            else:
+                return m.group(0)
         
         return re.sub(r'\{\s*(\w+)(\s+([\+\-])\s*(\d+)\s*(\w{0,1}))?\s*\}', _sub, termino)
     

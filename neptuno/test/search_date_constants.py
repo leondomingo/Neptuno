@@ -23,7 +23,7 @@ if __name__ == '__main__':
     meta = sa.MetaData(bind=conn.engine)
     s = Search(dbs, '_view_alumnos_en_grupos')
     
-    s.apply_qry('fechaf > {today}')
+    s.apply_qry('fechai < 1/1/2013, fechaf > {today + 1}')
     print s.sql
     
     ds = s(rp=5)
