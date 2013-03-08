@@ -6,6 +6,19 @@ from sqlalchemy.sql.expression import and_, Select, or_, alias
 from sqlalchemy.types import DATE, TIME, DATETIME, INTEGER, NUMERIC, BOOLEAN, \
     BIGINT
 import re
+import datetime as dt
+
+_CONSTANT_DATE_TODAY       = 'today'
+_CONSTANT_DATE_START_WEEK  = 'start_week'
+_CONSTANT_DATE_END_WEEK    = 'end_week'
+_CONSTANT_DATE_START_MONTH = 'start_month'
+_CONSTANT_DATE_END_MONTH   = 'end_month'
+_CONSTANT_DATE_START_YEAR  = 'start_year'
+_CONSTANT_DATE_END_YEAR    = 'end_year'
+_CONSTANT_DAY              = 'd'
+_CONSTANT_WEEK             = 'w'
+_CONSTANT_MONTH            = 'm'
+_CONSTANT_YEAR             = 'y'
 
 class Busqueda(object):
     
@@ -114,10 +127,94 @@ class Busqueda(object):
             
             else:
                 return None
+            
+    def process_date_constants(self, termino):
+        
+        def _sub(m):
+            cons = m.group(1)
+            s = m.group(3)
+            q = int(m.group(4) or 0)
+            t = m.group(5) or _CONSTANT_DAY
+            
+            if cons == _CONSTANT_DATE_TODAY:
+                r = dt.date.today()
+            
+            elif cons == _CONSTANT_DATE_START_WEEK:
+                wd = dt.date.today().weekday()
+                r = dt.date.today() - dt.timedelta(days=wd)
+            
+            elif cons == _CONSTANT_DATE_END_WEEK:
+                wd = 6 - dt.date.today().weekday()
+                r = dt.date.today() + dt.timedelta(days=wd)
+            
+            elif cons == _CONSTANT_DATE_START_MONTH:
+                today = dt.date.today()
+                r = dt.date(today.year, today.month, 1)
+            
+            elif cons == _CONSTANT_DATE_END_MONTH:
+                today = dt.date.today()
+                next_month = today + dt.timedelta(days=30)
+                r = dt.date(next_month.year, next_month.month, 1) - dt.timedelta(days=1)
+            
+            elif cons == _CONSTANT_DATE_START_YEAR:
+                today = dt.date.today()
+                r = dt.date(today.year, 1, 1)
+            
+            elif cons == _CONSTANT_DATE_END_YEAR:
+                today = dt.date.today()
+                r = dt.date(today.year, 12, 31)
+                
+            if s and q:
+                if t == _CONSTANT_DAY:
+                    if s == '-':
+                        n = -q
+                    else:
+                        n = q
+                    
+                    r = r + dt.timedelta(days=n)
+                        
+                elif t == _CONSTANT_WEEK:
+                    if s == '-':
+                        n = -q*7
+                    else:
+                        n = q*7
+                    
+                    r = r + dt.timedelta(days=n)
+                
+                elif t == _CONSTANT_MONTH:
+                    
+                    r_ = r
+                    
+                    if s == '-':
+                        n = -1
+                    else:
+                        n = +1
+                        
+                    i = 0
+                    while abs(i) != q:
+                        next_month = r_ + dt.timedelta(days=30*n)
+                        r_ = dt.date(next_month.year, next_month.month, r.day)
+                        
+                        i += n
+                        
+                    r = r_
+                        
+                elif t == _CONSTANT_YEAR:
+                    if s == '-':
+                        n = -q
+                        
+                    else:
+                        n = +q
+                        
+                    r = dt.date(r.year + n, r.month, r.day)
+                    
+            return r.strftime('%Y-%m-%d')
+        
+        return re.sub(r'\{\s*(\w+)(\s+([\+\-])\s*(\d+)\s*(\w{0,1}))?\s*\}', _sub, termino)
     
     def busqueda_campos(self, busqueda):
         
-        terminos = busqueda.split(',')
+        terminos = self.process_date_constants(busqueda).split(',')
         
         resultado = None
         sql = []
@@ -232,7 +329,7 @@ class Busqueda(object):
                         if isinstance(col.type, DATE) or \
                         isinstance(col.type, TIME) or \
                         isinstance(col.type, DATETIME):
-
+                        
                             # convert to date
                             if self.strtodatef:
                                 try:
@@ -359,7 +456,6 @@ class Busqueda(object):
                     else:
                         sql.append('(' + ' AND\n'.join(expresiones) + ')')
                             
-#        print 'SQL=' + '\n'.join(sql)
         if len(sql) > 0:
             resultado = ' AND\n'.join(sql).decode('utf-8')
         

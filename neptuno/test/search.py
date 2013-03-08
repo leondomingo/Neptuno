@@ -9,7 +9,7 @@ import sqlalchemy as sa
 
 if __name__ == '__main__':
     
-    cfg = {CONF_DB: 'ihmadrid',
+    cfg = {CONF_DB: 'ihmadrid__11722',
            CONF_HOST: 'localhost',
            CONF_USER: 'postgres',
            CONF_PASSW: '5390post'}
