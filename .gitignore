@@ -7,3 +7,5 @@ config.py
 Neptuno2.egg-info/
 dist/
 build/
+*.sublime-project
+*.sublime-workspace
