@@ -7,7 +7,7 @@ from neptuno.util import default_fmt_float
 from neptuno.xlsreport import XLSReport
 from sqlalchemy.types import INTEGER, NUMERIC, DATE, TIME, BOOLEAN, BIGINT, \
     DATETIME
-import datetime
+import datetime as dt
 import re
 import sys
 
@@ -324,7 +324,7 @@ class DataSet(object):
     def _formatdt(self, fmt, value):
 
         if isinstance(fmt, (str, unicode,)):
-            if value >= datetime.date(1900, 1, 1):
+            if isinstance(value, (dt.date, dt.datetime,)) and value >= dt.date(1900, 1, 1) or isinstance(value, dt.time):
                 s = unicode(value.strftime(fmt))
                 
             else:
@@ -423,16 +423,16 @@ class DataSet(object):
                     linea += self._format(self.int_fmt, dato[c])[:w].rjust(w)
 
                 # datetime
-                elif isinstance(dato[c], datetime.datetime):
+                elif isinstance(dato[c], dt.datetime):
                     #linea += unicode(dato[c].strftime('%s %s' % (self.date_fmt, self.time_fmt)))[:w].rjust(w)
                     linea += unicode(self._formatdt(self.datetime_fmt, dato[c]))[:w].rjust(w)
 
                 # date
-                elif isinstance(dato[c], datetime.date):
+                elif isinstance(dato[c], dt.date):
                     linea += unicode(self._formatdt(self.date_fmt, dato[c]))[:w].rjust(w)
 
                 # time
-                elif isinstance(dato[c], datetime.time):
+                elif isinstance(dato[c], dt.time):
                     #linea += unicode(dato[c].strftime(self.time_fmt))[:w].rjust(w)
                     linea += unicode(self._formatdt(self.time_fmt, dato[c]))[:w].rjust(w)
 
@@ -473,15 +473,15 @@ class DataSet(object):
             for item in row:
                 
                 # date
-                if isinstance(item, datetime.date):
+                if isinstance(item, dt.date):
                     dato.append(self._formatdt(self.date_fmt, item))
                     
                 # time
-                elif isinstance(item, datetime.time):
+                elif isinstance(item, dt.time):
                     dato.append(self._formatdt(self.time_fmt, item))
                 
                 # datetime
-                elif isinstance(item, datetime.datetime):
+                elif isinstance(item, dt.datetime):
                     dato.append(self._formatdt(self.datetime_fmt, item))
                     
                 # float, Decimal
