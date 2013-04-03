@@ -324,7 +324,11 @@ class DataSet(object):
     def _formatdt(self, fmt, value):
 
         if isinstance(fmt, (str, unicode,)):
-            if isinstance(value, (dt.date, dt.datetime,)) and value >= dt.date(1900, 1, 1) or isinstance(value, dt.time):
+            print type(value), fmt
+
+            if dt.date == type(value) and value >= dt.date(1900, 1, 1) or \
+            dt.datetime == type(value) and value >= dt.datetime(1900, 1, 1) or \
+            isinstance(value, dt.time):
                 s = unicode(value.strftime(fmt))
                 
             else:
@@ -332,7 +336,12 @@ class DataSet(object):
                     return fmt.replace('%d', '%.2d' % d.day).\
                         replace('%m', '%.2d' % d.month).\
                         replace('%Y', '%.4d' % d.year)
-                        
+
+                    if isinstance(d, (dt.datetime, dt.time)):
+                        return fmt.replace('%H', '%.2d' % d.hour).\
+                            replace('%M', '%.2d' % d.minute).\
+                            replace('%S', '%.2d' % d.second)
+
                 s = unicode(_strftime(value, fmt))
             
         elif hasattr(fmt, '__call__'):
