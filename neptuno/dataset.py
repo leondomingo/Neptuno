@@ -324,7 +324,6 @@ class DataSet(object):
     def _formatdt(self, fmt, value):
 
         if isinstance(fmt, (str, unicode,)):
-            print type(value), fmt
 
             if dt.date == type(value) and value >= dt.date(1900, 1, 1) or \
             dt.datetime == type(value) and value >= dt.datetime(1900, 1, 1) or \
