@@ -770,17 +770,22 @@ class Search(object):
         
         sql = self.sql
         if collection:
-            
+
             child_table_name = collection[0]
             child_attr = collection[1]
             parent_id = collection[2]
-            
-            child_table = alias(Table(child_table_name, self.meta, autoload=True))
-            
-            self.from_ = self.from_.\
-                join(child_table,
-                     and_(child_table.c.id == self.tbl.c.id,
-                          child_table.c[child_attr] == parent_id))
+
+            child_attr_alias = '%s$' % child_attr
+            if self.tbl.c.has_key(child_attr_alias):
+                sql = and_(sql, self.tbl.c[child_attr_alias] == parent_id)
+
+            else:
+                child_table = alias(Table(child_table_name, self.meta, autoload=True))
+                
+                self.from_ = self.from_.\
+                    join(child_table,
+                         and_(child_table.c.id == self.tbl.c.id,
+                              child_table.c[child_attr] == parent_id))
             
         # where
         if isinstance(self.tbl, Select):
