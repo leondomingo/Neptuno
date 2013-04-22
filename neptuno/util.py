@@ -322,7 +322,7 @@ def inicio_fin_semana(d):
     return (inicio, fin,)
     
 def format_float(value, thousands_sep=',', decimal_sep='.', 
-                 show_sign=False, n_dec=2):
+                 show_sign=False, n_dec=2, format=None):
     """
     IN
       value          <float> / <str>
@@ -330,6 +330,7 @@ def format_float(value, thousands_sep=',', decimal_sep='.',
       decimal_sep    <str>  (opcional => '.')
       show_sign      <bool> (opcional => False)
       n_dec          <int>  (opcional => 2)
+      format         <str>  (opcional => None)
       
     OUT
       <str>
@@ -338,6 +339,19 @@ def format_float(value, thousands_sep=',', decimal_sep='.',
       +x,xxx.xx
       -x,xxx.xx      
     """
+
+    if format:
+        #  9,999.00  (thousands_sep="," decimal_sep=".", n_dec=2)
+        #  9.999,00  (thousands_sep="." decimal_sep=",", n_dec=2)
+        #  9,999.000 (thousands_sep="," decimal_sep=".", n_dec=3)
+        # +9.999,00  (thousands_sep="." decimal_sep=",", n_dec=2, show_sign=True)
+        #   9999.00  (thousands_sep="", decimal_sep=".", n_dec=2)
+        m_format = re.search(r'^(\+)?[1-9](\.|,)?[1-9]{3}(\.|,)(0*)$', format)
+        if m_format:
+            show_sign = m_format.group(1) is not None
+            thousands_sep = m_format.group(2) or ''
+            decimal_sep = m_format.group(3) or ''
+            n_dec = len(m_format.group(4))
     
     fmt = '%%+%d.%df' % (n_dec, n_dec)
     
