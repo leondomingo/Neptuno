@@ -8,15 +8,17 @@ from sqlalchemy import MetaData, Table
 
 if __name__ == '__main__':
     
-    cfg = {CONF_DB: 'mqc_dev',
-           CONF_HOST: 'localhost',
+    cfg = {CONF_DB: 'ihmadrid__20130419',
+           CONF_HOST: 'localhost:5433',
            CONF_USER: 'postgres',
            CONF_PASSW: '5390post'}
     
     conn = Conexion(config=cfg)
     
     meta = MetaData(bind=conn.engine)
-    series = Table('series_de_numeracion', meta, autoload=True)
+    series = Table('sum_view', meta, autoload=True)
     
     ds = DataSet.procesar_resultado(conn.session, series.select())
-    print ds
+    data = ds.to_data()
+    for row in data:
+        print row
