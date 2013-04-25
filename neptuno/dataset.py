@@ -479,7 +479,7 @@ class DataSet(object):
         for row in self.data:
             dato = []
             for item in row:
-                
+
                 # date
                 if isinstance(item, dt.date):
                     dato.append(self._formatdt(self.date_fmt, item))
@@ -501,7 +501,7 @@ class DataSet(object):
                     dato.append(self.true_const if item else self.false_const)
                     
                 # int, long
-                elif isinstance(item, int):
+                elif isinstance(item, (int, long,)):
                     dato.append(self._format(self.int_fmt, item))
                 
                 # unicode
