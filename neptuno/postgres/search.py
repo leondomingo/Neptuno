@@ -129,7 +129,7 @@ class Busqueda(object):
                 return None
             
     def process_date_constants(self, termino):
-        
+
         def _sub(m):
             cons = m.group(1)
             s = m.group(3)
@@ -191,11 +191,37 @@ class Busqueda(object):
                             n = -1
                         else:
                             n = +1
+
+                        def _next_month(d, inc):
+                            year = d.year
+                            if inc > 0:
+                                if d.month < 12:
+                                    month = d.month + inc
+
+                                elif d.month == 12:
+                                    month = 1
+                                    year += 1
+                            else:
+                                if d.month > 1:
+                                    month = d.month + inc
+
+                                else:
+                                    month = 12
+                                    year -= 1
+
+                            return dt.date(year, month, 1)
                             
                         i = 0
                         while abs(i) != q:
-                            next_month = r_ + dt.timedelta(days=30*n)
-                            r_ = dt.date(next_month.year, next_month.month, r.day)
+                            next_month = _next_month(r_, n)
+
+                            if cons == _CONSTANT_DATE_END_MONTH:
+                                day = (_next_month(next_month, 1) - dt.timedelta(days=1)).day
+
+                            else:
+                                day = r.day
+
+                            r_ = dt.date(next_month.year, next_month.month, day)
                             
                             i += n
                             
