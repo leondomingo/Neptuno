@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from neptuno.dataset import DataSet
+from neptuno.util import strtotime
 from sqlalchemy import Table, MetaData, select, exists
 from sqlalchemy.sql.expression import and_, Select, or_, alias
-from sqlalchemy.types import DATE, TIME, DATETIME, INTEGER, NUMERIC, BOOLEAN, \
-    BIGINT
+from sqlalchemy.types import DATE, TIME, DATETIME, INTEGER, NUMERIC, BOOLEAN, BIGINT
 import re
 import datetime as dt
 
@@ -24,7 +24,12 @@ class Busqueda(object):
     
     def __init__(self, tabla, texto_busqueda, columnas_trans=None, strtodatef=None):
         self.tabla = tabla
-        self.cols = [col.name for col in self.tabla.columns]
+        self.cols = []
+        self.types = []
+        for col in self.tabla.columns:
+            self.cols.append(col.name)
+            self.types.append(col.type)
+
         self.cache_campo = {}
         
         # string to date conversion function
@@ -244,7 +249,7 @@ class Busqueda(object):
         return re.sub(r'\{\s*(\w+)(\s+([\+\-])\s*(\d+)\s*(\w{0,1}))?\s*\}', _sub, termino)
     
     def busqueda_campos(self, busqueda):
-        
+
         terminos = self.process_date_constants(busqueda).split(',')
         
         resultado = None
@@ -355,18 +360,16 @@ class Busqueda(object):
 
                     for termino2 in terminos2:
                         termino2 = self.sin_acentos(termino2)
-                        
+
                         # fecha, hora o fecha-hora
                         if isinstance(col.type, DATE) or \
                         isinstance(col.type, TIME) or \
                         isinstance(col.type, DATETIME):
-                        
+
                             # convert to date
                             if self.strtodatef:
                                 try:
                                     termino2 = self.strtodatef(termino2).strftime('%Y-%m-%d')
-                                    #print termino2
-                                    
                                 except:
                                     pass
                         
@@ -432,7 +435,7 @@ class Busqueda(object):
                         
                     # explícitos ("---")
                     for exp in explicitos:
-                        
+
                         if not (isinstance(col.type, DATE) or 
                                 isinstance(col.type, TIME) or
                                 isinstance(col.type, DATETIME)):
@@ -452,8 +455,6 @@ class Busqueda(object):
                             if self.strtodatef:
                                 try:
                                     termino2 = self.strtodatef(termino2).strftime('%Y-%m-%d')
-                                    #print termino2
-
                                 except:
                                     pass
 
@@ -494,91 +495,112 @@ class Busqueda(object):
                 
     def condicion_busqueda(self, busqueda):
         
-        if '*' in busqueda:
-            sql = None
+        filtros = [f.replace("'", "''").strip() for f in busqueda.decode('utf-8').split(',')]
         
-        else:            
-            filtros = [f.replace("'", "''").strip() 
-                       for f in busqueda.decode('utf-8').split(',')]
-            
-            sql = None
-            sql_filtros = []
-            for filtro in filtros:
+        sql = None
+        sql_filtros = []
+        for filtro in filtros:
+
+            m = re.search(r'^([^"]*)(<>|<=|>=|==|=|<|>|#|!|\+|-)(.+)', filtro)  
+            if m:
+                sql_filtro = self.busqueda_campos(filtro)
                 
-                m = re.search(r'^([^"]*)(<>|<=|>=|==|=|<|>|#|!|\+|-)(.+)', filtro)  
-                if m:
-                    sql_filtro = self.busqueda_campos(filtro)
-                    
-                else:
-                    sql_termino = []
-                    
-                    explicitos = re.findall(r'"([^"]+)"', filtro, re.I)
-                    
-                    filtro = re.sub(r'"[^"]+"', '', filtro, re.I | re.U)
-                    
-                    # quitar caracteres especiales
-                    filtro = filtro.\
-                        replace(u'(', u' ').replace(u')', u' ').\
-                        replace(u'?', u' ').replace(u'¿', u' ').\
-                        replace(u'@', u' ')
-                    
-                    terminos_de_busqueda = filtro.split()                    
-                    
-                    for termino in terminos_de_busqueda:
-                                                
-                        termino = self.sin_acentos(termino.encode('utf-8'))
+            else:
+                sql_termino = []
+                
+                explicitos = re.findall(r'"([^"]+)"', filtro, re.I)
+                
+                filtro = re.sub(r'"[^"]+"', '', filtro, re.I | re.U)
+                
+                # remove special characters
+                filtro = filtro.\
+                    replace(u'(', u' ').replace(u')', u' ').\
+                    replace(u'?', u' ').replace(u'¿', u' ').\
+                    replace(u'@', u' ')
+                
+                search_items = filtro.split()
+                
+                for item in search_items:
+
+                    # is_date
+                    is_date = False
+                    item_date = None
+                    if self.strtodatef:
+                        item_date = self.strtodatef(item)
+                        if item_date is not None:
+                            item_date = item_date.strftime('%Y-%m-%d')
+                            is_date = True
+
+                    # is_time
+                    is_time = False
+                    try:
+                        item_time = strtotime(item)
+                        if item_time is not None:
+                            is_time = True
+                    except:
+                        pass
+
+                    if item.strip():
+                        sql_campo = []
                         
-                        if termino.strip():
-                            sql_campo = []
-                            
-                            for columna in self.cols:
-                                if columna != 'id' and columna[0:3] != 'id_':
+                        for col_name, tipo in zip(self.cols, self.types):
+
+                            col_name = col_name.encode('utf-8')
+
+                            # DATE
+                            if isinstance(tipo, DATE) and is_date:
+                                sql_campo.append('"%s" IS NOT NULL AND "%s" = \'%s\'' % (col_name, col_name, item_date))
+
+                            # TIME
+                            elif isinstance(tipo, TIME) and is_time:
+                                sql_campo.append('"%s" IS NOT NULL AND "%s" = \'%s\'' % (col_name, col_name, item_time))                                
+
+                            # rest of types
+                            else:
+                                if col_name != 'id' and not col_name.startswith('id_') and not col_name.startswith('_') and not is_date and not is_time:
                                     try:
-                                        texto = '(CAST("%s" as Text) <> \'\' AND ' % columna.encode('utf-8')
-                                        texto += "UPPER(CAST(\"%s\" as Text)) SIMILAR TO UPPER('%%%s%%'))" % \
-                                            (columna.encode('utf-8'), termino)
-                                        
+                                        args_ = (col_name, col_name, self.sin_acentos(item.encode('utf-8')),)
+                                        texto  = "(CAST(\"%s\" as Text) <> '' AND UPPER(CAST(\"%s\" as Text)) SIMILAR TO UPPER('%%%s%%'))" % args_
                                         sql_campo.append(texto)
+
                                     except:
-                                        raise #return termino
-                                
-                            texto_sql_campo = ' OR\n'.join(sql_campo)
-                            texto_sql_campo = ' (' + texto_sql_campo + ')'
+                                        pass
                             
-                            sql_termino.append(texto_sql_campo)
-                    
-                    # explícitos ("---")        
-                    for exp in explicitos:
+                        texto_sql_campo = ' OR\n'.join(sql_campo)
+                        texto_sql_campo = ' (' + texto_sql_campo + ')'
                         
-                        termino = exp.encode('utf-8')
+                        sql_termino.append(texto_sql_campo)
+                
+                # explícitos ("---")        
+                for exp in explicitos:
+                    
+                    item = exp.encode('utf-8')
+                    
+                    if item.strip():
+                        sql_campo = []
                         
-                        if termino.strip():
-                            sql_campo = []
+                        for col_name in self.cols:
+                            if col_name != 'id' and not col_name.startswith('id_') and not col_name.startswith('_'):
+                                try:
+                                    texto = "(CAST(\"%s\" as Text) <> '' AND UPPER(CAST(\"%s\" as Text)) LIKE UPPER('%%%s%%'))" % (col_name, col_name, item)
+                                    sql_campo.append(texto)
+
+                                except:
+                                    raise
                             
-                            for columna in self.cols:
-                                if columna != 'id' and columna != 'busqueda' and columna[0:3] != 'id_':
-                                    try:
-                                        texto = '(CAST("%s" as Text) <> \'\' AND ' % columna.encode('utf-8')
-                                        texto += "UPPER(CAST(\"%s\" as Text)) LIKE UPPER('%%%s%%'))" % \
-                                            (columna.encode('utf-8'), termino)
-                                        
-                                        sql_campo.append(texto)
-                                    except:
-                                        raise #return termino
-                                
-                            texto_sql_campo = ' OR\n'.join(sql_campo)
-                            texto_sql_campo = ' (' + texto_sql_campo + ')'
-                            
-                            sql_termino.append(texto_sql_campo)
-                            
-                    sql_filtro = ' AND\n'.join(sql_termino)
-                    sql_filtro = sql_filtro.decode('utf-8')
-                    
-                if sql_filtro:
-                    sql_filtros.append(sql_filtro)
-                    
-            if sql_filtros:
-                sql = ' AND\n'.join(sql_filtros)
+                        texto_sql_campo = ' OR\n'.join(sql_campo)
+                        texto_sql_campo = ' (' + texto_sql_campo + ')'
+                        
+                        sql_termino.append(texto_sql_campo)
+                        
+                sql_filtro = ' AND\n'.join(sql_termino)
+                sql_filtro = sql_filtro.decode('utf-8')
+                
+            if sql_filtro:
+                sql_filtros.append(sql_filtro)
+                
+        if sql_filtros:
+            sql = ' AND\n'.join(sql_filtros)
         
         return sql
 
@@ -713,7 +735,9 @@ class Search(object):
     def apply_qry(self, q):
         
         if q:
-            
+            if isinstance(q, unicode):
+                q = q.encode('utf-8')
+
             # process "q"
             qres = Busqueda(self.tbl, q, strtodatef=self.strtodatef)
             
