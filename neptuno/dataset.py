@@ -11,11 +11,11 @@ import datetime as dt
 import re
 import sys
 
-COLUMNAS = 'columnas'
-COUNT = 'count'
+COLUMNAS          = 'columnas'
+COUNT             = 'count'
 LIMITE_RESULTADOS = 'limite_resultados'
-DATOS = 'datos'
-TOTALES = 'totales'
+DATOS             = 'datos'
+TOTALES           = 'totales'
 
 def tocsv(e):
     def _tocsv(func):

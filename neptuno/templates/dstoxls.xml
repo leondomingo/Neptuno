@@ -17,6 +17,8 @@
             <!--{% set type_ = ds.types[loop.index0] %}
             {% if type_ == 'float' %}
                 {% set type = 'float;%s'|format(fmt.float or '#,##0.00') %}
+            {% elif type_ == 'int' %}
+                {% set type = 'int' %}
             {% elif type_ == 'date' %}
                 {% set type = 'date;%s'|format(fmt.date or "mm/dd/yyyy") %}
             {% elif type_ == 'time' %}
